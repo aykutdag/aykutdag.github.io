@@ -132,9 +132,10 @@
       const li = el("li", "node-item");
       const btn = el("button", "node");
       btn.type = "button";
-      btn.innerHTML = '<span class="mark">' + glyphSVG(p.glyph) + '</span><span class="label"><span class="no"></span><span class="title"></span><span class="meta"></span></span>';
+      btn.innerHTML = '<span class="mark">' + glyphSVG(p.glyph) + '</span><span class="label"><span class="no"></span><span class="title"></span><span class="short"></span><span class="meta"></span></span>';
       btn.querySelector(".no").textContent = p.no;
       btn.querySelector(".title").textContent = p.title;
+      btn.querySelector(".short").textContent = p.short || p.title;
       btn.querySelector(".meta").textContent = p.meta;
       btn.addEventListener("mouseenter", () => hoverOnProject(p.index));
       btn.addEventListener("focus", () => hoverOnProject(p.index));
@@ -223,12 +224,54 @@
           p.fx = p.x;
           p.fy = p.y;
         }
-        nodeEls[p.index].li.classList.toggle("flip", tall ? p.fx > 0.5 : !short && p.fx > 0.72);
       });
     });
     // short screens: a node's label may use its column's width
     document.documentElement.style.setProperty("--col-w", Math.round(innerWidth * 0.22 - 56) + "px");
+    groups.forEach(g => placeLabels(g, tall, short));
     placeNodes();
+  }
+
+  // Labels must never cover each other, a node or the header and footer. For each node (at
+  // its final position) try the preferred side first, then the other side, then the same
+  // sides nudged up or down, and keep the first spot that is free and on screen.
+  function placeLabels(g, tall, short) {
+    const W = innerWidth, H = innerHeight;
+    const hit = (a, b) => a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b;
+    const taken = [...document.querySelectorAll(".name, .role, .tags, .group-nav, .nav, #foot-agents, .hint")]
+      .map(e => e.getBoundingClientRect())
+      .filter(r => r.width > 0 && r.height > 0)
+      .map(r => ({ l: r.left - 4, r: r.right + 4, t: r.top - 4, b: r.bottom + 4 }));
+    g.items.forEach(p => {
+      const x = p.fx * W, y = p.fy * H;
+      taken.push({ l: x - 20, r: x + 20, t: y - 20, b: y + 20 });
+    });
+    g.items.forEach(p => {
+      const li = nodeEls[p.index].li, lab = li.querySelector(".label");
+      const w = lab.offsetWidth, h = lab.offsetHeight;
+      const x = p.fx * W, y = p.fy * H, gap = 32; // .label sits 50px from the 36px node's edge
+      const prefer = tall ? (p.fx > 0.5 ? "left" : "right") : short ? "right" : (p.fx > 0.72 ? "left" : "right");
+      const sides = tall || short ? [prefer] : [prefer, prefer === "right" ? "left" : "right"];
+      const rectFor = (side, dy) => {
+        const l = side === "right" ? x + gap : x - gap - w;
+        return { l, r: l + w, t: y - h / 2 + dy, b: y + h / 2 + dy };
+      };
+      let best = null;
+      for (const dy of [0, -0.6 * h, 0.6 * h, -1.2 * h, 1.2 * h]) {
+        for (const side of sides) {
+          const r = rectFor(side, dy);
+          if (r.l < 6 || r.r > W - 6 || r.t < 6 || r.b > H - 6) continue;
+          if (taken.some(o => hit(r, o))) continue;
+          best = { side, dy, r };
+          break;
+        }
+        if (best) break;
+      }
+      if (!best) best = { side: sides[0], dy: 0, r: rectFor(sides[0], 0) }; // no free spot: keep the default
+      taken.push(best.r);
+      li.classList.toggle("flip", best.side === "left");
+      lab.style.setProperty("--dy", Math.round(best.dy) + "px");
+    });
   }
   layout();
   // The header's height (and so the tall layout) settles once the web fonts arrive.

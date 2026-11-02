@@ -3,7 +3,7 @@
 // Project x / y place the node once its colony is open.
 // Practice texts and credits follow Aykut_Dag_Portfolio.pdf; installations follow
 // AykutDag_MediaPortfolio.pdf. credits: [label, value] rows of the project's credit block.
-// text: paragraphs. duties: responsibilities. video: YouTube id. links: [{ label, href, icon }].
+// short: the node label on phones. text: paragraphs. duties: responsibilities. video: YouTube id. links: [{ label, href, icon }].
 window.GROUPS = [
   { id: "practice", label: "Practice", note: "Architecture offices", x: 0.30, y: 0.56 },
   { id: "research", label: "Research", note: "Academic work", x: 0.70, y: 0.32 },
@@ -15,6 +15,7 @@ window.PROJECTS = [
   {
     group: "practice", glyph: "sejong",
     title: "SPARK | II. Sejong Cultural Center for Performing Arts",
+    short: "SPARK",
     meta: "Seoul · 2023–2025 · Shortlisted finalist",
     text: [
       "The urban design approach for THE SPARK, the 2nd Sejong Center for Performing Arts, is focused on creating a cultural complex that becomes a landmark in the heart of the city, blending nature and culture into a harmonious space for the community. Located at the corner of Yeouido Park, surrounded by the Han River on the north-east side and connecting waterside public activities towards the south-west, THE SPARK aims to preserve the existing ecosystem while providing an area for urban cultural events next to Seoul’s international financial center."
@@ -42,6 +43,7 @@ window.PROJECTS = [
   {
     group: "practice", glyph: "libreville",
     title: "Libreville Arena & Convention Centre",
+    short: "Libreville Arena",
     meta: "Libreville · 2024 · Commission",
     text: [
       "The Libreville Arena & Convention Centre, located within the Champ Triomphal Masterplan in Libreville, Gabon, aims to establish a mixed-use center that serves as a catalyst for advancing and promoting Gabon as a major attraction in Central Africa.",
@@ -68,6 +70,7 @@ window.PROJECTS = [
   {
     group: "practice", glyph: "banpo",
     title: "THE FLUX | Banpo Cultural Connection Park",
+    short: "THE FLUX",
     meta: "Seoul · 2024 · Competition entry",
     text: [
       "The urban design vision for THE FLUX, the Banpo-Hangang River Connection Park and Cultural Facilities, revolves around crafting an elevated Cultural Park that stands out as a landmark in the city center. This park seamlessly integrates nature, culture, and urban life to form a cohesive space for the community.",
@@ -94,6 +97,7 @@ window.PROJECTS = [
   {
     group: "practice", glyph: "node",
     title: "THE NODE | Archeopark",
+    short: "THE NODE",
     meta: "Incheon · 2023 · Competition entry",
     text: [
       "Our spatial response to the design for Incheon Geomdan Museum Library Cultural Complex (IGMLCC) aims to create a cultural complex for the visitors and public where history and nature are the main subjects of THE NODE Archeopark.",
@@ -120,6 +124,7 @@ window.PROJECTS = [
   {
     group: "practice", glyph: "nefbaku",
     title: "NEF BAKU Residence",
+    short: "NEF Baku",
     meta: "Baku · 2022 · Commission",
     text: [
       "The proposed 18-storey NEF BAKU Residence, located in the rapidly evolving Baku Absheron district, is designed to reflect the distinctive character of its neighborhood while establishing harmony with its architectural presence across the entire district. This 75-meter-high residence tower aims to provide a vibrant addition to the district.",
@@ -145,6 +150,7 @@ window.PROJECTS = [
   {
     group: "practice", glyph: "viridia",
     title: "Viridia Hotel Building",
+    short: "Viridia Hotel",
     meta: "Kavaja · 2025 · Commission",
     text: [
       "Located in a dynamic urban setting, this residential tower seamlessly integrates city life with nature, drawing inspiration from the Balkan Green Lizard (Lacerta trilineata). Known for its adaptability and vibrant presence in the region’s landscapes, the lizard embodies the harmony between movement and environment—qualities reflected in the building’s design.",
@@ -168,6 +174,7 @@ window.PROJECTS = [
   {
     group: "practice", glyph: "birdscape",
     title: "COA Hills Birdscape",
+    short: "COA Birdscape",
     meta: "Sakarya · 2024 · Research project",
     text: [
       "The Birdscape project, part of the COA HILLS landscape design, is an experimental initiative aimed at encompassing all living beings. It offers a unique experience through birdhouses and the created landscape units. This project’s experimental nature and its connection to informatics involve a process inspired by nature and sustained by natural resources.",
@@ -193,6 +200,7 @@ window.PROJECTS = [
   {
     group: "practice", glyph: "kadikoy",
     title: "IN SITU | Kadıköy Square Urban Design Competition",
+    short: "IN SITU Kadıköy",
     meta: "Istanbul · 2020 · 1st Prize",
     text: [
       "Due to the influence of changing urban dynamics, terms such as “transit places” and “non-places” are discussed in contemporary public space literature. According to Augé (1997), a “place” is described as an area with identity, relational, and historical meaning, whereas a “non-place” does not create a specific environment for identity and relationships, instead generating loneliness and similarity.",
@@ -217,6 +225,7 @@ window.PROJECTS = [
   {
     group: "research", glyph: "thesis",
     title: "Immaterial Architectural Space",
+    short: "Immaterial Space",
     meta: "İTÜ · 2025– · M.Sc. thesis",
     text: ["A bio-inspired pneumatic modular system based on alveolar structures and Murray's Law, prototyped with cast platinum-cure silicone and 3D-printed TPU constraint networks."],
     credits: [
@@ -231,6 +240,7 @@ window.PROJECTS = [
   {
     group: "research", glyph: "stylegan",
     title: "Physarum × StyleGAN",
+    short: "Physarum × StyleGAN",
     meta: "İTÜ · Machine learning",
     text: ["StyleGAN models trained to blend historic urban morphology with the growth patterns of the slime mold Physarum polycephalum, as a generator for emergent urban layouts. The network on this page runs on the same organism's logic."],
     credits: [
@@ -244,6 +254,7 @@ window.PROJECTS = [
   {
     group: "research", glyph: "concrete",
     title: "Concrete Flowers",
+    short: "Concrete Flowers",
     meta: "İTÜ · Fabric formwork",
     text: ["A deployable mold system combining parametric modelling, 3D-printed articulated frames and flexible fabric membranes to cast variable concrete panels."],
     credits: [
@@ -259,6 +270,7 @@ window.PROJECTS = [
   {
     group: "media", glyph: "khora",
     title: "[KHORA]: Space of Becoming with Mind & Body",
+    short: "KHORA",
     meta: "IDAF Istanbul · 2026 · Spatial installation",
     text: [
       "In this work, real-time biophysiological data (EEG, heart rate) are processed and transformed into dynamic visual and auditory formations through a generative system design. By employing projection mapping techniques on semi-transparent surfaces, an immersive spatial environment is constructed that responds to the participant’s cognitive and physiological states.",
@@ -282,6 +294,7 @@ window.PROJECTS = [
   {
     group: "media", glyph: "basilica",
     title: "Basilica of Saint Neophytos",
+    short: "Saint Neophytos",
     meta: "İznik · Research & digital installation",
     text: [
       "This project focuses on the submerged basilica on the shores of Lake İznik, one of the significant monuments of early Christianity. By integrating archaeological preservation with computational design, the work reinterprets the structure’s historical phases through data-driven modeling and algorithmic visualization.",
@@ -299,6 +312,7 @@ window.PROJECTS = [
   {
     group: "media", glyph: "cobond",
     title: "[Co]BOND",
+    short: "[Co]BOND",
     meta: "Norway · 2025 · Installation proposal",
     text: [
       "[Co]BOND is a proposal for an interactive architectural installation exploring ecological empathy and human–nature synchronization. Inspired by Tønsberg’s whaling history, the project reimagines a destructive past as a regenerative future of coexistence.",

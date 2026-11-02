@@ -7,4 +7,5 @@ The home page is a live *Physarum polycephalum* simulation (agent-based, after J
 Run locally: `python -m http.server 8765` in this folder, then open http://127.0.0.1:8765.
 
 Before publishing, run `python stamp.py` so changed scripts and styles get new URLs.
+Check layouts with `python tools/check_layout.py` (overlaps, off-screen elements and overflow at 11 screen sizes).
 Add `?debug` to the address for a diagnosis readout (frame rate, quality tier, errors).
