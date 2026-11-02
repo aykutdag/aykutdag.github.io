@@ -65,6 +65,16 @@
     return e;
   }
 
+  // ---------- Visitor statistics ----------
+  // GoatCounter's script in index.html counts page views; these events count what visitors
+  // open (projects, colonies, CV, contact links). Nothing is sent if the script is blocked.
+  function track(path, title) {
+    try {
+      if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path, title: title || path, event: true });
+    } catch (e) { /* statistics are optional */ }
+  }
+  document.getElementById("cv-link").addEventListener("click", () => track("cv", "CV opened"));
+
   // ---------- Signals (electric pulses leaving a food source) ----------
   function signal(x, y, strength, tone) {
     signals.push({ x, y, t0: now(), s: strength });
@@ -261,6 +271,7 @@
       return;
     }
     if (gi === open) return;
+    track("colony/" + groups[gi].id, groups[gi].label);
     hoverOnColony(-1);
     hoverOnProject(-1);
     abandon(open < 0 ? groups.filter((g, k) => k !== gi).map(g => ({ x: g.fx, y: g.fy })) : groups[open].items.map(posOf));
@@ -364,6 +375,7 @@
   }
 
   function openProject(p) {
+    track("project/" + p.glyph, p.title);
     openWin(root => {
       const head = el("header", "win-head");
       head.append(el("div", "p-no", p.no + " · " + groups.find(g => g.id === p.group).label));
@@ -396,6 +408,7 @@
 
   document.querySelectorAll("[data-panel]").forEach(b => b.addEventListener("click", () => {
     const which = b.dataset.panel;
+    track(which, which === "about" ? "About opened" : "Contact opened");
     openWin(root => {
       const h = el("h2", null, which === "about" ? "About" : "Contact"); h.id = "win-title";
       root.append(h);
@@ -405,7 +418,9 @@
         const ul = el("ul", "links");
         CONTACT.forEach(c => {
           const a = el("a", null, c.label); a.href = c.href;
-          if (!c.href.startsWith("mailto:")) { a.target = "_blank"; a.rel = "noopener"; }
+          const mail = c.href.startsWith("mailto:");
+          if (!mail) { a.target = "_blank"; a.rel = "noopener"; }
+          a.addEventListener("click", () => track("contact/" + (mail ? "email" : c.label.toLowerCase()), "Contact: " + (mail ? "email" : c.label)));
           const li = el("li"); li.append(a); ul.append(li);
         });
         root.append(ul);
@@ -426,7 +441,10 @@
     viewBtn.textContent = on ? "Field" : "Index";
     layout();
   }
-  viewBtn.addEventListener("click", () => setList(!isList()));
+  viewBtn.addEventListener("click", () => {
+    setList(!isList());
+    if (isList()) track("index", "Index view opened");
+  });
 
   // Sound is on unless the visitor turned it off before (remembered in this browser). It
   // starts with the first tap, click or key press, since browsers block audio until then.
