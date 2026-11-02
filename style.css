@@ -109,6 +109,7 @@ body.poster.list::before { opacity: 0.22; }
 body.colony-open .colony-item { opacity: 0; visibility: hidden; }
 .colony { position: relative; display: block; width: 56px; height: 56px; text-align: left; }
 .ring {
+  position: relative;
   display: grid; place-items: center;
   width: 56px; height: 56px; border-radius: 50%;
   border: 1px solid var(--accent);
@@ -125,7 +126,7 @@ body.colony-open .colony-item { opacity: 0; visibility: hidden; }
 .colony .label { left: 76px; max-width: 280px; }
 .colony .title { font-size: 18px; }
 .colony .meta { max-height: none; opacity: 1; color: #a9b6bd; }
-.colony .label { text-shadow: 0 0 14px var(--bg), 0 0 6px var(--bg), 0 0 3px var(--bg), 0 0 1px var(--bg); }
+.colony .label { text-shadow: 0 0 18px var(--bg), 0 0 8px var(--bg), 0 0 4px var(--bg), 0 0 2px var(--bg), 0 0 1px var(--bg); }
 .colony-item.flip .label { left: auto; right: 76px; text-align: right; }
 
 /* Project nodes: a glyph marker sits exactly on the node's x/y (where the simulation feeds) */
@@ -139,12 +140,29 @@ body:not(.list) .node-item.shown { opacity: 1; visibility: visible; }
   text-align: left;
 }
 .mark {
+  position: relative;
   display: grid; place-items: center;
   width: 36px; height: 36px; border-radius: 50%;
-  border: 1px solid rgba(191, 227, 242, 0.5);
+  border: 1px solid rgba(191, 227, 242, 0.75);
   background: var(--bg);
+  box-shadow: inset 0 0 8px rgba(191, 227, 242, 0.14);
   transition: border-color 0.2s ease, transform 0.2s ease;
 }
+/* A soft glow around node and colony rings that slowly breathes. Only its opacity animates,
+   which the compositor handles without repainting. */
+.mark::after, .ring::after {
+  content: ""; position: absolute; inset: -1px; border-radius: 50%; pointer-events: none;
+  box-shadow: 0 0 12px 1px rgba(191, 227, 242, 0.55), 0 0 3px rgba(191, 227, 242, 0.7);
+  opacity: 0.6;
+  animation: ring-glow 5s ease-in-out infinite;
+}
+.ring::after { box-shadow: 0 0 22px 2px rgba(191, 227, 242, 0.5), 0 0 4px rgba(191, 227, 242, 0.7); }
+.node-item:nth-child(3n + 2) .mark::after, .colony-item:nth-child(2) .ring::after { animation-delay: -1.7s; }
+.node-item:nth-child(3n) .mark::after, .colony-item:nth-child(3) .ring::after { animation-delay: -3.4s; }
+.node:hover .mark::after, .node.active .mark::after, .colony:hover .ring::after { opacity: 1; animation: none; }
+@keyframes ring-glow { 0%, 100% { opacity: 0.35; } 50% { opacity: 0.85; } }
+@media (prefers-reduced-motion: reduce) { .mark::after, .ring::after { animation: none; } }
+body.list .mark::after { display: none; }
 .glyph { width: 24px; height: 24px; fill: none; stroke: var(--ink); stroke-linecap: round; stroke-linejoin: round; transition: stroke 0.2s ease; }
 .glyph * { stroke-width: 1; vector-effect: non-scaling-stroke; }
 .label {
@@ -152,7 +170,8 @@ body:not(.list) .node-item.shown { opacity: 1; visibility: visible; }
   transform: translateY(calc(-50% + var(--dy, 0px))); /* --dy: nudge chosen by placeLabels() in main.js */
   display: grid; gap: 2px;
   width: max-content; max-width: 250px;
-  text-shadow: 0 0 10px var(--bg), 0 0 4px var(--bg), 0 0 2px var(--bg);
+  /* a dark halo under the text so it reads on bright filaments */
+  text-shadow: 0 0 16px var(--bg), 0 0 8px var(--bg), 0 0 4px var(--bg), 0 0 2px var(--bg), 0 0 1px var(--bg);
 }
 .no { font-family: var(--mono); font-size: 11px; color: var(--muted); }
 .title { font-size: 14px; font-weight: 500; line-height: 1.2; }
@@ -218,7 +237,7 @@ body.modal:not(.gl-glass) .top, body.modal:not(.gl-glass) main, body.modal:not(.
   width: min(1000px, 100vw - 80px); height: min(700px, 100vh - 80px);
   border-radius: 30px; /* GLASS_RADIUS in main.js */
   color: var(--ink);
-  text-shadow: 0 1px 12px rgba(5, 7, 10, 0.5);
+  text-shadow: 0 1px 12px rgba(5, 7, 10, 0.7), 0 0 2px rgba(5, 7, 10, 0.6);
 }
 .win[hidden] { display: none; }
 .win.small { width: min(560px, 100vw - 48px); height: fit-content; max-height: min(640px, 100vh - 80px); }

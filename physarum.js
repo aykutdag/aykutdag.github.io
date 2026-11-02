@@ -19,6 +19,7 @@ window.Physarum = (function () {
     decay: 0.95,
     diffuse: 0.08,       // 0 = no blur, 1 = full 3x3 mean
     exposure: 0.13,      // trail value -> brightness
+    brightness: 0.72,    // overall field brightness; lower keeps the labels on top readable
     streakFade: 0.9,     // how long agent paths stay visible as hairs
     relief: 6.0,         // height-field strength for the lighting
     disturbRadius: 80,   // CSS px
@@ -165,7 +166,7 @@ uniform sampler2D trail;
 uniform sampler2D dust;
 uniform sampler2D glow;
 uniform vec2 res;
-uniform float exposure, relief, breath, signalSpeed;
+uniform float exposure, relief, breath, signalSpeed, brightness;
 uniform uint frame;
 uniform vec4 sig[${MAX_SIGNALS}];
 out vec4 o;
@@ -212,7 +213,8 @@ void main() {
   c += mix(silver * 0.8, white, t) * hair * (0.35 + 0.5 * diffuseL);
   c += vec3(0.75, 0.92, 1.0) * s * smoothstep(0.08, 0.5, t) * 1.3;
 
-  // vignette + film grain
+  // overall brightness, vignette + film grain
+  c *= brightness;
   vec2 q = (uv - 0.5) * vec2(res.x / res.y, 1.0);
   c *= smoothstep(1.15, 0.25, length(q));
   c += (rand(uvec2(gl_FragCoord.xy), frame) - 0.5) * 0.035;
@@ -264,7 +266,7 @@ void main() {
     c.r = frost(p + off * 1.15).r;
     c.b = frost(p + off * 0.85).b;
   }
-  c = c * 0.62 + vec3(0.030, 0.038, 0.046);
+  c = c * 0.48 + vec3(0.024, 0.030, 0.037); // darker tint: text on the glass stays readable
 
   vec2 L = length(light) > 1e-3 ? normalize(light) : vec2(-0.6, 0.8);
   float facing = abs(dot(n, L));
@@ -575,6 +577,7 @@ void main() { o = vec4(1.0, 0.0, 0.0, 1.0); }`;
       gl.uniform1f(ur.exposure, P.exposure);
       gl.uniform1f(ur.relief, P.relief);
       gl.uniform1f(ur.breath, breath);
+      gl.uniform1f(ur.brightness, P.brightness);
       gl.uniform1ui(ur.frame, frame);
       gl.uniform1f(ur.signalSpeed, P.signalSpeed * k);
       gl.uniform4fv(ur.sig, sig);
