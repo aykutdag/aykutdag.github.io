@@ -31,7 +31,9 @@
   });
 
   let sim = null;            // the live simulation; null shows the poster image instead
-  let still = reduceMotion;  // true: the network is drawn once per change instead of animating
+  // Reduce Motion keeps the organism alive but calm: half speed, no travelling pulses, and
+  // nodes and windows appear in place instead of flying out.
+  let still = false;         // true: the network is drawn once per change instead of animating
   let open = -1;             // index of the open colony; -1 shows the three colonies
   let spread = 0;            // 0 = projects gathered at their colony, 1 = in place
   let tween = null;          // { from, to, t0, dur, done }
@@ -219,12 +221,12 @@
   }
 
   function animate(to, dur, done) {
-    if (still) {
+    if (still || reduceMotion) {
       tween = null;
       spread = to;
       placeNodes();
       if (done) done();
-      settle();
+      if (still) settle();
       return;
     }
     tween = { from: spread, to, t0: now(), dur: dur * Math.abs(to - spread) || 0.01, done };
@@ -635,7 +637,7 @@
 
       stepTween();
 
-      if (now() > nextSignal) {
+      if (!reduceMotion && now() > nextSignal) {
         const pts = foodPoints();
         const f = pts[Math.floor(Math.random() * pts.length)];
         signal(f.x, f.y, 0.7, f.tone);
@@ -644,7 +646,7 @@
 
       feed(breath);
       sim.step();
-      sim.step();
+      if (!reduceMotion) sim.step();
       updateGlass();
       sim.render(breath);
     } catch (err) {
@@ -676,6 +678,7 @@
         sim ? "tier " + tier + " (" + TIERS[tier] + " MP) " + size : "poster",
         sim ? sim.agentCount.toLocaleString("en") + " agents" : "",
         still ? "still" : "live",
+        reduceMotion ? "reduce motion" : "",
         gov.locked ? "locked" : "",
         sim ? sim.info.renderer : ""
       ].filter(Boolean).join(" · ");
