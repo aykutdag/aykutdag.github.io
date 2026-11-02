@@ -6,17 +6,22 @@
   const ABANDON_TIME = 3;   // seconds an abandoned food source keeps pushing the network away
   const body = document.body;
   const canvas = document.getElementById("field");
+  const topEl = document.querySelector(".top");
   const coloniesEl = document.getElementById("colonies");
   const groupsEl = document.getElementById("groups");
   const groupNav = document.getElementById("group-nav");
   const hintEl = document.getElementById("hint");
   const win = document.getElementById("win");
   const winBody = document.getElementById("win-body");
-  const chrome = [document.querySelector(".top"), document.querySelector("main"), document.querySelector(".foot")];
-  const GLASS_RADIUS = 30;  // px, same as .win border-radius in style.css
+  const chrome = [topEl, document.querySelector("main"), document.querySelector(".foot")];
   const viewBtn = document.getElementById("toggle-view");
   const soundBtn = document.getElementById("sound");
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const touch = matchMedia("(pointer: coarse)").matches ||
+    (navigator.maxTouchPoints > 0 && Math.min(screen.width, screen.height) < 900);
+  // ?debug shows a performance readout; ?tier=N forces a quality tier; ?gl=1 runs the
+  // simulation even on a software renderer (for testing).
+  const params = new URLSearchParams(location.search);
 
   const groups = GROUPS.map(g => Object.assign({ items: [] }, g));
   PROJECTS.forEach((p, i) => {
@@ -25,14 +30,16 @@
     groups.find(g => g.id === p.group).items.push(p);
   });
 
-  let open = -1;     // index of the open colony; -1 shows the three colonies
-  let spread = 0;    // 0 = projects gathered at their colony, 1 = in place
-  let tween = null;  // { from, to, t0, dur, done }
+  let sim = null;            // the live simulation; null shows the poster image instead
+  let still = reduceMotion;  // true: the network is drawn once per change instead of animating
+  let open = -1;             // index of the open colony; -1 shows the three colonies
+  let spread = 0;            // 0 = projects gathered at their colony, 1 = in place
+  let tween = null;          // { from, to, t0, dur, done }
   let hoverColony = -1;
   let hoverProject = -1;
   let lastFocus = null;
   let signals = [];
-  let abandoned = []; // { x, y, t0 }: food sources the organism has just left
+  let abandoned = [];        // { x, y, t0 }: food sources the organism has just left
   const mouse = { x: -1, y: -1, px: -1, py: -1, speed: 0 };
   const now = () => performance.now() / 1000;
   const ease = t => 1 - Math.pow(1 - t, 3);
@@ -53,17 +60,17 @@
   }
 
   // Where a project node sits right now: drawn out of its colony as `spread` goes 0 → 1.
+  // fx / fy are the field positions for the current screen shape (see layout()).
   function posOf(p) {
     const g = groups.find(g => g.id === p.group);
     const k = ease(spread);
-    return { x: g.x + (p.x - g.x) * k, y: g.y + (p.y - g.y) * k };
+    return { x: g.fx + (p.fx - g.fx) * k, y: g.fy + (p.fy - g.fy) * k };
   }
 
   // ---------- Colonies ----------
+  const colonyItems = [];
   const colonyEls = groups.map((g, gi) => {
-    const li = el("li", "colony-item" + (g.x > 0.72 ? " flip" : ""));
-    li.style.left = g.x * 100 + "%";
-    li.style.top = g.y * 100 + "%";
+    const li = el("li", "colony-item");
     const btn = el("button", "colony");
     btn.type = "button";
     btn.innerHTML = '<span class="ring"><span class="count"></span></span><span class="label"><span class="title"></span><span class="meta"></span></span>';
@@ -77,6 +84,7 @@
     btn.addEventListener("click", e => openGroup(gi, e.detail === 0));
     li.append(btn);
     coloniesEl.append(li);
+    colonyItems.push(li);
     return btn;
   });
 
@@ -85,8 +93,8 @@
     hoverColony = gi;
     if (gi >= 0) {
       const g = groups[gi];
-      Sound.chime(gi * 3, false, g.x * 2 - 1);
-      signal(g.x, g.y, 1, gi * 3);
+      Sound.chime(gi * 3, false, g.fx * 2 - 1);
+      signal(g.fx, g.fy, 1, gi * 3);
     }
   }
 
@@ -98,7 +106,7 @@
     h.append(el("span", "count", String(g.items.length)));
     const ol = el("ol", "nodes");
     g.items.forEach(p => {
-      const li = el("li", "node-item" + (p.x > 0.72 ? " flip" : ""));
+      const li = el("li", "node-item");
       const btn = el("button", "node");
       btn.type = "button";
       btn.innerHTML = '<span class="mark">' + glyphSVG(p.glyph) + '</span><span class="label"><span class="no"></span><span class="title"></span><span class="meta"></span></span>';
@@ -149,15 +157,70 @@
     PROJECTS.forEach(p => nodeEls[p.index].li.classList.toggle("shown", gi >= 0 && p.group === groups[gi].id));
   }
 
+  // ---------- Layout for the screen shape ----------
+  // The data's x / y are drawn for landscape screens. Tall screens (phones) get the colonies
+  // stacked and each colony's projects in a two-column zig-zag below the header, so labels
+  // fit beside their nodes. Short landscape screens (phones turned sideways) get the colonies
+  // side by side and the projects in rows of up to four.
+  const TALL_COLONIES = [[0.30, 0.12], [0.70, 0.48], [0.34, 0.84]]; // x, and y within the free area
+  const SHORT_COLONIES = [[0.2, 0.15], [0.5, 0.6], [0.8, 0.15]];
+
+  function layout() {
+    const tall = innerHeight > innerWidth * 1.15;
+    const short = !tall && innerHeight < 560;
+    body.classList.toggle("tall", tall);
+    body.classList.toggle("short", short);
+    document.documentElement.style.setProperty("--top-h", topEl.offsetHeight + "px");
+    const top = Math.min(0.5, Math.max(0.3, (topEl.offsetHeight + 56) / innerHeight));
+    const bottom = short ? 0.82 : 0.88;
+    groups.forEach((g, gi) => {
+      if (tall || short) {
+        const c = (tall ? TALL_COLONIES : SHORT_COLONIES)[gi];
+        g.fx = c[0];
+        g.fy = top + (bottom - 0.1 - top) * c[1];
+      } else {
+        g.fx = g.x;
+        g.fy = g.y;
+      }
+      colonyItems[gi].style.left = g.fx * 100 + "%";
+      colonyItems[gi].style.top = g.fy * 100 + "%";
+      colonyItems[gi].classList.toggle("flip", !tall && !short && g.fx > 0.72);
+      const n = g.items.length;
+      const cols = Math.min(4, n), rows = Math.ceil(n / cols);
+      g.items.forEach((p, i) => {
+        if (tall) {
+          const inset = 0.05 * ((i >> 1) & 1);
+          p.fx = i % 2 ? 0.84 - inset : 0.16 + inset;
+          p.fy = n === 1 ? (top + bottom) / 2 : top + (bottom - top) * i / (n - 1);
+        } else if (short) {
+          const row = Math.floor(i / cols), col = i % cols;
+          p.fx = 0.06 + 0.88 * col / cols;
+          p.fy = rows === 1 ? (top + bottom) / 2 : top + (bottom - top) * row / (rows - 1);
+        } else {
+          p.fx = p.x;
+          p.fy = p.y;
+        }
+        nodeEls[p.index].li.classList.toggle("flip", tall ? p.fx > 0.5 : !short && p.fx > 0.72);
+      });
+    });
+    // short screens: a node's label may use its column's width
+    document.documentElement.style.setProperty("--col-w", Math.round(innerWidth * 0.22 - 56) + "px");
+    placeNodes();
+  }
+  layout();
+  // The header's height (and so the tall layout) settles once the web fonts arrive.
+  if (document.fonts) document.fonts.ready.then(() => { layout(); if (still) settle(); });
+
   // ---------- Opening and closing a colony ----------
   function abandon(points) {
-    if (reduceMotion) return;
+    if (still) return;
     const t = now();
     abandoned = abandoned.concat(points.map(q => ({ x: q.x, y: q.y, t0: t })));
   }
 
   function animate(to, dur, done) {
-    if (reduceMotion) {
+    if (still) {
+      tween = null;
       spread = to;
       placeNodes();
       if (done) done();
@@ -167,9 +230,9 @@
     tween = { from: spread, to, t0: now(), dur: dur * Math.abs(to - spread) || 0.01, done };
   }
 
-  function stepTween() {
+  function stepTween(finish) {
     if (!tween) return;
-    const k = Math.min(1, (now() - tween.t0) / tween.dur);
+    const k = finish ? 1 : Math.min(1, (now() - tween.t0) / tween.dur);
     spread = tween.from + (tween.to - tween.from) * k;
     placeNodes();
     if (k >= 1) {
@@ -187,7 +250,7 @@
     if (gi === open) return;
     hoverOnColony(-1);
     hoverOnProject(-1);
-    abandon(open < 0 ? groups.filter((g, k) => k !== gi) : groups[open].items.map(posOf));
+    abandon(open < 0 ? groups.filter((g, k) => k !== gi).map(g => ({ x: g.fx, y: g.fy })) : groups[open].items.map(posOf));
     open = gi;
     spread = 0;
     body.classList.add("colony-open");
@@ -195,8 +258,8 @@
     placeNodes();
     updateNav();
     const g = groups[gi];
-    Sound.chime(gi * 3, true, g.x * 2 - 1);
-    signal(g.x, g.y, 1.6, gi * 3);
+    Sound.chime(gi * 3, true, g.fx * 2 - 1);
+    signal(g.fx, g.fy, 1.6, gi * 3);
     animate(1, OPEN_TIME);
     if (viaKeyboard) nodeEls[g.items[0].index].btn.focus();
   }
@@ -233,15 +296,15 @@
   function updateNav() {
     navBtns.forEach((b, k) => b.setAttribute("aria-pressed", k === open + 1));
     hintEl.textContent = open < 0
-      ? "Move to disturb the network · select a colony to open it"
-      : "Select a node to open a project · Esc returns to all colonies";
+      ? (touch ? "Drag to disturb the network · tap a colony to open it" : "Move to disturb the network · select a colony to open it")
+      : (touch ? "Tap a node to open a project" : "Select a node to open a project · Esc returns to all colonies");
   }
   updateNav();
 
   // ---------- Floating glass window ----------
-  // On the field the glass itself is drawn by the simulation (see setGlass in physarum.js),
-  // so the window grows out of the clicked node and the rest of the interface fades away.
-  // In the index view, or without WebGL, CSS frosted glass stands in.
+  // On the animated field the glass itself is drawn by the simulation (see setGlass in
+  // physarum.js), so the window grows out of the clicked node and the rest of the interface
+  // fades away. In the index view, on a still field or without WebGL, CSS frosted glass stands in.
   function centerOf(elem) {
     const r = elem.getBoundingClientRect();
     return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
@@ -253,7 +316,7 @@
     winBody.replaceChildren();
     build(winBody);
     win.classList.toggle("small", !!small);
-    body.classList.toggle("gl-glass", !!sim && !isList());
+    body.classList.toggle("gl-glass", !!sim && !still && !isList());
     body.classList.add("modal");
     chrome.forEach(c => { c.inert = true; });
     win.style.setProperty("--fx", from.x - innerWidth / 2 + "px");
@@ -262,7 +325,6 @@
     win.classList.add("enter");
     win.hidden = false;
     win.querySelector(".win-close").focus({ preventScroll: true });
-    if (reduceMotion && sim) redraw();
   }
 
   function closeWin(instant) {
@@ -273,7 +335,6 @@
       body.classList.remove("modal");
       chrome.forEach(c => { c.inert = false; });
       if (lastFocus && !instant) lastFocus.focus({ preventScroll: true });
-      if (reduceMotion && sim) redraw();
     };
     if (instant || reduceMotion) {
       done();
@@ -308,6 +369,7 @@
           img.src = src;
           img.alt = p.title + ", image " + (k + 1);
           img.loading = "lazy";
+          img.decoding = "async";
           media.append(img);
         });
       } else {
@@ -349,9 +411,9 @@
     body.classList.toggle("list", on);
     viewBtn.setAttribute("aria-pressed", on);
     viewBtn.textContent = on ? "Field" : "Index";
+    layout();
   }
   viewBtn.addEventListener("click", () => setList(!isList()));
-  if (innerWidth < 720) setList(true);
 
   soundBtn.addEventListener("click", () => {
     const on = Sound.toggle();
@@ -359,42 +421,83 @@
     soundBtn.textContent = on ? "Sound on" : "Sound off";
   });
 
-  // ---------- Simulation ----------
-  let sim = null;
-  try { sim = Physarum.create(canvas); } catch (err) { console.error(err); }
-  window.physarum = sim; // handy for tuning sim.params from the console
-  if (!sim) {
-    canvas.remove();
-    setList(true);
-    viewBtn.hidden = true;
-    return;
+  // ---------- Pointer and touch ----------
+  // A finger disturbs the network only while it is down; a mouse while it is over the page.
+  addEventListener("pointermove", e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+  addEventListener("pointerdown", e => { mouse.x = mouse.px = e.clientX; mouse.y = mouse.py = e.clientY; });
+  const lift = e => { if (e.pointerType !== "mouse") mouse.x = -1; };
+  addEventListener("pointerup", lift);
+  addEventListener("pointercancel", lift);
+  document.documentElement.addEventListener("mouseleave", () => { mouse.x = -1; });
+
+  // ---------- Simulation and quality ----------
+  // Tiers are trail sizes in megapixels; the canvas renders at the same size. A device starts
+  // at a tier that suits it, and while frames take too long the governor steps down. Below the
+  // last tier the network stops animating and is drawn once per change (still). Devices that
+  // cannot run it at all, or render in software, show a poster image of the network instead.
+  const TIERS = [4, 2.4, 1.4, 0.9, 0.55, 0.32, 0.2];
+  const SLOW_MS = 30;     // median frame time that counts as too slow (about 33 fps)
+  const TARGET_MS = 20;   // what a step down aims for
+  const DENSITY = 0.22;   // agents per trail pixel
+  let tier = 0;
+  let running = false;
+  let lost = false;
+
+  function startTier() {
+    const forced = parseInt(params.get("tier"), 10);
+    if (forced >= 0 && forced < TIERS.length) return forced;
+    if (!touch) return 0;
+    return Math.min(innerWidth, innerHeight) < 600 ? TIERS.indexOf(0.9) : TIERS.indexOf(1.4); // phone : tablet
   }
+
+  function scaleFor(t) { // trail pixels per CSS pixel
+    return Math.min(devicePixelRatio || 1, 2, Math.sqrt(TIERS[t] * 1e6 / (innerWidth * innerHeight)));
+  }
+
+  function applyTier() {
+    sim.resize(innerWidth, innerHeight, scaleFor(tier), DENSITY, foodPoints());
+    gov.reset();
+    document.getElementById("foot-agents").textContent =
+      "Physarum polycephalum · " + sim.agentCount.toLocaleString("en") + " agents";
+  }
+
+  // Frame-time governor. Frame times include waiting for the GPU, so a slow GPU shows up as
+  // long frames. If stepping down does not make frames shorter, the frame rate is capped by
+  // something else (a 30 Hz power-saving mode, for example) and it stops stepping down.
+  const gov = {
+    deltas: [], t0: 0, skip: 0, prev: 0, locked: false,
+    reset() { this.deltas = []; this.skip = 12; this.t0 = 0; },
+    add(dt) {
+      if (this.locked || still || params.has("tier")) return;
+      if (dt <= 0 || dt > 250) return; // tab hidden or the page stalled: not rendering cost
+      if (this.skip > 0) { this.skip--; return; }
+      if (!this.t0) this.t0 = now();
+      this.deltas.push(dt);
+      if (this.deltas.length < 40 && !(this.deltas.length >= 8 && now() - this.t0 > 1.5)) return;
+      const m = this.deltas.slice().sort((a, b) => a - b)[this.deltas.length >> 1];
+      this.deltas = []; this.t0 = 0;
+      if (m <= SLOW_MS) { this.prev = 0; return; }
+      if (this.prev && m > this.prev * 0.9) { this.locked = true; return; }
+      this.prev = m;
+      // cost is roughly proportional to pixels: jump as far down as the slowdown suggests
+      const want = TIERS[tier] * TARGET_MS / m;
+      let next = tier + 1;
+      while (next < TIERS.length - 1 && TIERS[next] > want) next++;
+      if (tier === TIERS.length - 1) goStill();
+      else { tier = next; applyTier(); }
+    }
+  };
 
   // Food sources: the three colonies, or the projects of the open colony.
   function foodPoints() {
     if (open < 0) {
-      return groups.map((g, gi) => ({ x: g.x, y: g.y, s: gi === hoverColony ? 3 : 1.6, tone: gi * 3 }));
+      return groups.map((g, gi) => ({ x: g.fx, y: g.fy, s: gi === hoverColony ? 3 : 1.6, tone: gi * 3 }));
     }
     return groups[open].items.map(p => {
       const q = posOf(p);
       return { x: q.x, y: q.y, s: p.index === hoverProject ? 2.5 : 0.9, tone: p.index };
     });
   }
-
-  function resize() {
-    const dpr = devicePixelRatio || 1;
-    canvas.width = Math.round(innerWidth * Math.min(dpr, 2));
-    canvas.height = Math.round(innerHeight * Math.min(dpr, 2));
-    sim.resize(innerWidth, innerHeight, dpr, innerWidth < 720 ? 0.15 : 0.25, foodPoints());
-    document.getElementById("foot-agents").textContent =
-      "Physarum polycephalum · " + sim.agentCount.toLocaleString("en") + " agents";
-  }
-  let resizeTimer;
-  addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(resize, 200); });
-  resize();
-
-  addEventListener("pointermove", e => { mouse.x = e.clientX; mouse.y = e.clientY; });
-  document.addEventListener("pointerleave", () => { mouse.x = -1; });
 
   // Abandoned sources repel (negative strength), fading out over ABANDON_TIME.
   function repellents() {
@@ -427,58 +530,155 @@
       light.x += (mouse.x - cx - light.x) * 0.15;
       light.y += (cy - mouse.y - light.y) * 0.15;
     }
+    const cs = getComputedStyle(win);
     sim.setGlass({
       x: r.left, y: r.top, w: r.width, h: r.height,
-      r: GLASS_RADIUS * r.width / win.offsetWidth,
-      a: parseFloat(getComputedStyle(win).opacity),
+      r: (parseFloat(cs.borderTopLeftRadius) || 30) * r.width / win.offsetWidth,
+      a: parseFloat(cs.opacity),
       lx: light.x, ly: light.y
     });
   }
 
-  // Reduced motion: grow a still network for the current food instead of animating.
+  // Still mode: grow a network for the current food and draw it once.
   function settle() {
+    if (!sim || lost) return;
     feed(0.5);
     for (let i = 0; i < 400; i++) sim.step();
-    redraw();
-  }
-
-  function redraw() {
-    updateGlass();
+    sim.setGlass(null);
     sim.render(0.5);
   }
 
-  // The organism fires a signal from a random food source every few seconds.
-  let nextSignal = now() + 1.5;
-
-  const t0 = now();
-  function frame() {
-    const t = now() - t0;
-    const breath = 0.5 + 0.5 * Math.sin((t / BREATH_PERIOD) * Math.PI * 2);
-
-    if (mouse.px >= 0 && mouse.x >= 0) {
-      const d = Math.hypot(mouse.x - mouse.px, mouse.y - mouse.py);
-      mouse.speed += (d - mouse.speed) * 0.2;
-    } else mouse.speed *= 0.9;
-    mouse.px = mouse.x; mouse.py = mouse.y;
-    Sound.activity(mouse.speed, Math.max(0, mouse.x) / innerWidth);
-
-    stepTween();
-
-    if (now() > nextSignal) {
-      const pts = foodPoints();
-      const f = pts[Math.floor(Math.random() * pts.length)];
-      signal(f.x, f.y, 0.7, f.tone);
-      nextSignal = now() + 2.5 + Math.random() * 3;
-    }
-
-    feed(breath);
-    sim.step();
-    sim.step();
-    updateGlass();
-    sim.render(breath);
-    requestAnimationFrame(frame);
+  function goStill() {
+    still = true;
+    running = false;
+    stepTween(true);
+    abandoned = [];
+    settle();
   }
 
-  if (reduceMotion) settle();
-  else requestAnimationFrame(frame);
+  function showPoster(on) {
+    body.classList.toggle("poster", on);
+  }
+
+  function startSim() {
+    try { sim = Physarum.create(canvas); } catch (err) { console.error(err); sim = null; }
+    if (sim && sim.info.software && !params.has("gl")) sim = null;
+    window.physarum = sim; // handy for tuning sim.params from the console
+    if (!sim) {
+      still = true;
+      showPoster(true);
+      return;
+    }
+    showPoster(false);
+    try {
+      applyTier();
+    } catch (err) {
+      console.error(err);
+      sim = null;
+      still = true;
+      showPoster(true);
+      return;
+    }
+    if (still) settle();
+    else if (!running) { running = true; requestAnimationFrame(frame); }
+  }
+
+  // Mobile browsers drop WebGL contexts under memory pressure or in the background.
+  canvas.addEventListener("webglcontextlost", e => {
+    e.preventDefault();
+    lost = true;
+    showPoster(true);
+  });
+  canvas.addEventListener("webglcontextrestored", () => {
+    lost = false;
+    startSim();
+  });
+
+  let resizeTimer;
+  addEventListener("resize", () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      layout();
+      if (sim && !lost) {
+        applyTier();
+        if (still) settle();
+      }
+    }, 200);
+  });
+
+  // The organism fires a signal from a random food source every few seconds.
+  let nextSignal = now() + 1.5;
+  let lastTs = 0;
+  let tick = 0;
+  const t0 = now();
+
+  function frame(ts) {
+    if (!running) return;
+    requestAnimationFrame(frame);
+    const dt = lastTs ? ts - lastTs : 0;
+    lastTs = ts;
+    if (lost || !sim) return;
+    // In the index view the field is only a dim backdrop: half the frames are enough.
+    if (isList() && (tick++ & 1)) return;
+    try {
+      if (!isList()) gov.add(dt);
+      if (!running) return; // the governor switched to still
+
+      const t = now() - t0;
+      const breath = 0.5 + 0.5 * Math.sin((t / BREATH_PERIOD) * Math.PI * 2);
+      if (mouse.px >= 0 && mouse.x >= 0) {
+        const d = Math.hypot(mouse.x - mouse.px, mouse.y - mouse.py);
+        mouse.speed += (d - mouse.speed) * 0.2;
+      } else mouse.speed *= 0.9;
+      mouse.px = mouse.x; mouse.py = mouse.y;
+      Sound.activity(mouse.speed, Math.max(0, mouse.x) / innerWidth);
+
+      stepTween();
+
+      if (now() > nextSignal) {
+        const pts = foodPoints();
+        const f = pts[Math.floor(Math.random() * pts.length)];
+        signal(f.x, f.y, 0.7, f.tone);
+        nextSignal = now() + 2.5 + Math.random() * 3;
+      }
+
+      feed(breath);
+      sim.step();
+      sim.step();
+      updateGlass();
+      sim.render(breath);
+    } catch (err) {
+      // Never leave a broken canvas on screen: fall back to the poster image.
+      console.error(err);
+      running = false;
+      sim = null;
+      still = true;
+      showPoster(true);
+    }
+  }
+
+  tier = startTier();
+  startSim();
+
+  // ---------- ?debug readout ----------
+  if (params.has("debug")) {
+    const box = el("div", "debug");
+    body.append(box);
+    let frames = 0, last = performance.now();
+    (function count() { frames++; requestAnimationFrame(count); })();
+    setInterval(() => {
+      const t = performance.now();
+      const fps = Math.round(frames * 1000 / (t - last));
+      frames = 0; last = t;
+      const size = sim ? sim.size.join("×") : "—";
+      box.textContent = [
+        fps + " fps",
+        sim ? "tier " + tier + " (" + TIERS[tier] + " MP) " + size : "poster",
+        sim ? sim.agentCount.toLocaleString("en") + " agents" : "",
+        still ? "still" : "live",
+        gov.locked ? "locked" : "",
+        sim ? sim.info.renderer : ""
+      ].filter(Boolean).join(" · ");
+    }, 500);
+  }
 })();

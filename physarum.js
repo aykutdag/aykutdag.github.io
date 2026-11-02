@@ -30,15 +30,27 @@ in vec2 p;
 out vec2 uv;
 void main() { uv = p * 0.5 + 0.5; gl_Position = vec4(p, 0.0, 1.0); }`;
 
+  // Integer hash (PCG): the usual fract(sin(...)) hash loses precision on many mobile GPUs,
+  // which shows up as patterned, correlated randomness. Needs highp int.
+  const GLSL_RAND = `
+uint pcg(uint v) {
+  uint s = v * 747796405u + 2891336453u;
+  uint w = ((s >> ((s >> 28u) + 4u)) ^ s) * 277803737u;
+  return (w >> 22u) ^ w;
+}
+float rand(uvec2 p, uint seed) { return float(pcg(p.x ^ pcg(p.y ^ pcg(seed)))) * (1.0 / 4294967296.0); }`;
+
   const FS_UPDATE = `#version 300 es
 precision highp float;
+precision highp int;
 uniform sampler2D agents;
 uniform sampler2D trail;
 uniform vec2 res;
-uniform float sa, sd, ra, speed, time, disturbR;
+uniform float sa, sd, ra, speed, disturbR;
+uniform uint frame;
 uniform vec3 mouse;
 out vec4 o;
-float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+${GLSL_RAND}
 float sense(vec2 pos, float a) {
   return textureLod(trail, (pos + vec2(cos(a), sin(a)) * sd) / res, 0.0).r;
 }
@@ -46,7 +58,7 @@ void main() {
   vec4 s = texelFetch(agents, ivec2(gl_FragCoord.xy), 0);
   vec2 pos = s.xy;
   float a = s.z;
-  float rnd = hash(gl_FragCoord.xy + fract(time) * 97.0);
+  float rnd = rand(uvec2(gl_FragCoord.xy), frame);
   float f = sense(pos, a), l = sense(pos, a + sa), r = sense(pos, a - sa);
   if (f < l && f < r) a += (rnd - 0.5) * 2.0 * ra;
   else if (l > r && l > f) a += ra;
@@ -60,9 +72,9 @@ void main() {
     pos += dm / max(dd, 1.0) * k * mouse.z * 5.0 * speed;
   }
 
-  pos += vec2(cos(a), sin(a)) * speed;
-  if (pos.x < 1.0 || pos.x > res.x - 1.0) { a = 3.14159265 - a; pos.x = clamp(pos.x, 1.0, res.x - 1.0); }
-  if (pos.y < 1.0 || pos.y > res.y - 1.0) { a = -a; pos.y = clamp(pos.y, 1.0, res.y - 1.0); }
+  // The field wraps around (a torus): agents bouncing off the walls would pile up into
+  // bright lines along the screen edges.
+  pos = mod(pos + vec2(cos(a), sin(a)) * speed, res);
   o = vec4(pos, a, s.w);
 }`;
 
@@ -117,16 +129,47 @@ void main() {
   // Rendering in the look of a lit specimen under a microscope: the trail map is
   // treated as a height field (relief lighting), filaments are white on steel blue,
   // single agents show up as sparkling dust, plus film grain and a vignette.
-  const FS_RENDER = `#version 300 es
+  // Soft glow from coarse mip levels (a ring of taps avoids blocky texels). It is smooth,
+  // so it renders at quarter resolution once per frame instead of per screen pixel.
+  const FS_GLOW = `#version 300 es
 precision highp float;
 in vec2 uv;
 uniform sampler2D trail;
-uniform sampler2D dust;
 uniform vec2 res;
-uniform float exposure, relief, breath, time, signalSpeed;
+uniform float exposure;
+out vec4 o;
+float T(vec2 o, float lod) { return 1.0 - exp(-textureLod(trail, uv + o / res, lod).r * exposure); }
+void main() {
+  float g = T(vec2(0.0), 2.0) * 0.4;
+  for (int i = 0; i < 8; i++) {
+    float a = float(i) * 0.785398 + 0.39;
+    vec2 d = vec2(cos(a), sin(a));
+    g += T(d * 10.0, 3.0) * 0.05 + T(d * 26.0, 4.5) * 0.05;
+  }
+  o = vec4(g, 0.0, 0.0, 1.0);
+}`;
+
+  // Carries the trail over when the resolution changes, so the network survives a resize.
+  const FS_COPY = `#version 300 es
+precision highp float;
+in vec2 uv;
+uniform sampler2D src;
+out vec4 o;
+void main() { o = vec4(texture(src, uv).r, 0.0, 0.0, 1.0); }`;
+
+  const FS_RENDER = `#version 300 es
+precision highp float;
+precision highp int;
+in vec2 uv;
+uniform sampler2D trail;
+uniform sampler2D dust;
+uniform sampler2D glow;
+uniform vec2 res;
+uniform float exposure, relief, breath, signalSpeed;
+uniform uint frame;
 uniform vec4 sig[${MAX_SIGNALS}];
 out vec4 o;
-float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+${GLSL_RAND}
 float tone(float v) { return 1.0 - exp(-v * exposure); }
 float T(vec2 o, float lod) { return tone(textureLod(trail, uv + o / res, lod).r); }
 void main() {
@@ -141,13 +184,7 @@ void main() {
   float diffuseL = max(dot(n, L), 0.0);
   float spec = pow(max(dot(reflect(-L, n), vec3(0.0, 0.0, 1.0)), 0.0), 28.0);
 
-  // soft glow from coarse mip levels (ring of taps avoids blocky texels)
-  float g = T(vec2(0.0), 2.0) * 0.4;
-  for (int i = 0; i < 8; i++) {
-    float a = float(i) * 0.785398 + 0.39;
-    vec2 d = vec2(cos(a), sin(a));
-    g += T(d * 10.0, 3.0) * 0.05 + T(d * 26.0, 4.5) * 0.05;
-  }
+  float g = texture(glow, uv).r;
 
   // agent paths of the last few frames: sharp 1px hairs inside the veins, sparkles outside
   float hair = 1.0 - exp(-texture(dust, uv).r * 0.35);
@@ -178,7 +215,7 @@ void main() {
   // vignette + film grain
   vec2 q = (uv - 0.5) * vec2(res.x / res.y, 1.0);
   c *= smoothstep(1.15, 0.25, length(q));
-  c += (hash(p + fract(time) * 311.0) - 0.5) * 0.035;
+  c += (rand(uvec2(gl_FragCoord.xy), frame) - 0.5) * 0.035;
   o = vec4(pow(max(c, 0.0), vec3(0.95)), 1.0);
 }`;
 
@@ -251,9 +288,20 @@ precision highp float;
 out vec4 o;
 void main() { o = vec4(1.0, 0.0, 0.0, 1.0); }`;
 
+  // Returns null when the device cannot run the simulation (no WebGL2, no float render
+  // targets, or a driver that reports them but fails); shader errors throw.
   function create(canvas) {
-    const gl = canvas.getContext("webgl2", { antialias: false, alpha: false });
+    const gl = canvas.getContext("webgl2", { antialias: false, alpha: false, powerPreference: "high-performance" });
     if (!gl || !gl.getExtension("EXT_color_buffer_float")) return null;
+
+    const dbg = gl.getExtension("WEBGL_debug_renderer_info");
+    const renderer = String(gl.getParameter(dbg ? dbg.UNMASKED_RENDERER_WEBGL : gl.RENDERER));
+    const info = {
+      renderer,
+      // software rasterizers: far too slow for a live simulation
+      software: /swiftshader|llvmpipe|softpipe|software|basic render/i.test(renderer)
+    };
+    const maxSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
 
     function shader(type, src) {
       const s = gl.createShader(type);
@@ -285,7 +333,9 @@ void main() { o = vec4(1.0, 0.0, 0.0, 1.0); }`;
       dust: program(VS_DEPOSIT, FS_DUST),
       fade: program(VS_QUAD, FS_FADE),
       render: program(VS_QUAD, FS_RENDER),
-      glass: program(VS_QUAD, FS_GLASS)
+      glass: program(VS_QUAD, FS_GLASS),
+      glow: program(VS_QUAD, FS_GLOW),
+      copy: program(VS_QUAD, FS_COPY)
     };
 
     const quadVao = gl.createVertexArray();
@@ -307,6 +357,9 @@ void main() { o = vec4(1.0, 0.0, 0.0, 1.0); }`;
       const fb = gl.createFramebuffer();
       gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
       gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, t, 0);
+      if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) {
+        throw new Error("Framebuffer incomplete for format " + internal);
+      }
       if (mip) {
         gl.clearColor(0, 0, 0, 1);
         gl.clear(gl.COLOR_BUFFER_BIT);
@@ -314,23 +367,34 @@ void main() { o = vec4(1.0, 0.0, 0.0, 1.0); }`;
       }
       return { t, fb };
     }
+    function free(x) { if (x) { gl.deleteTexture(x.t); gl.deleteFramebuffer(x.fb); } }
 
-    let tw, th, k, aw, ah, agents, trail, dust, scene;
+    // Some drivers expose the extension yet cannot render to these formats.
+    try {
+      [target(4, 4, gl.RGBA32F, gl.RGBA, gl.FLOAT, false), target(4, 4, gl.R16F, gl.RED, gl.HALF_FLOAT, true)].forEach(free);
+    } catch (err) {
+      return null;
+    }
+
+    let tw, th, k, aw, ah, agents, trail, dust, scene, glow;
     const glass = { rect: new Float32Array(4), radius: 0, alpha: 0, light: new Float32Array([-0.6, 0.8]) };
     const food = new Float32Array(MAX_FOOD * 3);
     const sig = new Float32Array(MAX_SIGNALS * 4);
     const mouse = new Float32Array(3);
-    let nFood = 0, time = 0;
+    let nFood = 0, frame = 0;
 
-    // seeds: [{x, y}] in 0–1 screen space; agents start around them (plus some scattered).
+    // scale: trail (and canvas) pixels per CSS pixel; the caller picks it for the device.
     // density: agents per trail pixel.
-    function resize(cssW, cssH, dpr, density, seeds) {
-      // Trail map at device-pixel resolution for sharp filaments, capped at ~4 MP.
-      k = Math.min(dpr, 2, Math.sqrt(4e6 / (cssW * cssH)));
-      tw = Math.round(cssW * k);
-      th = Math.round(cssH * k);
+    // seeds: [{x, y}] in 0–1 screen space; agents start around them (plus some scattered).
+    // An existing network is carried over to the new resolution.
+    function resize(cssW, cssH, scale, density, seeds) {
+      k = Math.min(scale, maxSize / cssW, maxSize / cssH);
+      tw = Math.max(1, Math.round(cssW * k));
+      th = Math.max(1, Math.round(cssH * k));
+      canvas.width = tw;
+      canvas.height = th;
       aw = 512;
-      ah = Math.round(Math.min(524288, Math.max(65536, tw * th * density)) / aw);
+      ah = Math.round(Math.min(524288, Math.max(16384, tw * th * density)) / aw);
 
       const data = new Float32Array(aw * ah * 4);
       const r0 = 40 * k;
@@ -347,12 +411,35 @@ void main() { o = vec4(1.0, 0.0, 0.0, 1.0); }`;
         }
         data[i * 4 + 2] = a;
       }
-      [agents, trail, dust, scene && [scene]].forEach(pair => pair && pair.forEach(x => { gl.deleteTexture(x.t); gl.deleteFramebuffer(x.fb); }));
+      const old = trail;
+      [agents, dust].forEach(pair => pair && pair.forEach(free));
+      [scene, glow].forEach(free);
       agents = [0, 1].map(() => target(aw, ah, gl.RGBA32F, gl.RGBA, gl.FLOAT, false, data));
-      trail = [0, 1].map(() => target(tw, th, gl.R16F, gl.RED, gl.HALF_FLOAT, true));
+      trail = [0, 1].map(() => {
+        const t = target(tw, th, gl.R16F, gl.RED, gl.HALF_FLOAT, true);
+        gl.bindTexture(gl.TEXTURE_2D, t.t); // wrap, so sensing and diffusion continue across edges
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+        return t;
+      });
       dust = [0, 1].map(() => target(tw, th, gl.R16F, gl.RED, gl.HALF_FLOAT, false));
       scene = target(tw, th, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, true); // field image seen through the glass
+      glow = target(Math.ceil(tw / 4), Math.ceil(th / 4), gl.R16F, gl.RED, gl.HALF_FLOAT, false);
+      gl.bindTexture(gl.TEXTURE_2D, glow.t);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
       dust.forEach(d => { gl.bindFramebuffer(gl.FRAMEBUFFER, d.fb); gl.clearColor(0, 0, 0, 1); gl.clear(gl.COLOR_BUFFER_BIT); });
+
+      if (old) {
+        gl.disable(gl.BLEND);
+        gl.bindVertexArray(quadVao);
+        gl.useProgram(prog.copy.p);
+        gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, old[0].t);
+        gl.uniform1i(prog.copy.u.src, 0);
+        gl.viewport(0, 0, tw, th);
+        trail.forEach(t => { gl.bindFramebuffer(gl.FRAMEBUFFER, t.fb); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); });
+        old.forEach(free);
+      }
     }
 
     // Positions arrive in 0–1 screen space (y down); convert to trail pixels (y up).
@@ -389,7 +476,7 @@ void main() { o = vec4(1.0, 0.0, 0.0, 1.0); }`;
     }
 
     function step() {
-      time += 0.016;
+      frame = (frame + 1) >>> 0;
       gl.disable(gl.BLEND);
 
       // 1. agents sense trail[0] and move: agents[0] -> agents[1]
@@ -403,7 +490,7 @@ void main() { o = vec4(1.0, 0.0, 0.0, 1.0); }`;
       gl.uniform1i(uu.agents, 0); gl.uniform1i(uu.trail, 1);
       gl.uniform2f(uu.res, tw, th);
       gl.uniform1f(uu.sa, P.sensorAngle); gl.uniform1f(uu.sd, P.sensorDist * k);
-      gl.uniform1f(uu.ra, P.turn); gl.uniform1f(uu.speed, P.speed * k); gl.uniform1f(uu.time, time);
+      gl.uniform1f(uu.ra, P.turn); gl.uniform1f(uu.speed, P.speed * k); gl.uniform1ui(uu.frame, frame);
       gl.uniform1f(uu.disturbR, P.disturbRadius * k); gl.uniform3fv(uu.mouse, mouse);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
       agents.reverse();
@@ -457,24 +544,34 @@ void main() { o = vec4(1.0, 0.0, 0.0, 1.0); }`;
       gl.drawArrays(gl.POINTS, 0, aw * ah);
       gl.disable(gl.BLEND);
 
-      gl.bindTexture(gl.TEXTURE_2D, trail[0].t);
-      gl.generateMipmap(gl.TEXTURE_2D); // for the glow
+      gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, trail[0].t);
+      gl.generateMipmap(gl.TEXTURE_2D); // for the glow and the relief
+
+      gl.bindVertexArray(quadVao);
+      gl.useProgram(prog.glow.p);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, glow.fb);
+      gl.viewport(0, 0, Math.ceil(tw / 4), Math.ceil(th / 4));
+      gl.uniform1i(prog.glow.u.trail, 0);
+      gl.uniform2f(prog.glow.u.res, tw, th);
+      gl.uniform1f(prog.glow.u.exposure, P.exposure);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
       // With a glass window open the field renders into `scene` first, then through the glass.
       const glassOn = glass.alpha > 0.001;
       gl.bindFramebuffer(gl.FRAMEBUFFER, glassOn ? scene.fb : null);
-      gl.viewport(0, 0, glassOn ? tw : canvas.width, glassOn ? th : canvas.height);
-      gl.bindVertexArray(quadVao);
+      gl.viewport(0, 0, tw, th);
       gl.useProgram(prog.render.p);
-      gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, trail[0].t);
       gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, dust[0].t);
+      gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D, glow.t);
       const ur = prog.render.u;
       gl.uniform1i(ur.trail, 0);
       gl.uniform1i(ur.dust, 1);
+      gl.uniform1i(ur.glow, 2);
       gl.uniform2f(ur.res, tw, th);
       gl.uniform1f(ur.exposure, P.exposure);
       gl.uniform1f(ur.relief, P.relief);
       gl.uniform1f(ur.breath, breath);
-      gl.uniform1f(ur.time, time);
+      gl.uniform1ui(ur.frame, frame);
       gl.uniform1f(ur.signalSpeed, P.signalSpeed * k);
       gl.uniform4fv(ur.sig, sig);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
@@ -483,7 +580,6 @@ void main() { o = vec4(1.0, 0.0, 0.0, 1.0); }`;
       gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, scene.t);
       gl.generateMipmap(gl.TEXTURE_2D); // blur levels for the frost
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-      gl.viewport(0, 0, canvas.width, canvas.height);
       gl.useProgram(prog.glass.p);
       const ug = prog.glass.u;
       gl.uniform1i(ug.scene, 0);
@@ -497,8 +593,9 @@ void main() { o = vec4(1.0, 0.0, 0.0, 1.0); }`;
     }
 
     return {
-      resize, setFood, setMouse, setSignals, setGlass, step, render, params: P,
-      get agentCount() { return aw * ah; }
+      resize, setFood, setMouse, setSignals, setGlass, step, render, params: P, info,
+      get agentCount() { return aw * ah; },
+      get size() { return [tw, th]; }
     };
   }
 
