@@ -17,7 +17,7 @@ window.GLYPHS = {
   birdscape: '<path d="M4 24Q7 14 10 24T16 24T22 24"/><path d="M27 24C27 14 44 13 44 24C44 35 27 34 27 24Z"/><circle cx="36" cy="24" r="3"/>',
   // Square and the flows crossing it
   kadikoy: '<rect x="9" y="9" width="30" height="30"/><path d="M4 31C16 31 22 19 44 17"/><path d="M15 44C17 31 29 22 31 4"/>',
-  // Murray's-law branching ending in alveoli
+  // Murray's-law branching ending in alveoli (the M.Sc. thesis, unused until it is published)
   thesis: '<path d="M24 44V32M24 32L15 23M24 32L33 23M15 23L11 16M15 23L19 16M33 23L29 16M33 23L37 16"/><circle cx="11" cy="12.5" r="3.5"/><circle cx="19" cy="12.5" r="3.5"/><circle cx="29" cy="12.5" r="3.5"/><circle cx="37" cy="12.5" r="3.5"/>',
   // Urban grid turning into a slime-mold network
   stylegan: '<circle cx="7" cy="16" r="1"/><circle cx="14" cy="16" r="1"/><circle cx="21" cy="16" r="1"/><circle cx="7" cy="24" r="1"/><circle cx="14" cy="24" r="1"/><circle cx="21" cy="24" r="1"/><circle cx="7" cy="32" r="1"/><circle cx="14" cy="32" r="1"/><circle cx="21" cy="32" r="1"/><path d="M27 14L35 20L44 13M35 20L33 30L42 37M33 30L26 35"/>',

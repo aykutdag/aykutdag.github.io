@@ -119,7 +119,7 @@ window.PROJECTS = [
       ["Size", "23,000 m²"],
       ["Architect", "Melike Altınışık Architects (MAA) + WITHWORKS (WW) + MUSU Architects"],
       ["Design architect", "Melike Altınışık Architects"],
-      ["Project team (competition stage)", "Aykut Dağ, Atakan Gündüz, Adham Mashaal, Elifcan Merden"],
+      ["Project team (competition stage)", "Aykut Dağ, Atakan Gündüz, Adham Mashaal, Elifcan Merdan"],
       ["Architectural assistant team", "Muskaan Chowdhary, Anya Ghosh, Faizan Sharief"]
     ],
     duties: ["Leading interns", "Concept design development", "Contributed to diagram production", "Visualization"],
@@ -230,54 +230,14 @@ window.PROJECTS = [
 
   // ---------- Research (İTÜ Architectural Design Computing; Bauhaus-Universität Weimar) ----------
   {
-    group: "research", glyph: "thesis",
-    title: "Immaterial Architectural Space",
-    short: "Immaterial Space",
-    meta: "İTÜ · 2025– · M.Sc. thesis",
-    text: ["A bio-inspired pneumatic modular system based on alveolar structures and Murray's Law, prototyped with cast platinum-cure silicone and 3D-printed TPU constraint networks."],
-    credits: [
-      ["Location", "Istanbul Technical University"],
-      ["Date", "2025–"],
-      ["Type", "M.Sc. thesis, research through design"],
-      ["Programme", "Architectural Design Computing, İTÜ"],
-      ["Role", "Researcher (advisor: Assoc. Prof. Dr. Sevil Yazıcı)"]
-    ],
-    x: 0.24, y: 0.46
-  },
-  {
-    group: "research", glyph: "weimar",
-    title: "Urban Porosity in Weimar",
-    short: "Urban Porosity",
-    meta: "Bauhaus-Universität Weimar · 2025 · Urban simulation",
-    text: [
-      "Physarum polycephalum is a single-celled organism that forms efficient networks, inspiring simulations for urban design and infrastructure planning. This project uses a Physarum-inspired, agent-based model to simulate an adaptive and porous urban fabric in Weimar.",
-      "Instead of a rigid top-down plan, the network emerges organically from attractor points, generating efficient and flexible connections. The goal is an urban system that self-organizes, negotiates complexity, and integrates green, open, and resilient spaces.",
-      "The project imagines the city plan as a kind of machine dream, where urban structure emerges through the adaptive logic of Physarum. The visual transitions were created with StyleGAN, merging the patterns of slime mold and the geometries of urban grids; the process was then simulated and refined within a parametric design environment, translating this vision onto the fabric of Weimar."
-    ],
-    credits: [
-      ["Project", "Urban Porosity in Weimar: Physarum-Inspired Agent-Based Urban Fabric Generation (Part I)"],
-      ["Course", "Parametric Urban Design & Analysis"],
-      ["Institution", "Bauhaus-Universität Weimar (Erasmus+ exchange)"],
-      ["Date", "Summer semester 2025"],
-      ["Location", "Weimar, Germany"],
-      ["Type", "Course project, agent-based simulation and video"],
-      ["Author", "Aykut Dağ"],
-      ["Tools", "TouchDesigner, StyleGAN, After Effects"]
-    ],
-    film: { src: "media/urban-porosity.mp4", poster: "img/weimar-poster.jpg", portrait: true },
-    links: [{ label: "Instagram post", href: "https://www.instagram.com/p/DQRRft4CGt-/", icon: "instagram" }],
-    images: ["img/weimar-1.jpg", "img/weimar-2.jpg"],
-    x: 0.84, y: 0.40
-  },
-  {
     group: "research", glyph: "stylegan",
-    title: "Physarum × StyleGAN",
-    short: "Physarum × StyleGAN",
-    meta: "İTÜ · 2024 · Machine learning",
+    title: "Physarum Urban Generation I: Istanbul",
+    short: "Physarum Urban I",
+    meta: "İTÜ · 2024 · Machine learning (part I)",
     text: [
       "Physarum polycephalum connects food sources through remarkably efficient networks; in a maze it finds the shortest path between two food sources (Nakagaki et al., 2000). This paper asks whether that natural optimization can inform urban form, using Istanbul as the case.",
       "A StyleGAN3 model was trained in Google Colab on two datasets: urban plans of Istanbul’s suburban and historical fabric at different scales, and images of Physarum growth patterns. The generated images blend the two into hybrid urban patterns, morphological variations from dense cores to sprawling networks, and new configurations.",
-      "The results were mixed: some outputs captured both the city and the organism, while others overfitted, lost spatial coherence or varied in quality. More diverse training data, better model settings and stronger evaluation metrics are named as the next steps."
+      "The results were mixed: some outputs captured both the city and the organism, while others overfitted, lost spatial coherence or varied in quality. More diverse training data, better model settings and stronger evaluation metrics are named as the next steps. The study continued as part II at Bauhaus-Universität Weimar."
     ],
     credits: [
       ["Project", "Machine Learning for Biomimicry in Architecture: Synthesizing Urban and Fungal Patterns Using StyleGAN, the Case of Istanbul"],
@@ -289,7 +249,32 @@ window.PROJECTS = [
       ["Tools", "StyleGAN3, Python, Google Colab"]
     ],
     images: ["img/stylegan-1.jpg", "img/stylegan-2.jpg", "img/stylegan-3.jpg", "img/stylegan-4.jpg", "img/stylegan-5.jpg", "img/stylegan-6.jpg", "img/stylegan-7.jpg"],
-    x: 0.56, y: 0.30
+    x: 0.28, y: 0.44
+  },
+  {
+    group: "research", glyph: "weimar",
+    title: "Physarum Urban Generation II: Weimar",
+    short: "Physarum Urban II",
+    meta: "Bauhaus-Universität Weimar · 2025 · Urban simulation (part II)",
+    text: [
+      "Physarum polycephalum is a single-celled organism that forms efficient networks, inspiring simulations for urban design and infrastructure planning. This project uses a Physarum-inspired, agent-based model to simulate an adaptive and porous urban fabric in Weimar.",
+      "Instead of a rigid top-down plan, the network emerges organically from attractor points, generating efficient and flexible connections. The goal is an urban system that self-organizes, negotiates complexity, and integrates green, open, and resilient spaces.",
+      "The project imagines the city plan as a kind of machine dream, where urban structure emerges through the adaptive logic of Physarum. The visual transitions come from part I, where StyleGAN merged the patterns of slime mold with the geometries of urban grids; here the process was simulated and refined within a parametric design environment, translating this vision onto the fabric of Weimar."
+    ],
+    credits: [
+      ["Project", "Urban Porosity in Weimar: Physarum-Inspired Agent-Based Urban Fabric Generation"],
+      ["Course", "Parametric Urban Design & Analysis"],
+      ["Institution", "Bauhaus-Universität Weimar (Erasmus+ exchange)"],
+      ["Date", "Summer semester 2025"],
+      ["Location", "Weimar, Germany"],
+      ["Type", "Course project, agent-based simulation and video"],
+      ["Author", "Aykut Dağ"],
+      ["Tools", "Rhino, Grasshopper, TouchDesigner, StyleGAN, After Effects"]
+    ],
+    film: { src: "media/urban-porosity.mp4", poster: "img/weimar-poster.jpg", portrait: true },
+    links: [{ label: "Instagram post", href: "https://www.instagram.com/p/DQRRft4CGt-/", icon: "instagram" }],
+    images: ["img/weimar-1.jpg", "img/weimar-2.jpg"],
+    x: 0.58, y: 0.30
   },
   {
     group: "research", glyph: "acoustic",
@@ -311,7 +296,7 @@ window.PROJECTS = [
       ["Tools", "Rhino, Grasshopper, Firefly, IsoVist, Pachyderm"]
     ],
     images: ["img/acoustic-1.jpg", "img/acoustic-2.jpg", "img/acoustic-3.jpg", "img/acoustic-4.jpg", "img/acoustic-5.jpg", "img/acoustic-6.jpg", "img/acoustic-7.jpg", "img/acoustic-8.jpg", "img/acoustic-9.jpg"],
-    x: 0.70, y: 0.62
+    x: 0.80, y: 0.52
   },
   {
     group: "research", glyph: "orchestra",
@@ -335,7 +320,7 @@ window.PROJECTS = [
     ],
     film: { src: "media/orchestra.mp4", poster: "img/orchestra-poster.jpg" },
     images: ["img/orchestra-1.jpg", "img/orchestra-2.jpg", "img/orchestra-3.jpg", "img/orchestra-4.jpg", "img/orchestra-5.jpg", "img/orchestra-6.jpg", "img/orchestra-7.jpg", "img/orchestra-8.jpg", "img/orchestra-9.jpg", "img/orchestra-10.jpg"],
-    x: 0.20, y: 0.80
+    x: 0.22, y: 0.78
   },
   {
     group: "research", glyph: "concrete",
@@ -357,7 +342,7 @@ window.PROJECTS = [
       ["Tools", "Rhino, Grasshopper, Crane, Kangaroo, Weaverbird, Agisoft Metashape, 3D printing (PLA)"]
     ],
     images: ["img/concrete-1.jpg", "img/concrete-2.jpg", "img/concrete-3.jpg", "img/concrete-4.jpg", "img/concrete-5.jpg", "img/concrete-6.jpg", "img/concrete-7.jpg", "img/concrete-8.jpg", "img/concrete-9.jpg", "img/concrete-10.jpg", "img/concrete-11.jpg", "img/concrete-12.jpg"],
-    x: 0.40, y: 0.64
+    x: 0.52, y: 0.70
   },
 
   // ---------- Installations and media ----------
