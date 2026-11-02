@@ -460,7 +460,10 @@
     const forced = parseInt(params.get("tier"), 10);
     if (forced >= 0 && forced < TIERS.length) return forced;
     if (!touch) return 0;
-    return Math.min(innerWidth, innerHeight) < 600 ? TIERS.indexOf(0.9) : TIERS.indexOf(1.4); // phone : tablet
+    // Phones with 3x screens (an iPhone 16 Pro ran tier 3 at a steady 60 fps) start one tier
+    // sharper; other phones at 0.9 MP, tablets at 1.4 MP. The governor steps down if needed.
+    if (Math.min(innerWidth, innerHeight) >= 600) return TIERS.indexOf(1.4);
+    return TIERS.indexOf((devicePixelRatio || 1) >= 3 ? 1.4 : 0.9);
   }
 
   function scaleFor(t) { // trail pixels per CSS pixel
