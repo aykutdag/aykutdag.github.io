@@ -21,6 +21,12 @@ window.GLYPHS = {
   thesis: '<path d="M24 44V32M24 32L15 23M24 32L33 23M15 23L11 16M15 23L19 16M33 23L29 16M33 23L37 16"/><circle cx="11" cy="12.5" r="3.5"/><circle cx="19" cy="12.5" r="3.5"/><circle cx="29" cy="12.5" r="3.5"/><circle cx="37" cy="12.5" r="3.5"/>',
   // Urban grid turning into a slime-mold network
   stylegan: '<circle cx="7" cy="16" r="1"/><circle cx="14" cy="16" r="1"/><circle cx="21" cy="16" r="1"/><circle cx="7" cy="24" r="1"/><circle cx="14" cy="24" r="1"/><circle cx="21" cy="24" r="1"/><circle cx="7" cy="32" r="1"/><circle cx="14" cy="32" r="1"/><circle cx="21" cy="32" r="1"/><path d="M27 14L35 20L44 13M35 20L33 30L42 37M33 30L26 35"/>',
+  // Porous cells inside an urban block outline
+  weimar: '<path d="M8 6H40V42H12Z"/><circle cx="18" cy="16" r="4"/><circle cx="30" cy="18" r="5"/><circle cx="20" cy="30" r="5"/><circle cx="32" cy="33" r="3.5"/>',
+  // Sound source, its waves and the panels turning around it
+  acoustic: '<circle cx="24" cy="24" r="2.5"/><path d="M15 15A12.7 12.7 0 0 1 33 15M15 33A12.7 12.7 0 0 0 33 33"/><path d="M6 10L10 6M38 6L42 10M6 38L10 42M38 42L42 38M4 24H9M39 24H44"/>',
+  // Piezo disc wired to three LEDs
+  orchestra: '<circle cx="15" cy="33" r="9"/><circle cx="15" cy="33" r="4"/><path d="M24 33H30V12M30 27H38M30 19H42M30 12H34"/><circle cx="39.5" cy="27" r="1.5"/><circle cx="43.5" cy="19" r="1.5"/><circle cx="35.5" cy="12" r="1.5"/>',
   // Fabric membrane sagging in a frame
   concrete: '<path d="M6 12H42M6 12V7M42 12V7"/><path d="M6 12Q24 42 42 12"/><path d="M13 12Q24 31 35 12"/>',
   // EEG trace running through a room

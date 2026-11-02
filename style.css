@@ -295,7 +295,10 @@ body:not(.gl-glass) .win {
 /* 16:9 from padding (resolved from the width everywhere), not aspect-ratio, whose height
    can collapse inside a scrolling column and let the next image slide under the video */
 .win .video { position: relative; height: 0; padding-bottom: 56.25%; border-radius: 12px; overflow: hidden; background: #000; }
-.win .video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.win .video iframe, .win .video video { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.win .video video { object-fit: contain; background: #000; }
+/* a vertical (9:16) film: narrower, centred, so it does not fill the whole column */
+.win .video.portrait { width: min(100%, 340px); margin-left: auto; margin-right: auto; padding-bottom: min(177.78%, 604px); }
 .win dt { font-family: var(--mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; padding-top: 2px; }
 .win dd { margin: 0; }
 .win p { font-size: 15px; line-height: 1.6; color: #d8e0e4; margin: 0 0 14px; }

@@ -2,8 +2,10 @@
 // GROUPS x / y place each colony on the opening field (0–1 of the screen width / height).
 // Project x / y place the node once its colony is open.
 // Practice texts and credits follow Aykut_Dag_Portfolio.pdf; installations follow
-// AykutDag_MediaPortfolio.pdf. credits: [label, value] rows of the project's credit block.
-// short: the node label on phones. text: paragraphs. duties: responsibilities. video: YouTube id. links: [{ label, href, icon }].
+// AykutDag_MediaPortfolio.pdf; research projects summarize the course reports.
+// credits: [label, value] rows of the project's credit block. short: the node label on phones.
+// text: paragraphs. duties: responsibilities. video: YouTube id.
+// film: a video hosted with the site { src, poster, portrait }. links: [{ label, href, icon }].
 window.GROUPS = [
   { id: "practice", label: "Practice", note: "Architecture offices", x: 0.30, y: 0.56 },
   { id: "research", label: "Research", note: "Academic work", x: 0.70, y: 0.32 },
@@ -36,6 +38,7 @@ window.PROJECTS = [
       ["Media assistant team", "Alper Fatih Tepe, Elif Yalçın, Samet Yılmaz, Yağmur Ayaydın"]
     ],
     duties: ["Team leading", "Concept design development", "Architectural layouts, space organizations", "Managing area lists", "2D drawings (plan, section, elevation)", "Contributed to diagram production", "Visualization", "Architectural model photography & videography"],
+    links: [{ label: "Project page at Melike Altınışık Architects", href: "https://www.melikealtinisik.com/2-index/3549-iisejong-cultural-center-for-performing-arts/", icon: "external" }],
     images: ["img/sejong-1.jpg", "img/sejong-2.jpg", "img/sejong-3.jpg", "img/sejong-4.jpg"],
     credit: "2D drawings by Aykut Dağ · renders by MAA",
     x: 0.56, y: 0.26
@@ -64,6 +67,7 @@ window.PROJECTS = [
       ["Architectural assistant team", "Onkar Pal, Rabia Maral"]
     ],
     duties: ["Team leading", "Concept design development", "Contributed to diagram production", "Visualization"],
+    links: [{ label: "Project page at Melike Altınışık Architects", href: "https://www.melikealtinisik.com/2-index/3645-libreville-arena-convention-center/", icon: "external" }],
     images: ["img/libreville-1.jpg", "img/libreville-2.jpg", "img/libreville-3.jpg"],
     x: 0.86, y: 0.38
   },
@@ -91,6 +95,7 @@ window.PROJECTS = [
       ["Architectural assistant team", "Onkar Pal, Elif Yalçın"]
     ],
     duties: ["Leading interns", "Concept design development", "Contributed to diagram production", "Visualization"],
+    links: [{ label: "Project page at Melike Altınışık Architects", href: "https://www.melikealtinisik.com/2-index/3608-banpo-cultural-connection-park/", icon: "external" }],
     images: ["img/banpo-1.jpg", "img/banpo-2.jpg", "img/banpo-3.jpg"],
     x: 0.22, y: 0.42
   },
@@ -143,6 +148,7 @@ window.PROJECTS = [
       ["Architectural assistant team", "Kutay Koçtekin, Abdullah Aydemir, Abdullah Mallah"]
     ],
     duties: ["Intern team leading", "Concept design development", "Architectural layouts, space organizations", "Managing area lists", "2D drawings (plan, section, elevation)", "Contributed to diagram production", "Visualization"],
+    links: [{ label: "Project page at Melike Altınışık Architects", href: "https://www.melikealtinisik.com/2-index/3681-nef-baku-residence/", icon: "external" }],
     images: ["img/nefbaku-1.jpg", "img/nefbaku-2.jpg", "img/nefbaku-3.jpg"],
     credit: "Renders by MAA",
     x: 0.70, y: 0.58
@@ -194,6 +200,7 @@ window.PROJECTS = [
       ["Architectural assistant team", "Tuğçe Naz Demir"]
     ],
     duties: ["Team leading", "Concept design development", "Architectural layouts, space organizations", "2D drawings (plan, section, elevation)", "Contributed to diagram production", "Visualization"],
+    links: [{ label: "COA Hills at Melike Altınışık Architects", href: "https://www.melikealtinisik.com/2-index/3462-coa-hills/", icon: "external" }],
     images: ["img/birdscape-1.jpg", "img/birdscape-2.jpg", "img/birdscape-3.jpg", "img/birdscape-4.jpg"],
     x: 0.16, y: 0.74
   },
@@ -221,7 +228,7 @@ window.PROJECTS = [
     x: 0.46, y: 0.82
   },
 
-  // ---------- Research (drafts until the academic texts are compiled) ----------
+  // ---------- Research (İTÜ Architectural Design Computing; Bauhaus-Universität Weimar) ----------
   {
     group: "research", glyph: "thesis",
     title: "Immaterial Architectural Space",
@@ -235,35 +242,122 @@ window.PROJECTS = [
       ["Programme", "Architectural Design Computing, İTÜ"],
       ["Role", "Researcher (advisor: Assoc. Prof. Dr. Sevil Yazıcı)"]
     ],
-    x: 0.30, y: 0.50
+    x: 0.24, y: 0.46
+  },
+  {
+    group: "research", glyph: "weimar",
+    title: "Urban Porosity in Weimar",
+    short: "Urban Porosity",
+    meta: "Bauhaus-Universität Weimar · 2025 · Urban simulation",
+    text: [
+      "Physarum polycephalum is a single-celled organism that forms efficient networks, inspiring simulations for urban design and infrastructure planning. This project uses a Physarum-inspired, agent-based model to simulate an adaptive and porous urban fabric in Weimar.",
+      "Instead of a rigid top-down plan, the network emerges organically from attractor points, generating efficient and flexible connections. The goal is an urban system that self-organizes, negotiates complexity, and integrates green, open, and resilient spaces.",
+      "The project imagines the city plan as a kind of machine dream, where urban structure emerges through the adaptive logic of Physarum. The visual transitions were created with StyleGAN, merging the patterns of slime mold and the geometries of urban grids; the process was then simulated and refined within a parametric design environment, translating this vision onto the fabric of Weimar."
+    ],
+    credits: [
+      ["Project", "Urban Porosity in Weimar: Physarum-Inspired Agent-Based Urban Fabric Generation (Part I)"],
+      ["Course", "Parametric Urban Design & Analysis"],
+      ["Institution", "Bauhaus-Universität Weimar (Erasmus+ exchange)"],
+      ["Date", "Summer semester 2025"],
+      ["Location", "Weimar, Germany"],
+      ["Type", "Course project, agent-based simulation and video"],
+      ["Author", "Aykut Dağ"],
+      ["Tools", "TouchDesigner, StyleGAN, After Effects"]
+    ],
+    film: { src: "media/urban-porosity.mp4", poster: "img/weimar-poster.jpg", portrait: true },
+    links: [{ label: "Instagram post", href: "https://www.instagram.com/p/DQRRft4CGt-/", icon: "instagram" }],
+    images: ["img/weimar-1.jpg", "img/weimar-2.jpg"],
+    x: 0.84, y: 0.40
   },
   {
     group: "research", glyph: "stylegan",
     title: "Physarum × StyleGAN",
     short: "Physarum × StyleGAN",
-    meta: "İTÜ · Machine learning",
-    text: ["StyleGAN models trained to blend historic urban morphology with the growth patterns of the slime mold Physarum polycephalum, as a generator for emergent urban layouts. The network on this page runs on the same organism's logic."],
-    credits: [
-      ["Location", "Istanbul Technical University"],
-      ["Type", "Research, machine learning"],
-      ["Programme", "Architectural Design Computing, İTÜ"],
-      ["Role", "Researcher"]
+    meta: "İTÜ · 2024 · Machine learning",
+    text: [
+      "Physarum polycephalum connects food sources through remarkably efficient networks; in a maze it finds the shortest path between two food sources (Nakagaki et al., 2000). This paper asks whether that natural optimization can inform urban form, using Istanbul as the case.",
+      "A StyleGAN3 model was trained in Google Colab on two datasets: urban plans of Istanbul’s suburban and historical fabric at different scales, and images of Physarum growth patterns. The generated images blend the two into hybrid urban patterns, morphological variations from dense cores to sprawling networks, and new configurations.",
+      "The results were mixed: some outputs captured both the city and the organism, while others overfitted, lost spatial coherence or varied in quality. More diverse training data, better model settings and stronger evaluation metrics are named as the next steps."
     ],
-    x: 0.64, y: 0.36
+    credits: [
+      ["Project", "Machine Learning for Biomimicry in Architecture: Synthesizing Urban and Fungal Patterns Using StyleGAN, the Case of Istanbul"],
+      ["Course", "MBL 559E, Spring 2023–24"],
+      ["Programme", "M.Sc. Architectural Design Computing, Istanbul Technical University"],
+      ["Date", "June 2024"],
+      ["Type", "Course research paper"],
+      ["Author", "Aykut Dağ"],
+      ["Tools", "StyleGAN3, Python, Google Colab"]
+    ],
+    images: ["img/stylegan-1.jpg", "img/stylegan-2.jpg", "img/stylegan-3.jpg", "img/stylegan-4.jpg", "img/stylegan-5.jpg", "img/stylegan-6.jpg", "img/stylegan-7.jpg"],
+    x: 0.56, y: 0.30
+  },
+  {
+    group: "research", glyph: "acoustic",
+    title: "Adaptive Acoustic Panels in Open Office Layouts",
+    short: "Adaptive Acoustics",
+    meta: "İTÜ · 2024 · Generative systems",
+    text: [
+      "Open-plan offices support collaboration but suffer from noise, echo and low speech privacy. This study proposes acoustic panels that respond to sound in real time: they close around loud areas to contain the noise and open again in quiet periods, so the office stays communicative.",
+      "Live sound from a microphone is streamed into Grasshopper with Firefly; panels near the source rotate more, distant ones less. Rectangular, hexagonal and radial grids of 1 m modules were simulated, with IsoVist measuring the areas reached by direct sound and Pachyderm tracing the reflections.",
+      "In a fully open layout, direct sound reached 29.5% of the floor with the rectangular grid, 35% with the hexagonal and 40% with the radial grid. Reflections spread widest with the rectangular grid and faded fastest with the hexagonal and radial grids."
+    ],
+    credits: [
+      ["Project", "Adaptive Acoustic Panels in Open Office Layouts: Impact of Different Grid Configurations on Noise Control"],
+      ["Course", "MBL 512 Üretken Sistemler (Generative Systems)"],
+      ["Programme", "M.Sc. Architectural Design Computing, Istanbul Technical University"],
+      ["Date", "June 2024"],
+      ["Type", "Course research paper"],
+      ["Author", "Aykut Dağ"],
+      ["Tools", "Rhino, Grasshopper, Firefly, IsoVist, Pachyderm"]
+    ],
+    images: ["img/acoustic-1.jpg", "img/acoustic-2.jpg", "img/acoustic-3.jpg", "img/acoustic-4.jpg", "img/acoustic-5.jpg", "img/acoustic-6.jpg", "img/acoustic-7.jpg", "img/acoustic-8.jpg", "img/acoustic-9.jpg"],
+    x: 0.70, y: 0.62
+  },
+  {
+    group: "research", glyph: "orchestra",
+    title: "The Orchestra of Illumination",
+    short: "Orchestra",
+    meta: "İTÜ · 2024 · Smart materials",
+    text: [
+      "An interactive installation in which visitors’ steps make light. Its floor is a pressure-sensing system of piezo discs: each press generates a small current that lights LEDs, so the space turns human behaviour into light without batteries or an Arduino.",
+      "The form was found in Grasshopper with an attractor-point system: lights close to a pressure node shine brighter, distant ones dimmer. The circuit was simulated in Fritzing and tested on a breadboard prototype with different numbers of LEDs and piezo discs.",
+      "The best setup lit nine LEDs in a series circuit with parallel sections and a diode after every two LEDs; the LEDs’ own resistance made extra resistors and capacitors unnecessary. The study points to programmable building surfaces that harvest energy from people or wind."
+    ],
+    credits: [
+      ["Project", "Creating Interaction Spaces from the Human Behavior Data of Pressure on Piezo Buzzer: The Case of “The Orchestra of Illumination”"],
+      ["Course", "MBL 557E Material-Based Computational Design in Architecture"],
+      ["Instructor", "Assoc. Prof. Dr. Sevil Yazıcı"],
+      ["Programme", "M.Sc. Architectural Design Computing, Istanbul Technical University"],
+      ["Date", "Fall 2023–24 (January 2024)"],
+      ["Type", "Course project, interactive installation prototype"],
+      ["Author", "Aykut Dağ"],
+      ["Tools", "Rhino, Grasshopper, Fritzing, piezo discs, LEDs"]
+    ],
+    film: { src: "media/orchestra.mp4", poster: "img/orchestra-poster.jpg" },
+    images: ["img/orchestra-1.jpg", "img/orchestra-2.jpg", "img/orchestra-3.jpg", "img/orchestra-4.jpg", "img/orchestra-5.jpg", "img/orchestra-6.jpg", "img/orchestra-7.jpg", "img/orchestra-8.jpg", "img/orchestra-9.jpg", "img/orchestra-10.jpg"],
+    x: 0.20, y: 0.80
   },
   {
     group: "research", glyph: "concrete",
     title: "Concrete Flowers",
     short: "Concrete Flowers",
-    meta: "İTÜ · Fabric formwork",
-    text: ["A deployable mold system combining parametric modelling, 3D-printed articulated frames and flexible fabric membranes to cast variable concrete panels."],
-    credits: [
-      ["Location", "Istanbul Technical University"],
-      ["Type", "Research, digital fabrication"],
-      ["Programme", "Digital Architectural Design and Modelling, İTÜ"],
-      ["Role", "Designer"]
+    meta: "İTÜ · 2023 · Fabric formwork",
+    text: [
+      "A deployable mold for micro-scale fabric formwork, developed from an origami crease pattern of four valley and four mountain lines with added supports, so that the unit stands on its own and still folds into many variations.",
+      "The folding was studied in Grasshopper with Crane, then built through laser-cut and 3D-printed trials to a final PLA mold whose eight legs adjust in height step by step, joined at a central detail that lets each move independently. Viscose fabric laid over the strung frame takes the concrete: three parts white cement to one part water, cured for 12 hours.",
+      "Four casts with different leg heights produced eight-petalled “concrete flowers”. They were digitized with photogrammetry and compared with Kangaroo fabric simulations: the overall forms match while the bulges differ. As modules, the units suggest facade panels, screens and kinetic surfaces."
     ],
-    x: 0.54, y: 0.72
+    credits: [
+      ["Project", "Extending Possibilities of Deployable Fabric Formwork in the Case of “Concrete Flowers”"],
+      ["Course", "MBL 513E Digital Architectural Design and Modeling"],
+      ["Programme", "M.Sc. Architectural Design Computing, Istanbul Technical University"],
+      ["Date", "Fall 2023"],
+      ["Type", "Course project, physical and digital"],
+      ["Author", "Aykut Dağ"],
+      ["Tools", "Rhino, Grasshopper, Crane, Kangaroo, Weaverbird, Agisoft Metashape, 3D printing (PLA)"]
+    ],
+    images: ["img/concrete-1.jpg", "img/concrete-2.jpg", "img/concrete-3.jpg", "img/concrete-4.jpg", "img/concrete-5.jpg", "img/concrete-6.jpg", "img/concrete-7.jpg", "img/concrete-8.jpg", "img/concrete-9.jpg", "img/concrete-10.jpg", "img/concrete-11.jpg", "img/concrete-12.jpg"],
+    x: 0.40, y: 0.64
   },
 
   // ---------- Installations and media ----------

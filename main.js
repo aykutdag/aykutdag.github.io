@@ -421,7 +421,8 @@
 
   const ICONS = {
     instagram: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="0.9"/></svg>',
-    youtube: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="5.5" width="19" height="13" rx="4"/><path d="M10 9.2L15 12L10 14.8Z"/></svg>'
+    youtube: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="5.5" width="19" height="13" rx="4"/><path d="M10 9.2L15 12L10 14.8Z"/></svg>',
+    external: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 4.5H19.5V10.5M19.5 4.5L11 13M17 14V19.5H4.5V7H10"/></svg>'
   };
 
   // A project window: credits, description and responsibilities on the left; video and
@@ -470,6 +471,19 @@
         box.append(f);
         media.append(box);
       }
+      if (p.film) {
+        const box = el("div", "video" + (p.film.portrait ? " portrait" : ""));
+        const v = document.createElement("video");
+        v.controls = true;
+        v.playsInline = true;
+        v.preload = "none"; // nothing downloads until the visitor presses play
+        v.poster = p.film.poster;
+        v.src = p.film.src;
+        v.setAttribute("controlslist", "nodownload");
+        v.setAttribute("aria-label", p.title + " (video)");
+        box.append(v);
+        media.append(box);
+      }
       (p.images || []).forEach((src, k) => {
         const img = el("img");
         img.src = src;
@@ -478,12 +492,12 @@
         img.decoding = "async";
         media.append(img);
       });
-      if (!p.video && !(p.images && p.images.length)) media.append(el("div", "img-slot", "Images to come"));
+      if (!p.video && !p.film && !(p.images && p.images.length)) media.append(el("div", "img-slot", "Images to come"));
       const cols = el("div", "win-cols");
       cols.append(info, media);
       root.append(head, cols);
     }, centerOf(nodeEls[p.index].btn));
-    if (p.video) Sound.duck(true);
+    if (p.video || p.film) Sound.duck(true);
   }
 
   document.querySelectorAll("[data-panel]").forEach(b => b.addEventListener("click", () => {
