@@ -25,8 +25,6 @@ window.GLYPHS = {
   concrete: '<path d="M6 12H42M6 12V7M42 12V7"/><path d="M6 12Q24 42 42 12"/><path d="M13 12Q24 31 35 12"/>',
   // EEG trace running through a room
   khora: '<rect x="6" y="10" width="36" height="28" rx="1"/><path d="M6 26H13L15 19L18 32L21 15L24 29L26 24H42"/>',
-  // Droplet and ripples
-  vortex: '<path d="M24 4C21 9 21 11 24 12C27 11 27 9 24 4Z"/><circle cx="24" cy="30" r="4"/><circle cx="24" cy="30" r="9"/><circle cx="24" cy="30" r="15"/>',
   // Basilica plan with a play mark
   basilica: '<path d="M6 16H32A8 8 0 0 1 32 32H6Z"/><path d="M17 20L25 24L17 28Z"/>',
   // Whale bubble-net spiral and an agent

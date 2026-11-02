@@ -355,6 +355,8 @@
     if (win.hidden) return false;
     const done = () => {
       win.hidden = true;
+      winBody.replaceChildren(); // also stops a playing video
+      Sound.duck(false);
       win.classList.remove("enter", "leave");
       body.classList.remove("modal");
       chrome.forEach(c => { c.inert = false; });
@@ -374,36 +376,71 @@
     return true;
   }
 
+  const ICONS = {
+    instagram: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="0.9"/></svg>',
+    youtube: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="5.5" width="19" height="13" rx="4"/><path d="M10 9.2L15 12L10 14.8Z"/></svg>'
+  };
+
+  // A project window: credits, description and responsibilities on the left; video and
+  // images on the right. While a video is open the site's own sound steps aside.
   function openProject(p) {
     track("project/" + p.glyph, p.title);
     openWin(root => {
       const head = el("header", "win-head");
       head.append(el("div", "p-no", p.no + " · " + groups.find(g => g.id === p.group).label));
       const h = el("h2", null, p.title); h.id = "win-title"; head.append(h);
+
       const info = el("div", "win-info");
-      const dl = el("dl");
-      [["Location", p.place], ["Year", p.year], ["Type", p.type], ["Context", p.office], ["Role", p.role]]
-        .filter(([, v]) => v)
-        .forEach(([k, v]) => { dl.append(el("dt", null, k), el("dd", null, v)); });
-      info.append(dl, el("p", null, p.text));
-      if (p.credit) info.append(el("p", "credit", p.credit));
-      const media = el("div", "win-media");
-      if (p.images && p.images.length) {
-        p.images.forEach((src, k) => {
-          const img = el("img");
-          img.src = src;
-          img.alt = p.title + ", image " + (k + 1);
-          img.loading = "lazy";
-          img.decoding = "async";
-          media.append(img);
-        });
-      } else {
-        media.append(el("div", "img-slot", "Images to come"));
+      const dl = el("dl", "credits");
+      p.credits.filter(([, v]) => v).forEach(([k, v]) => { dl.append(el("dt", null, k), el("dd", null, v)); });
+      info.append(dl);
+      [].concat(p.text || []).forEach(t => info.append(el("p", null, t)));
+      if (p.duties && p.duties.length) {
+        const ul = el("ul", "duties");
+        p.duties.forEach(d => ul.append(el("li", null, d)));
+        info.append(el("h3", "sub", "Responsibilities"), ul);
       }
+      if (p.credit) info.append(el("p", "credit", p.credit));
+      const links = (p.links || []).concat(p.video ? [{ label: "Watch on YouTube", href: "https://www.youtube.com/watch?v=" + p.video, icon: "youtube" }] : []);
+      if (links.length) {
+        const ul = el("ul", "ext");
+        links.forEach(l => {
+          const a = el("a");
+          a.href = l.href; a.target = "_blank"; a.rel = "noopener";
+          a.innerHTML = ICONS[l.icon] || "";
+          a.append(el("span", null, l.label));
+          a.addEventListener("click", () => track("link/" + (l.icon || "external") + "/" + p.glyph, l.label));
+          const li = el("li"); li.append(a); ul.append(li);
+        });
+        info.append(ul);
+      }
+
+      const media = el("div", "win-media");
+      if (p.video) {
+        const box = el("div", "video");
+        const f = document.createElement("iframe");
+        f.src = "https://www.youtube-nocookie.com/embed/" + p.video + "?rel=0&playsinline=1";
+        f.title = p.title + " (video)";
+        f.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+        f.allowFullscreen = true;
+        f.referrerPolicy = "strict-origin-when-cross-origin"; // YouTube refuses embeds without a referrer
+        box.append(f);
+        media.append(box);
+      }
+      (p.images || []).forEach((src, k) => {
+        const img = el("img");
+        img.src = src;
+        img.alt = p.title + ", image " + (k + 1);
+        img.loading = "lazy";
+        img.decoding = "async";
+        media.append(img);
+      });
+      if (!p.video && !(p.images && p.images.length)) media.append(el("div", "img-slot", "Images to come"));
       const cols = el("div", "win-cols");
       cols.append(info, media);
       root.append(head, cols);
     }, centerOf(nodeEls[p.index].btn));
+    if (p.video) Sound.duck(true);
   }
 
   document.querySelectorAll("[data-panel]").forEach(b => b.addEventListener("click", () => {

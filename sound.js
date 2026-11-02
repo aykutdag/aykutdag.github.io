@@ -10,6 +10,7 @@ window.Sound = (function () {
   let ctx, master, bus, droneFilter, rustleFilter, rustleGain;
   let on = false;
   let hidden = false;
+  let ducked = false; // quiet while something else plays (a project video)
 
   function impulse(seconds) {
     const len = Math.floor(ctx.sampleRate * seconds);
@@ -69,7 +70,7 @@ window.Sound = (function () {
 
   function fade() {
     if (!ctx) return;
-    const now = ctx.currentTime, audible = on && !hidden;
+    const now = ctx.currentTime, audible = on && !hidden && !ducked;
     master.gain.cancelScheduledValues(now);
     master.gain.setTargetAtTime(audible ? 0.9 : 0, now, audible ? 0.6 : 0.25);
   }
@@ -102,6 +103,11 @@ window.Sound = (function () {
     if (!ctx) return;
     if (hidden) { fade(); return; }
     if (on && ctx.state !== "running") ctx.resume().catch(() => {});
+    fade();
+  }
+
+  function duck(v) {
+    ducked = v;
     fade();
   }
 
@@ -170,7 +176,7 @@ window.Sound = (function () {
   }
 
   return {
-    set, unlock, setHidden, activity, chime, blip,
+    set, unlock, setHidden, duck, activity, chime, blip,
     get on() { return on; },
     get state() { return ctx ? ctx.state : "not started"; } // for the ?debug readout
   };
