@@ -288,11 +288,14 @@ precision highp float;
 out vec4 o;
 void main() { o = vec4(1.0, 0.0, 0.0, 1.0); }`;
 
+  let failure = ""; // why the last create() returned null
+
   // Returns null when the device cannot run the simulation (no WebGL2, no float render
   // targets, or a driver that reports them but fails); shader errors throw.
   function create(canvas) {
     const gl = canvas.getContext("webgl2", { antialias: false, alpha: false, powerPreference: "high-performance" });
-    if (!gl || !gl.getExtension("EXT_color_buffer_float")) return null;
+    if (!gl) { failure = "no WebGL2"; return null; }
+    if (!gl.getExtension("EXT_color_buffer_float")) { failure = "no EXT_color_buffer_float"; return null; }
 
     const dbg = gl.getExtension("WEBGL_debug_renderer_info");
     const renderer = String(gl.getParameter(dbg ? dbg.UNMASKED_RENDERER_WEBGL : gl.RENDERER));
@@ -373,6 +376,7 @@ void main() { o = vec4(1.0, 0.0, 0.0, 1.0); }`;
     try {
       [target(4, 4, gl.RGBA32F, gl.RGBA, gl.FLOAT, false), target(4, 4, gl.R16F, gl.RED, gl.HALF_FLOAT, true)].forEach(free);
     } catch (err) {
+      failure = "float render targets fail: " + err.message;
       return null;
     }
 
@@ -599,5 +603,5 @@ void main() { o = vec4(1.0, 0.0, 0.0, 1.0); }`;
     };
   }
 
-  return { create };
+  return { create, get failure() { return failure; } };
 })();

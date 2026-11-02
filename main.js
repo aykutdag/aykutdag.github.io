@@ -1,4 +1,18 @@
 (function () {
+  // ?debug shows a diagnosis readout; ?tier=N forces a quality tier; ?gl=1 runs the
+  // simulation even on a software renderer (for testing).
+  const params = new URLSearchParams(location.search);
+  // What the ?debug readout reports: why the simulation is not running (if so), how many
+  // frames it has drawn, a hash of the drawn pixels (it changes while the field moves),
+  // lost WebGL contexts and any errors.
+  const status = { why: "", frames: 0, lost: 0, hash: "", errors: [] };
+  if (params.has("debug")) {
+    addEventListener("error", e => status.errors.push((e.message || "error") + " @" + String(e.filename || "").split("/").pop() + ":" + e.lineno));
+    addEventListener("unhandledrejection", e => status.errors.push("promise: " + e.reason));
+    const logError = console.error;
+    console.error = function (...a) { status.errors.push(a.map(String).join(" ")); logError.apply(console, a); };
+  }
+
   const BREATH_PERIOD = 24; // seconds, matches the drone LFO in sound.js
   const SIGNAL_LIFE = 3.5;  // seconds a signal keeps travelling
   const OPEN_TIME = 1.4;    // seconds for a colony's projects to spread out
@@ -19,9 +33,6 @@
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const touch = matchMedia("(pointer: coarse)").matches ||
     (navigator.maxTouchPoints > 0 && Math.min(screen.width, screen.height) < 900);
-  // ?debug shows a performance readout; ?tier=N forces a quality tier; ?gl=1 runs the
-  // simulation even on a software renderer (for testing).
-  const params = new URLSearchParams(location.search);
 
   const groups = GROUPS.map(g => Object.assign({ items: [] }, g));
   PROJECTS.forEach((p, i) => {
@@ -563,8 +574,16 @@
   }
 
   function startSim() {
-    try { sim = Physarum.create(canvas); } catch (err) { console.error(err); sim = null; }
-    if (sim && sim.info.software && !params.has("gl")) sim = null;
+    status.why = "";
+    try {
+      sim = Physarum.create(canvas);
+      if (!sim) status.why = Physarum.failure;
+    } catch (err) {
+      console.error(err);
+      status.why = "create: " + err.message;
+      sim = null;
+    }
+    if (sim && sim.info.software && !params.has("gl")) { status.why = "software renderer"; sim = null; }
     window.physarum = sim; // handy for tuning sim.params from the console
     if (!sim) {
       still = true;
@@ -576,6 +595,7 @@
       applyTier();
     } catch (err) {
       console.error(err);
+      status.why = "resize: " + err.message;
       sim = null;
       still = true;
       showPoster(true);
@@ -589,6 +609,8 @@
   canvas.addEventListener("webglcontextlost", e => {
     e.preventDefault();
     lost = true;
+    status.lost++;
+    status.why = "context lost";
     showPoster(true);
   });
   canvas.addEventListener("webglcontextrestored", () => {
@@ -649,9 +671,12 @@
       if (!reduceMotion) sim.step();
       updateGlass();
       sim.render(breath);
+      status.frames++;
+      if (debugGl && status.frames % 30 === 0) status.hash = pixelHash();
     } catch (err) {
       // Never leave a broken canvas on screen: fall back to the poster image.
       console.error(err);
+      status.why = "frame: " + err.message;
       running = false;
       sim = null;
       still = true;
@@ -659,29 +684,49 @@
     }
   }
 
-  tier = startTier();
-  startSim();
-
   // ---------- ?debug readout ----------
+  // A hash of a block of drawn pixels, read right after rendering: if it keeps changing the
+  // simulation is drawing new frames, so a still screen would mean the browser is not showing them.
+  const debugGl = params.has("debug");
+  function pixelHash() {
+    const gl = canvas.getContext("webgl2"); // the simulation's context (created with its own attributes)
+    const n = 32, px = new Uint8Array(n * n * 4);
+    gl.readPixels((canvas.width - n) >> 1, (canvas.height - n) >> 1, n, n, gl.RGBA, gl.UNSIGNED_BYTE, px);
+    let h = 0;
+    for (let i = 0; i < px.length; i++) h = (h * 31 + px[i]) >>> 0;
+    return h.toString(16).slice(-5);
+  }
+
   if (params.has("debug")) {
     const box = el("div", "debug");
     body.append(box);
-    let frames = 0, last = performance.now();
-    (function count() { frames++; requestAnimationFrame(count); })();
+    let raf = 0, last = performance.now(), simLast = 0;
+    (function count() { raf++; requestAnimationFrame(count); })();
     setInterval(() => {
-      const t = performance.now();
-      const fps = Math.round(frames * 1000 / (t - last));
-      frames = 0; last = t;
-      const size = sim ? sim.size.join("×") : "—";
-      box.textContent = [
-        fps + " fps",
-        sim ? "tier " + tier + " (" + TIERS[tier] + " MP) " + size : "poster",
-        sim ? sim.agentCount.toLocaleString("en") + " agents" : "",
-        still ? "still" : "live",
-        reduceMotion ? "reduce motion" : "",
-        gov.locked ? "locked" : "",
-        sim ? sim.info.renderer : ""
-      ].filter(Boolean).join(" · ");
+      try {
+        const t = performance.now(), sec = (t - last) / 1000;
+        const fps = Math.round(raf / sec), simFps = Math.round((status.frames - simLast) / sec);
+        raf = 0; simLast = status.frames; last = t;
+        box.textContent = [
+          fps + " fps (sim " + simFps + ")",
+          "frames " + status.frames + (status.hash ? " #" + status.hash : ""),
+          sim ? "tier " + tier + " " + sim.size.join("×") : "poster",
+          sim ? sim.agentCount.toLocaleString("en") + " agents" : "",
+          still ? "still" : (running ? "live" : "stopped"),
+          reduceMotion ? "reduce motion" : "",
+          gov.locked ? "locked" : "",
+          status.why ? "why: " + status.why : "",
+          status.lost ? "lost " + status.lost : "",
+          status.errors.length ? "error: " + status.errors[status.errors.length - 1].slice(0, 120) : "",
+          sim ? sim.info.renderer : "",
+          innerWidth + "×" + innerHeight + " @" + (devicePixelRatio || 1)
+        ].filter(Boolean).join(" · ");
+      } catch (err) {
+        box.textContent = "debug: " + err.message + " · " + status.errors.join(" | ");
+      }
     }, 500);
   }
+
+  tier = startTier();
+  startSim();
 })();
