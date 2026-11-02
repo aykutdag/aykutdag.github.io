@@ -571,9 +571,30 @@
   const gate = document.getElementById("gate");
   let gateOpen = true;
 
+  // "Welcome" changes language every second, through a short glitch
+  const WELCOME = [
+    ["en", "Welcome"], ["tr", "Hoş geldiniz"], ["de", "Willkommen"], ["fr", "Bienvenue"],
+    ["es", "Bienvenidos"], ["ja", "ようこそ"], ["it", "Benvenuti"], ["ar", "أهلاً وسهلاً"],
+    ["el", "Καλώς ήρθατε"], ["ko", "환영합니다"], ["pt", "Boas-vindas"], ["ru", "Добро пожаловать"],
+    ["hi", "स्वागत है"], ["nl", "Welkom"], ["zh", "欢迎"], ["sw", "Karibu"], ["he", "ברוכים הבאים"], ["sv", "Välkommen"],
+  ];
+  const gateName = document.getElementById("gate-name");
+  let welcomeAt = 0;
+  const welcomeTimer = setInterval(() => {
+    welcomeAt = (welcomeAt + 1) % WELCOME.length;
+    const [lang, word] = WELCOME[welcomeAt];
+    gateName.lang = lang;
+    gateName.dataset.text = word; // the glitch slices show the next word first
+    gateName.classList.remove("glitch");
+    void gateName.offsetWidth; // restart the animation
+    gateName.classList.add("glitch");
+    setTimeout(() => { gateName.textContent = word; }, 120);
+  }, 1000);
+
   function enter() {
     if (!gateOpen) return;
     gateOpen = false;
+    clearInterval(welcomeTimer);
     Sound.set(true);
     body.classList.remove("gated");
     chrome.forEach(c => { c.inert = false; });

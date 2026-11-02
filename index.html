@@ -8,16 +8,16 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=f1bd8f87">
+  <link rel="stylesheet" href="style.css?v=9eb1ec68">
 </head>
 <body>
   <canvas id="field" aria-hidden="true"></canvas>
 
   <!-- Entry screen: browsers allow sound only after a click, so entering starts it.
        Hidden until main.js shows it, so a script failure never locks the page. -->
-  <div id="gate" class="gate" role="dialog" aria-modal="true" aria-labelledby="gate-name" hidden>
+  <div id="gate" class="gate" role="dialog" aria-modal="true" aria-label="Welcome" hidden>
     <div class="gate-inner">
-      <p class="gate-name" id="gate-name">Welcome</p>
+      <p class="gate-name" id="gate-name" lang="en" aria-hidden="true">Welcome</p>
       <button type="button" class="gate-enter" id="gate-enter">Enter</button>
     </div>
   </div>
@@ -60,7 +60,7 @@
   <script src="glyphs.js?v=8c4af774"></script>
   <script src="sound.js?v=5e7779a0"></script>
   <script src="physarum.js?v=6a88886e"></script>
-  <script src="main.js?v=26be31b0"></script>
+  <script src="main.js?v=9071cc78"></script>
   <!-- Visitor statistics (cookieless): https://aykutdag.goatcounter.com -->
   <script data-goatcounter="https://aykutdag.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>

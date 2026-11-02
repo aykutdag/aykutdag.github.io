@@ -55,24 +55,57 @@ img { -webkit-user-drag: none; pointer-events: none; }
 .gate[hidden] { display: none; }
 .gate.out { opacity: 0; visibility: hidden; pointer-events: none; }
 body.gated .top, body.gated main, body.gated .foot { opacity: 0; }
-.gate-inner { text-shadow: 0 0 22px var(--bg), 0 0 10px var(--bg), 0 0 4px var(--bg); }
-.gate-name { margin: 0 0 36px; font-size: clamp(46px, 8vw, 112px); font-weight: 500; letter-spacing: -0.03em; line-height: 0.95; }
+.gate-inner { width: 100%; text-shadow: 0 0 22px var(--bg), 0 0 10px var(--bg), 0 0 4px var(--bg); }
+/* fixed height and full width, so words in other scripts never move the ring */
+.gate-name {
+  position: relative; margin: 0 0 14px; height: 1.3em;
+  font-size: clamp(23px, 4vw, 56px); font-weight: 500; letter-spacing: -0.03em; line-height: 1.3; white-space: nowrap;
+}
+.gate-name:lang(ar), .gate-name:lang(hi) { letter-spacing: 0; } /* joined scripts */
+/* Glitch: two tinted copies of the next word flicker in offset slices, then the word swaps */
+.gate-name::before, .gate-name::after {
+  content: attr(data-text); position: absolute; inset: 0; opacity: 0; pointer-events: none;
+}
+.gate-name.glitch { animation: glitch-shake 0.3s step-end both; }
+.gate-name.glitch::before { color: var(--accent); animation: glitch-a 0.3s step-end both; }
+.gate-name.glitch::after { color: #6f8796; animation: glitch-b 0.3s step-end both; }
+@keyframes glitch-shake {
+  20% { transform: translate(-2px, 1px) skewX(-8deg); opacity: 0.5; }
+  40% { transform: translate(3px, -1px); opacity: 1; }
+  60% { transform: translate(-1px, 0) skewX(5deg); opacity: 0.35; }
+  80% { transform: translate(1px, 0); opacity: 0.9; }
+  100% { transform: none; opacity: 1; }
+}
+@keyframes glitch-a {
+  0% { opacity: 1; clip-path: inset(0 0 68% 0); transform: translate(-7px, 0); }
+  25% { opacity: 1; clip-path: inset(42% 0 34% 0); transform: translate(6px, 0); }
+  50% { opacity: 1; clip-path: inset(74% 0 0 0); transform: translate(-3px, 0); }
+  75% { opacity: 1; clip-path: inset(12% 0 62% 0); transform: translate(2px, 0); }
+  100% { opacity: 0; }
+}
+@keyframes glitch-b {
+  0% { opacity: 1; clip-path: inset(58% 0 12% 0); transform: translate(6px, 0); }
+  25% { opacity: 1; clip-path: inset(8% 0 70% 0); transform: translate(-5px, 0); }
+  50% { opacity: 1; clip-path: inset(30% 0 48% 0); transform: translate(4px, 0); }
+  75% { opacity: 1; clip-path: inset(66% 0 6% 0); transform: translate(-2px, 0); }
+  100% { opacity: 0; }
+}
 .gate-enter {
   position: relative; display: inline-grid; place-items: center;
-  width: 84px; height: 84px; border-radius: 50%;
-  font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.16em;
+  width: 42px; height: 42px; border-radius: 50%;
+  font-family: var(--mono); font-size: 8px; text-transform: uppercase; letter-spacing: 0.12em;
   border: 1px solid var(--accent); background: rgba(5, 7, 10, 0.6);
-  box-shadow: 0 0 0 8px rgba(5, 7, 10, 0.45), 0 0 0 9px rgba(191, 227, 242, 0.3);
+  box-shadow: 0 0 0 4px rgba(5, 7, 10, 0.45), 0 0 0 5px rgba(191, 227, 242, 0.3);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 .gate-enter::after {
   content: ""; position: absolute; inset: -1px; border-radius: 50%; pointer-events: none;
-  box-shadow: 0 0 30px 3px rgba(191, 227, 242, 0.5), 0 0 5px rgba(191, 227, 242, 0.8);
+  box-shadow: 0 0 15px 2px rgba(191, 227, 242, 0.5), 0 0 4px rgba(191, 227, 242, 0.8);
   animation: ring-glow 4s ease-in-out infinite;
 }
 .gate-enter:hover, .gate-enter:focus-visible {
   transform: scale(1.06); outline: none;
-  box-shadow: 0 0 0 8px rgba(5, 7, 10, 0.45), 0 0 0 9px rgba(191, 227, 242, 0.8);
+  box-shadow: 0 0 0 4px rgba(5, 7, 10, 0.45), 0 0 0 5px rgba(191, 227, 242, 0.8);
 }
 @media (prefers-reduced-motion: reduce) { .gate-enter::after { animation: none; } }
 
