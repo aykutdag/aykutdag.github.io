@@ -56,12 +56,11 @@ img { -webkit-user-drag: none; pointer-events: none; }
 .gate.out { opacity: 0; visibility: hidden; pointer-events: none; }
 body.gated .top, body.gated main, body.gated .foot { opacity: 0; }
 .gate-inner { text-shadow: 0 0 22px var(--bg), 0 0 10px var(--bg), 0 0 4px var(--bg); }
-.gate-name { margin: 0; font-size: clamp(46px, 8vw, 112px); font-weight: 500; letter-spacing: -0.03em; line-height: 0.95; }
-.gate-role { margin: 14px 0 40px; font-size: clamp(14px, 1.4vw, 17px); color: #b9c4ca; }
+.gate-name { margin: 0 0 36px; font-size: clamp(46px, 8vw, 112px); font-weight: 500; letter-spacing: -0.03em; line-height: 0.95; }
 .gate-enter {
   position: relative; display: inline-grid; place-items: center;
-  width: 116px; height: 116px; border-radius: 50%;
-  font-family: var(--mono); font-size: 13px; text-transform: uppercase; letter-spacing: 0.16em;
+  width: 84px; height: 84px; border-radius: 50%;
+  font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.16em;
   border: 1px solid var(--accent); background: rgba(5, 7, 10, 0.6);
   box-shadow: 0 0 0 8px rgba(5, 7, 10, 0.45), 0 0 0 9px rgba(191, 227, 242, 0.3);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
@@ -315,6 +314,14 @@ body:not(.gl-glass) .win {
 .win .p-no { font-family: var(--mono); font-size: 12px; color: var(--accent); }
 .win h2 { font-size: clamp(24px, 2.5vw, 34px); font-weight: 500; letter-spacing: -0.015em; line-height: 1.08; margin: 8px 0 0; }
 .win.small h2 { margin: 0 44px 18px 0; } /* clear of the close button */
+.win.about { width: min(900px, 100vw - 48px); }
+.about-grid {
+  display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 6fr); grid-template-rows: auto 1fr;
+  grid-template-areas: "photo head" "photo text"; column-gap: 32px; align-items: start;
+}
+.about-grid h2 { grid-area: head; }
+.about-grid .about-text { grid-area: text; }
+.about-grid .portrait { grid-area: photo; display: block; width: 100%; height: auto; border-radius: 14px; }
 .win-cols { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 34px; min-height: 0; }
 .win-info, .win-media {
   overflow-y: auto; padding-bottom: 34px;
@@ -370,6 +377,11 @@ body:not(.gl-glass) .win {
   .win-cols { display: block; }
   .win-info, .win-media { overflow: visible; padding-bottom: 0; }
   .win-media { margin-top: 20px; }
+  .about-grid { grid-template-columns: 1fr; grid-template-rows: none; grid-template-areas: "head" "photo" "text"; }
+  .about-grid .portrait {
+    width: min(100%, 420px); aspect-ratio: 4 / 5; max-height: 46vh; margin-bottom: 22px;
+    object-fit: cover; object-position: 62% 40%;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .win.enter, .win.enter .win-body, .win.leave { animation: none; }
@@ -384,6 +396,12 @@ body.short .colony .label, body.short .colony-item.flip .label {
 body.short .colony .label { max-width: 30vw; }
 body.tall .node-item .label { max-width: 40vw; }
 body.short .node-item .label { max-width: var(--col-w, 140px); }
+/* Phones: a soft dark plate under each label, so text never sits directly on a filament */
+body.tall:not(.list) .node .label, body.short:not(.list) .node .label,
+body.tall .colony .label, body.short .colony .label {
+  padding: 3px 8px; border-radius: 8px;
+  background: rgba(5, 7, 10, 0.62);
+}
 /* On phones the field shows each project's short title on one line; the window has the full one */
 .node .short { display: none; }
 body.tall:not(.list) .node .title, body.short:not(.list) .node .title { display: none; }

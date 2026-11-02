@@ -410,6 +410,7 @@ window.PROJECTS = [
 ];
 
 window.ABOUT = {
+  photo: "img/aykut.jpg",
   text: [
     "Architectural and computational designer with 4+ years of experience in international competitions and concept design for cultural, hospitality and office buildings.",
     "I work with parametric design in Rhino and Grasshopper, interactive systems in TouchDesigner, generative AI and hands-on digital fabrication, with a particular interest in biophilic and bio-inspired design.",

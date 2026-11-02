@@ -377,12 +377,14 @@
     return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
   }
 
-  function openWin(build, from, small) {
+  // variant: extra classes for the window ("small" for Contact, "small about" for About)
+  function openWin(build, from, variant) {
     if (!win.hidden) closeWin(true);
     lastFocus = document.activeElement;
     winBody.replaceChildren();
     build(winBody);
-    win.classList.toggle("small", !!small);
+    win.classList.remove("small", "about");
+    if (variant) win.classList.add(...variant.split(" "));
     body.classList.toggle("gl-glass", !!sim && !still && !isList());
     body.classList.add("modal");
     chrome.forEach(c => { c.inert = true; });
@@ -505,10 +507,20 @@
     track(which, which === "about" ? "About opened" : "Contact opened");
     openWin(root => {
       const h = el("h2", null, which === "about" ? "About" : "Contact"); h.id = "win-title";
-      root.append(h);
       if (which === "about") {
-        ABOUT.text.forEach(t => root.append(el("p", null, t)));
+        // portrait beside the text; stacked on narrow screens with the heading
+        // first, so the photo never sits under the close button
+        const grid = el("div", "about-grid");
+        const img = el("img", "portrait");
+        img.src = ABOUT.photo;
+        img.alt = "Portrait of Aykut Dağ";
+        img.decoding = "async";
+        const text = el("div", "about-text");
+        ABOUT.text.forEach(t => text.append(el("p", null, t)));
+        grid.append(h, img, text);
+        root.append(grid);
       } else {
+        root.append(h);
         const ul = el("ul", "links");
         CONTACT.forEach(c => {
           const a = el("a", null, c.label); a.href = c.href;
@@ -519,7 +531,7 @@
         });
         root.append(ul);
       }
-    }, centerOf(b), true);
+    }, centerOf(b), which === "about" ? "small about" : "small");
   }));
 
   win.querySelector(".win-close").addEventListener("click", () => closeWin());
@@ -627,6 +639,8 @@
   }
 
   function applyTier() {
+    // phones: a dimmer field, since small labels sit closer to bright filaments
+    sim.params.brightness = innerWidth < 720 || innerHeight < 560 ? 0.5 : 0.72;
     sim.resize(innerWidth, innerHeight, scaleFor(tier), DENSITY, foodPoints());
     gov.reset();
     document.getElementById("foot-agents").textContent =
