@@ -447,6 +447,18 @@
     addEventListener(type, () => Sound.unlock(), { capture: true, passive: true }));
   document.addEventListener("visibilitychange", () => Sound.setHidden(document.hidden));
 
+  // ---------- Copy deterrents ----------
+  // No context menu (Save image, Copy), copying or dragging, except on links and contact
+  // details. This stops casual copying only: screenshots and the files themselves stay reachable.
+  const allowed = t => t instanceof Element && !!t.closest("a, .links");
+  addEventListener("contextmenu", e => { if (!allowed(e.target)) e.preventDefault(); });
+  addEventListener("dragstart", e => { if (!allowed(e.target)) e.preventDefault(); });
+  ["copy", "cut"].forEach(type => addEventListener(type, e => {
+    const sel = getSelection();
+    const node = sel && sel.anchorNode && (sel.anchorNode.nodeType === 1 ? sel.anchorNode : sel.anchorNode.parentElement);
+    if (!allowed(node)) e.preventDefault();
+  }));
+
   // ---------- Pointer and touch ----------
   // A finger disturbs the network only while it is down; a mouse while it is over the page.
   addEventListener("pointermove", e => { mouse.x = e.clientX; mouse.y = e.clientY; });
