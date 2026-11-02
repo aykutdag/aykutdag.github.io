@@ -428,11 +428,24 @@
   }
   viewBtn.addEventListener("click", () => setList(!isList()));
 
-  soundBtn.addEventListener("click", () => {
-    const on = Sound.toggle();
+  // Sound is on unless the visitor turned it off before (remembered in this browser). It
+  // starts with the first tap, click or key press, since browsers block audio until then.
+  function showSound(on) {
     soundBtn.setAttribute("aria-pressed", on);
     soundBtn.textContent = on ? "Sound on" : "Sound off";
+  }
+  let soundWanted = true;
+  try { soundWanted = localStorage.getItem("sound") !== "off"; } catch (e) { /* storage blocked */ }
+  Sound.set(soundWanted, false);
+  showSound(soundWanted);
+  soundBtn.addEventListener("click", () => {
+    const on = Sound.set(!Sound.on);
+    showSound(on);
+    try { localStorage.setItem("sound", on ? "on" : "off"); } catch (e) { /* storage blocked */ }
   });
+  ["pointerdown", "pointerup", "touchend", "keydown", "click"].forEach(type =>
+    addEventListener(type, () => Sound.unlock(), { capture: true, passive: true }));
+  document.addEventListener("visibilitychange", () => Sound.setHidden(document.hidden));
 
   // ---------- Pointer and touch ----------
   // A finger disturbs the network only while it is down; a mouse while it is over the page.
@@ -717,6 +730,7 @@
           sim ? sim.agentCount.toLocaleString("en") + " agents" : "",
           still ? "still" : (running ? "live" : "stopped"),
           reduceMotion ? "reduce motion" : "",
+          "sound " + (Sound.on ? "on" : "off") + " (" + Sound.state + ")",
           gov.locked ? "locked" : "",
           status.why ? "why: " + status.why : "",
           status.lost ? "lost " + status.lost : "",

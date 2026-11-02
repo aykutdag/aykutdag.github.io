@@ -1,11 +1,15 @@
-// Generative sound layer (Web Audio). Nothing plays until the visitor turns it on.
+// Generative sound layer (Web Audio).
 // - Drone: a low A chord whose filter "breathes" with the network's shuttle-streaming rhythm.
 // - Rustle: filtered noise that follows cursor speed (pitch follows cursor x).
 // - Chimes: each project node has its own bell tone from an A minor pentatonic scale.
+// Browsers only let audio start from a tap, click or key press, so the graph is built and
+// resumed in unlock(), which the page calls from those events. `on` is the visitor's choice;
+// nothing sounds until a gesture has unlocked the context.
 window.Sound = (function () {
   const SCALE = [220, 261.63, 293.66, 329.63, 392, 440, 523.25, 587.33, 659.25, 783.99];
   let ctx, master, bus, droneFilter, rustleFilter, rustleGain;
   let on = false;
+  let hidden = false;
 
   function impulse(seconds) {
     const len = Math.floor(ctx.sampleRate * seconds);
@@ -63,24 +67,47 @@ window.Sound = (function () {
     noise.start();
   }
 
-  function toggle() {
-    if (!ctx) build();
-    on = !on;
-    const now = ctx.currentTime;
-    if (on) {
-      ctx.resume();
-      master.gain.cancelScheduledValues(now);
-      master.gain.setTargetAtTime(0.9, now, 0.6);
-    } else {
-      master.gain.cancelScheduledValues(now);
-      master.gain.setTargetAtTime(0, now, 0.25);
+  function fade() {
+    if (!ctx) return;
+    const now = ctx.currentTime, audible = on && !hidden;
+    master.gain.cancelScheduledValues(now);
+    master.gain.setTargetAtTime(audible ? 0.9 : 0, now, audible ? 0.6 : 0.25);
+  }
+
+  // Call from a user gesture (tap, click, key press). Builds the graph the first time and
+  // resumes the context whenever the browser suspended it (iOS does in the background).
+  function unlock() {
+    if (!on || hidden) return;
+    if (!ctx) {
+      // iOS 17+: play like media, so the ring/silent switch does not mute the site
+      try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (e) { /* not supported */ }
+      try { build(); } catch (e) { ctx = null; return; }
     }
+    if (ctx.state !== "running") ctx.resume().catch(() => {});
+    fade();
+  }
+
+  // The visitor's choice; returns it. From the sound button's click it also unlocks;
+  // at page load (gesture = false) it only records the choice.
+  function set(v, gesture = true) {
+    on = v;
+    if (on && gesture) unlock();
+    fade();
     return on;
+  }
+
+  // Quiet while the page is in the background; back on return (if the visitor wants sound).
+  function setHidden(v) {
+    hidden = v;
+    if (!ctx) return;
+    if (hidden) { fade(); return; }
+    if (on && ctx.state !== "running") ctx.resume().catch(() => {});
+    fade();
   }
 
   // speed: cursor speed in px/frame, x01: cursor x in 0–1
   function activity(speed, x01) {
-    if (!on) return;
+    if (!on || !ctx) return;
     const now = ctx.currentTime;
     rustleGain.gain.setTargetAtTime(Math.min(0.06, speed * 0.0012), now, 0.08);
     rustleFilter.frequency.setTargetAtTime(350 + x01 * 2600, now, 0.12);
@@ -96,7 +123,7 @@ window.Sound = (function () {
   }
 
   function chime(index, strong, pan) {
-    if (!on) return;
+    if (!on || !ctx) return;
     const f = SCALE[index % SCALE.length];
     const now = ctx.currentTime;
     const peak = strong ? 0.16 : 0.07;
@@ -116,7 +143,7 @@ window.Sound = (function () {
 
   // Electric signal leaving a node: a short falling blip and a crackle of filtered noise.
   function blip(index, strength, pan) {
-    if (!on) return;
+    if (!on || !ctx) return;
     const now = ctx.currentTime;
     const out = panner(pan);
     const g = 0.035 * strength;
@@ -142,5 +169,9 @@ window.Sound = (function () {
     n.start(now);
   }
 
-  return { toggle, activity, chime, blip, get on() { return on; } };
+  return {
+    set, unlock, setHidden, activity, chime, blip,
+    get on() { return on; },
+    get state() { return ctx ? ctx.state : "not started"; } // for the ?debug readout
+  };
 })();
