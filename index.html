@@ -8,10 +8,20 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=f24af87a">
+  <link rel="stylesheet" href="style.css?v=8e49c480">
 </head>
 <body>
   <canvas id="field" aria-hidden="true"></canvas>
+
+  <!-- Entry screen: browsers allow sound only after a click, so entering starts it.
+       Hidden until main.js shows it, so a script failure never locks the page. -->
+  <div id="gate" class="gate" role="dialog" aria-modal="true" aria-labelledby="gate-name" hidden>
+    <div class="gate-inner">
+      <p class="gate-name" id="gate-name">Aykut Dağ</p>
+      <p class="gate-role">Architectural &amp; Computational Designer</p>
+      <button type="button" class="gate-enter" id="gate-enter">Enter</button>
+    </div>
+  </div>
 
   <header class="top">
     <div class="ident">
@@ -51,7 +61,7 @@
   <script src="glyphs.js?v=8c4af774"></script>
   <script src="sound.js?v=5e7779a0"></script>
   <script src="physarum.js?v=6a88886e"></script>
-  <script src="main.js?v=219b7a13"></script>
+  <script src="main.js?v=4f5b0ef0"></script>
   <!-- Visitor statistics (cookieless): https://aykutdag.goatcounter.com -->
   <script data-goatcounter="https://aykutdag.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>

@@ -72,6 +72,9 @@ with sync_playwright() as p:
         ctx.route("**/gc.zgo.at/**", lambda r: r.abort())
         pg = ctx.new_page(); errs = []; pg.on("pageerror", lambda e: errs.append(str(e)))
         pg.goto(BASE); pg.wait_for_timeout(1500)
+        # pass the entry screen before checking the site behind it
+        pg.evaluate("(() => { const g = document.getElementById('gate'); if (g && !g.hidden) document.getElementById('gate-enter').click(); })()")
+        pg.wait_for_timeout(1100)
         problems = []
         run(pg, "home", "field", problems)
         n_groups = pg.locator(".colony").count()

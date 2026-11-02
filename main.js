@@ -540,24 +540,43 @@
     if (isList()) track("index", "Index view opened");
   });
 
-  // Sound is on unless the visitor turned it off before (remembered in this browser). It
-  // starts with the first tap, click or key press, since browsers block audio until then.
+  // Sound is on; it starts with the entry click, since browsers block audio until a click,
+  // tap or key press. The button turns it off and on for this visit only.
   function showSound(on) {
     soundBtn.setAttribute("aria-pressed", on);
     soundBtn.textContent = on ? "Sound on" : "Sound off";
   }
-  let soundWanted = true;
-  try { soundWanted = localStorage.getItem("sound") !== "off"; } catch (e) { /* storage blocked */ }
-  Sound.set(soundWanted, false);
-  showSound(soundWanted);
-  soundBtn.addEventListener("click", () => {
-    const on = Sound.set(!Sound.on);
-    showSound(on);
-    try { localStorage.setItem("sound", on ? "on" : "off"); } catch (e) { /* storage blocked */ }
-  });
+  Sound.set(true, false);
+  showSound(true);
+  soundBtn.addEventListener("click", () => showSound(Sound.set(!Sound.on)));
   ["pointerdown", "pointerup", "touchend", "keydown", "click"].forEach(type =>
-    addEventListener(type, () => Sound.unlock(), { capture: true, passive: true }));
+    addEventListener(type, () => { if (!gateOpen) Sound.unlock(); }, { capture: true, passive: true }));
   document.addEventListener("visibilitychange", () => Sound.setHidden(document.hidden));
+
+  // ---------- Entry screen ----------
+  // The site opens behind an entry screen; its click (anywhere) starts the sound, since
+  // browsers allow audio only after a click, tap or key press.
+  const gate = document.getElementById("gate");
+  let gateOpen = true;
+
+  function enter() {
+    if (!gateOpen) return;
+    gateOpen = false;
+    Sound.set(true);
+    body.classList.remove("gated");
+    chrome.forEach(c => { c.inert = false; });
+    gate.classList.add("out");
+    setTimeout(() => { gate.hidden = true; }, 900);
+    track("enter", "Entered the site");
+    Sound.chime(5, true, 0);
+    signal(0.5, 0.5, 1.6, 5);
+  }
+
+  gate.hidden = false;
+  body.classList.add("gated");
+  chrome.forEach(c => { c.inert = true; });
+  document.getElementById("gate-enter").focus({ preventScroll: true });
+  gate.addEventListener("click", enter);
 
   // ---------- Copy deterrents ----------
   // No context menu (Save image, Copy), copying or dragging, except on links and contact

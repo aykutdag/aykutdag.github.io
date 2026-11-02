@@ -44,6 +44,39 @@ img { -webkit-user-drag: none; pointer-events: none; }
   transition: opacity 0.4s ease;
 }
 
+/* Entry screen over the living field */
+.gate {
+  position: fixed; inset: 0; z-index: 8;
+  display: grid; place-items: center; padding: 24px; text-align: center;
+  background: radial-gradient(ellipse at center, rgba(5, 7, 10, 0.6) 0%, rgba(5, 7, 10, 0.25) 55%, rgba(5, 7, 10, 0.55) 100%);
+  cursor: pointer;
+  transition: opacity 0.8s ease, visibility 0.8s;
+}
+.gate[hidden] { display: none; }
+.gate.out { opacity: 0; visibility: hidden; pointer-events: none; }
+body.gated .top, body.gated main, body.gated .foot { opacity: 0; }
+.gate-inner { text-shadow: 0 0 22px var(--bg), 0 0 10px var(--bg), 0 0 4px var(--bg); }
+.gate-name { margin: 0; font-size: clamp(46px, 8vw, 112px); font-weight: 500; letter-spacing: -0.03em; line-height: 0.95; }
+.gate-role { margin: 14px 0 40px; font-size: clamp(14px, 1.4vw, 17px); color: #b9c4ca; }
+.gate-enter {
+  position: relative; display: inline-grid; place-items: center;
+  width: 116px; height: 116px; border-radius: 50%;
+  font-family: var(--mono); font-size: 13px; text-transform: uppercase; letter-spacing: 0.16em;
+  border: 1px solid var(--accent); background: rgba(5, 7, 10, 0.6);
+  box-shadow: 0 0 0 8px rgba(5, 7, 10, 0.45), 0 0 0 9px rgba(191, 227, 242, 0.3);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.gate-enter::after {
+  content: ""; position: absolute; inset: -1px; border-radius: 50%; pointer-events: none;
+  box-shadow: 0 0 30px 3px rgba(191, 227, 242, 0.5), 0 0 5px rgba(191, 227, 242, 0.8);
+  animation: ring-glow 4s ease-in-out infinite;
+}
+.gate-enter:hover, .gate-enter:focus-visible {
+  transform: scale(1.06); outline: none;
+  box-shadow: 0 0 0 8px rgba(5, 7, 10, 0.45), 0 0 0 9px rgba(191, 227, 242, 0.8);
+}
+@media (prefers-reduced-motion: reduce) { .gate-enter::after { animation: none; } }
+
 /* Poster: a still image of the network for devices that cannot run the simulation */
 body.poster #field { visibility: hidden; }
 body.poster::before {
