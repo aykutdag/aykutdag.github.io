@@ -54,7 +54,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=32d5ded5">
+  <link rel="stylesheet" href="style.css?v=9f75daad">
 </head>
 <body data-project="orchestra-of-illumination">
   <canvas id="field" aria-hidden="true"></canvas>
@@ -136,11 +136,26 @@
     <div id="win-body" class="win-body"><header class="win-head"><div class="p-no">12 · Research &amp; Lab</div><h2 id="win-title">The Orchestra of Illumination</h2></header><div class="win-cols"><div class="win-info"><dl class="credits"><dt>Project</dt><dd>Creating Interaction Spaces from the Human Behavior Data of Pressure on Piezo Buzzer: The Case of “The Orchestra of Illumination”</dd><dt>Course</dt><dd>MBL 557E Material-Based Computational Design in Architecture</dd><dt>Instructor</dt><dd>Assoc. Prof. Dr. Sevil Yazıcı</dd><dt>Programme</dt><dd>M.Sc. Architectural Design Computing, Istanbul Technical University</dd><dt>Date</dt><dd>Fall 2023–24 (January 2024)</dd><dt>Type</dt><dd>Course project, interactive installation prototype</dd><dt>Author</dt><dd>Aykut Dağ</dd><dt>Tools</dt><dd>Rhino, Grasshopper, Fritzing, piezo discs, LEDs</dd></dl><p>An interactive installation in which visitors’ steps make light. Its floor is a pressure-sensing system of piezo discs: each press generates a small current that lights LEDs, so the space turns human behaviour into light without batteries or an Arduino.</p><p>The form was found in Grasshopper with an attractor-point system: lights close to a pressure node shine brighter, distant ones dimmer. The circuit was simulated in Fritzing and tested on a breadboard prototype with different numbers of LEDs and piezo discs.</p><p>The best setup lit nine LEDs in a series circuit with parallel sections and a diode after every two LEDs; the LEDs’ own resistance made extra resistors and capacitors unnecessary. The study points to programmable building surfaces that harvest energy from people or wind.</p></div><div class="win-media"><img src="img/orchestra-1.jpg" alt="The Orchestra of Illumination, image 1 of 10" width="763" height="707" loading="lazy" decoding="async"><img src="img/orchestra-2.jpg" alt="The Orchestra of Illumination, image 2 of 10" width="1106" height="664" loading="lazy" decoding="async"><img src="img/orchestra-3.jpg" alt="The Orchestra of Illumination, image 3 of 10" width="863" height="580" loading="lazy" decoding="async"><img src="img/orchestra-4.jpg" alt="The Orchestra of Illumination, image 4 of 10" width="913" height="609" loading="lazy" decoding="async"><img src="img/orchestra-5.jpg" alt="The Orchestra of Illumination, image 5 of 10" width="1173" height="775" loading="lazy" decoding="async"><img src="img/orchestra-6.jpg" alt="The Orchestra of Illumination, image 6 of 10" width="1327" height="780" loading="lazy" decoding="async"><img src="img/orchestra-7.jpg" alt="The Orchestra of Illumination, image 7 of 10" width="586" height="995" loading="lazy" decoding="async"><img src="img/orchestra-8.jpg" alt="The Orchestra of Illumination, image 8 of 10" width="939" height="688" loading="lazy" decoding="async"><img src="img/orchestra-9.jpg" alt="The Orchestra of Illumination, image 9 of 10" width="1800" height="1273" loading="lazy" decoding="async"><img src="img/orchestra-10.jpg" alt="The Orchestra of Illumination, image 10 of 10" width="1800" height="1273" loading="lazy" decoding="async"></div></div></div>
   </div>
 
+  <!-- A project's images full screen (opened from the window) -->
+  <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer" hidden>
+    <img class="lb-img" alt="">
+    <p class="lb-count" aria-live="polite"></p>
+    <button type="button" class="lb-btn lb-prev" aria-label="Previous image">
+      <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M7.5 2.5L4 6L7.5 9.5"/></svg>
+    </button>
+    <button type="button" class="lb-btn lb-next" aria-label="Next image">
+      <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 2.5L8 6L4.5 9.5"/></svg>
+    </button>
+    <button type="button" class="lb-btn lb-close" aria-label="Close the image viewer">
+      <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2L10 10M10 2L2 10"/></svg>
+    </button>
+  </div>
+
   <script src="projects.js?v=38390c60"></script>
   <script src="glyphs.js?v=8c4af774"></script>
   <script src="sound.js?v=5e7779a0"></script>
   <script src="physarum.js?v=6a88886e"></script>
-  <script src="main.js?v=8a066d05"></script>
+  <script src="main.js?v=55e14675"></script>
   <!-- Visitor statistics (cookieless): https://aykutdag.goatcounter.com -->
   <script data-goatcounter="https://aykutdag.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>

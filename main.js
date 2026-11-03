@@ -402,6 +402,8 @@
 
   function closeWin(instant) {
     if (win.hidden) return false;
+    closeLightbox(true);
+    openSlug = null;
     const done = () => {
       win.hidden = true;
       winBody.replaceChildren(); // also stops a playing video
@@ -438,6 +440,7 @@
   const HOME_TITLE = "Aykut Dağ — Architectural & Computational Designer";
   const projectUrl = p => "/projects/" + p.slug + "/";
   let pushedProject = false; // the open project's address was added to the history here
+  let openSlug = null;       // the project in the window, if any
 
   // The window grows out of the project's node, or out of the middle when it is not on screen.
   function originOf(p) {
@@ -513,19 +516,27 @@
         box.append(v);
         media.append(box);
       }
-      (p.images || []).forEach((src, k) => {
+      // each image enlarges into the viewer
+      const shots = p.images || [];
+      shots.forEach((src, k) => {
+        const btn = el("button", "shot");
+        btn.type = "button";
+        btn.setAttribute("aria-label", "Enlarge image " + (k + 1) + " of " + shots.length);
         const img = el("img");
         img.src = src;
-        img.alt = p.title + ", image " + (k + 1);
+        img.alt = p.title + ", image " + (k + 1) + " of " + shots.length;
         img.loading = "lazy";
         img.decoding = "async";
-        media.append(img);
+        btn.append(img);
+        btn.addEventListener("click", () => openLightbox(shots, k, p.title, btn));
+        media.append(btn);
       });
       if (!p.video && !p.film && !(p.images && p.images.length)) media.append(el("div", "img-slot", "Images to come"));
       const cols = el("div", "win-cols");
       cols.append(info, media);
       root.append(head, cols);
     }, from || originOf(p));
+    openSlug = p.slug;
     if (p.video || p.film) Sound.duck(true);
     document.title = p.title + " — Aykut Dağ";
     if (viaHistory) {
@@ -554,10 +565,11 @@
   // Back and forward: a project address opens that project; otherwise the window closes and
   // the sheet shows or hides as it was at that point of the history.
   addEventListener("popstate", () => {
+    if (closeLightbox(true)) return; // back from the viewer: the window stays
     const m = location.pathname.match(/^\/projects\/([^/]+)\/?$/);
     const p = m && bySlug[m[1]];
     if (p) {
-      if (!gateOpen) openProject(p, null, true);
+      if (!gateOpen && openSlug !== p.slug) openProject(p, null, true);
       return;
     }
     pushedProject = false;
@@ -570,7 +582,67 @@
   win.querySelector(".win-close").addEventListener("click", () => dismiss());
   addEventListener("keydown", e => {
     if (e.key !== "Escape") return;
-    if (!dismiss() && !closeSheet()) closeGroup();
+    if (!closeLightbox() && !dismiss() && !closeSheet()) closeGroup();
+  });
+
+  // ---------- Image viewer ----------
+  // A project's images full screen, on a plain dark ground so their colours stay true.
+  // Arrows, the arrow keys and a sideways swipe step through them; Esc, the ×, a tap beside
+  // the image or the back button return to the window.
+  const lb = document.getElementById("lightbox");
+  const lbImg = lb.querySelector(".lb-img");
+  const lbCount = lb.querySelector(".lb-count");
+  let lbList = [], lbAt = 0, lbTitle = "", lbFrom = null;
+
+  function showShot(k) {
+    lbAt = (k + lbList.length) % lbList.length;
+    lbImg.src = lbList[lbAt];
+    lbImg.alt = lbTitle + ", image " + (lbAt + 1) + " of " + lbList.length;
+    lbCount.textContent = (lbAt + 1) + " / " + lbList.length;
+    [lbAt - 1, lbAt + 1].forEach(j => { new Image().src = lbList[(j + lbList.length) % lbList.length]; });
+  }
+
+  function openLightbox(list, k, title, from) {
+    lbList = list; lbTitle = title; lbFrom = from;
+    lb.classList.toggle("single", list.length < 2);
+    showShot(k);
+    lb.hidden = false;
+    win.inert = true;
+    history.pushState(Object.assign({}, history.state, { viewer: true }), "", location.href);
+    lb.querySelector(".lb-close").focus({ preventScroll: true });
+  }
+
+  // Returns true when the viewer was open. The visitor's close steps back over its history
+  // entry (popstate then closes it).
+  function closeLightbox(viaHistory) {
+    if (lb.hidden) return false;
+    if (!viaHistory && history.state && history.state.viewer) {
+      history.back();
+      return true;
+    }
+    lb.hidden = true;
+    lbImg.removeAttribute("src");
+    win.inert = false;
+    if (lbFrom && document.contains(lbFrom)) lbFrom.focus({ preventScroll: true });
+    return true;
+  }
+
+  lb.querySelector(".lb-prev").addEventListener("click", () => showShot(lbAt - 1));
+  lb.querySelector(".lb-next").addEventListener("click", () => showShot(lbAt + 1));
+  lb.querySelector(".lb-close").addEventListener("click", () => closeLightbox());
+  lb.addEventListener("click", e => { if (e.target === lb) closeLightbox(); });
+  addEventListener("keydown", e => {
+    if (lb.hidden || lbList.length < 2) return;
+    if (e.key === "ArrowLeft") showShot(lbAt - 1);
+    else if (e.key === "ArrowRight") showShot(lbAt + 1);
+  });
+  let swipe = null;
+  lb.addEventListener("pointerdown", e => { swipe = e.pointerType === "mouse" ? null : { x: e.clientX, y: e.clientY }; });
+  lb.addEventListener("pointerup", e => {
+    if (!swipe || lbList.length < 2) return;
+    const dx = e.clientX - swipe.x, dy = e.clientY - swipe.y;
+    swipe = null;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) showShot(lbAt + (dx < 0 ? 1 : -1));
   });
 
   // ---------- Second layer: the portfolio sheet ----------

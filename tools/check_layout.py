@@ -126,6 +126,18 @@ with sync_playwright() as p:
         if "KHORA" not in (pg.evaluate("(document.getElementById('win-title') || {}).textContent") or ""):
             problems.append("project page: /projects/khora/ did not open its project")
         run(pg, "project page khora", "window", problems)
+        # the image viewer: on screen, its buttons clear of the image and of each other
+        pg.evaluate("document.querySelector('.win-media .shot').click()"); pg.wait_for_timeout(300)
+        pg.wait_for_function("document.querySelector('.lb-img').complete", timeout=20000)
+        for pr in pg.evaluate("""() => {
+          const R = e => e.getBoundingClientRect(), out = [];
+          const hit = (a, b) => a.left < b.right - 1 && b.left < a.right - 1 && a.top < b.bottom - 1 && b.top < a.bottom - 1;
+          const parts = [...document.querySelectorAll('.lb-img, .lb-count, .lb-btn')].filter(e => getComputedStyle(e).display !== 'none');
+          parts.forEach(e => { const r = R(e); if (r.left < 0 || r.top < 0 || r.right > innerWidth || r.bottom > innerHeight) out.push('viewer: outside screen ' + e.className); });
+          for (let i = 0; i < parts.length; i++) for (let j = i + 1; j < parts.length; j++) if (hit(R(parts[i]), R(parts[j]))) out.push('viewer: ' + parts[i].className + ' × ' + parts[j].className);
+          return out; }"""):
+            problems.append("image viewer: " + pr)
+        pg.keyboard.press("Escape"); pg.wait_for_timeout(300)
         print(f"== {vname}: {len(problems)} problems" + (f", errors {errs}" if errs else ""), flush=True)
         for pr in problems: print("   ", pr)
         total += problems
