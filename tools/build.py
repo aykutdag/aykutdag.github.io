@@ -1,6 +1,6 @@
 """Build step before publishing: python tools/build.py
 
-1. Writes the sheet's sections (intro, selected work, projects, research, about, contact) into
+1. Writes the sheet's sections (intro, selected work, projects, about, contact) into
    index.html as plain HTML, between <!-- build:sheet --> and <!-- /build:sheet -->, then stamps
    asset URLs (runs stamp.py).
 2. Writes one page per project at projects/<slug>/index.html: the same site, with the
@@ -150,17 +150,16 @@ def sheet_html(data):
     def head(no, title, name):
         return f'<h2 class="s-head" id="h-{name}" tabindex="-1"><span class="s-no">{no}</span>{esc(title)}</h2>'
 
-    def card(p, kicker=True):
+    def card(p):
         src = preview(p)
         if src:
             w, h = image_size(src)
             pic = f'<img class="card-img" src="{src}" alt="" width="{w}" height="{h}" loading="lazy" decoding="async">'
         else:
             pic = f'<span class="card-img card-blank">{glyph[p["glyph"]]}</span>'
-        label = esc(groups[p["group"]]["label"]) if kicker else ""  # not repeated inside its own section
         return (f'<li><a class="card" href="/projects/{p["slug"]}/" data-slug="{p["slug"]}">{pic}'
                 f'<span class="card-body"><span class="card-kicker"><span class="mark">{glyph[p["glyph"]]}</span>'
-                f'{label}</span>'
+                f'{esc(groups[p["group"]]["label"])}</span>'
                 f'<span class="card-title">{esc(p["title"])}</span><span class="card-sub">{esc(p["meta"])}</span></span></a></li>')
 
     def row(order, p):
@@ -211,19 +210,8 @@ def sheet_html(data):
              '<button type="button" data-sort="year" aria-pressed="false">Year</button></div></div>'
              '<ol class="rows">' + "".join(row(i, p) for i, p in enumerate(projects)) + "</ol></section>")
 
-    pubs = []
-    for it in about["publications"]:
-        year, title, where = it[0], it[1], it[2]
-        name = (f'<a href="/projects/{it[3]}/" data-slug="{it[3]}">{esc(title)}</a>' if len(it) > 3 else esc(title))
-        pubs.append(f'<li><span class="pub-year">{esc(year)}</span><span class="pub-body"><span class="pub-title">{name}</span>'
-                    f'<span class="pub-where">{esc(where)}</span></span></li>')
-    s.append(f'<section class="s" data-section="research" aria-labelledby="h-research">{head("04", "Research & Lab", "research")}'
-             f'<p class="s-note">{esc(about["research"])}</p>'
-             '<ul class="cards cards-small">' + "".join(card(p, kicker=False) for p in projects if p["group"] == "research") + "</ul>"
-             '<h3 class="s-sub">Publications &amp; exhibitions</h3><ul class="pubs">' + "".join(pubs) + "</ul></section>")
-
     pw, ph = image_size(about["photo"])
-    s.append(f'<section class="s s-about" data-section="about" aria-labelledby="h-about">{head("05", "About", "about")}'
+    s.append(f'<section class="s s-about" data-section="about" aria-labelledby="h-about">{head("04", "About", "about")}'
              f'<div class="about-cols"><img class="portrait" src="{about["photo"]}" alt="Portrait of Aykut Dağ" width="{pw}" height="{ph}" loading="lazy" decoding="async">'
              '<dl class="axes">' + "".join(f"<dt>{esc(t)}</dt><dd>{esc(d)}</dd>" for t, d in about["axes"]) + "</dl></div>"
              '<div class="cv-cols">'
@@ -239,7 +227,7 @@ def sheet_html(data):
         extra = "" if mail else ' target="_blank" rel="noopener"'
         links.append(f'<li><a href="{esc(c["href"])}"{extra} data-track="contact/{what}" data-track-title="Contact: {esc(c["label"] if not mail else "email")}">{esc(c["label"])}</a></li>')
     links.append('<li><a href="Aykut_Dag_CV.pdf" target="_blank" rel="noopener" data-track="cv" data-track-title="CV opened">CV (PDF)</a></li>')
-    s.append(f'<section class="s s-contact" data-section="contact" aria-labelledby="h-contact">{head("06", "Contact", "contact")}'
+    s.append(f'<section class="s s-contact" data-section="contact" aria-labelledby="h-contact">{head("05", "Contact", "contact")}'
              '<ul class="contact-links">' + "".join(links) + f'</ul><p class="s-note">{esc(about["location"])}</p></section>')
     s.append(f'<footer class="sheet-foot"><span>© {datetime.date.today().year} Aykut Dağ</span>'
              '<span>The field: <i>Physarum polycephalum</i>, after Jones (2010)</span></footer>')

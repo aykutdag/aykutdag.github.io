@@ -429,7 +429,6 @@ window.ABOUT = {
     ["Computational exploration", "Rhino and Grasshopper definitions for facade panelization, form-finding and geometric rationalization; StyleGAN models and agent-based simulations that grow urban fabric from the behaviour of Physarum polycephalum."],
     ["Experimental environments", "Sensor-driven installations, a responsive environment that turns EEG and heart-rate data into projection and spatial sound with KHORA Collective, and soft robotic actuators cast in silicone."]
   ],
-  research: "Studies in computation, material and interaction from the M.Sc. in Architectural Design Computing at İTÜ and an Erasmus+ semester at the Bauhaus-Universität Weimar.",
   // [years, place, role, location]
   experience: [
     ["2024–2025", "GG-loop", "Architectural Designer, facade design and computational visualization", "Amsterdam (remote)"],
@@ -449,13 +448,6 @@ window.ABOUT = {
     ["2020", "Kadıköy Square Urban Design Competition", "1st Prize, with Aboutblank and Adapt Architects"],
     ["2020", "Haliç Seashore Design Competition", "3rd Prize, with Nous Architecture"],
     ["2020", "1927 Mimarlar Derneği", "3rd Prize, architectural drawing and photography"]
-  ],
-  // [year, title, where, project slug (optional)]
-  publications: [
-    ["2026", "Pulse Pavilion: A Human-Driven Psychophysiological Spatial Feedback System", "Digital Futures 2026 · abstract accepted · with KHORA Collective (Uçkan, Atukeren, Dağ et al.)"],
-    ["2026", "[KHORA]: Space of Becoming with Mind & Body", "Istanbul Digital Art Festival (IDAF), Atatürk Kültür Merkezi · spatial and generative designer, KHORA Collective", "khora"],
-    ["2020", "Glitch | Queer | Space", "Archithese, Zurich · issue “Queer”, pp. 68–69 · text and computational artwork"],
-    ["2019", "Sanata Bi Yer", "Doğuş Group exhibition, Istanbul · architectural photography"]
   ],
   location: "Based in Bursa, Turkey — open to relocation and remote work."
 };

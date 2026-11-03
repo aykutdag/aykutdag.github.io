@@ -648,7 +648,7 @@
   // ---------- Second layer: the portfolio sheet ----------
   // Scrolling down on the field (the wheel, PageDown / ↓ / Space, or the cue at the bottom,
   // tapped or dragged up) raises a glass sheet with the portfolio as a document: intro,
-  // selected work, every project, research and publications, about and contact. Its sections
+  // selected work, every project, about and contact. Its sections
   // are plain HTML written by tools/build.py. The sheet stays put while its content scrolls,
   // so the glass the simulation draws behind it never lags the text. It has its own history
   // entry, so the back button lowers it again.
@@ -847,7 +847,7 @@
       .forEach(li => rowList.append(li));
   }));
 
-  // Links to projects (rows, cards, publications) open the project window here; with a
+  // Links to projects (rows and cards) open the project window here; with a
   // modifier key or the middle button they open the project's page in a new tab.
   sheet.addEventListener("click", e => {
     const a = e.target.closest("a[data-slug]");

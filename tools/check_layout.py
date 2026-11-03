@@ -47,7 +47,7 @@ CHECK_JS = r"""(mode) => {
     if (r.left < -1 || r.right > vw + 1 || r.top < -1) out.push('sheet outside screen: ' + [r.left, r.top, r.right].map(Math.round));
     if (sc.scrollWidth > sc.clientWidth + 1) out.push('sheet: horizontal overflow ' + sc.scrollWidth + ' > ' + sc.clientWidth);
     if (hit(R(sheet.querySelector('.sheet-tabs')), R(sheet.querySelector('.sheet-close')))) out.push('sheet: tabs × close button');
-    [['.areas', 'li'], ['.cards', 'li'], ['.rows', 'li'], ['.pubs', 'li'], ['.tl', 'li'], ['.cv-cols', 'div'], ['.about-cols', '*'],
+    [['.areas', 'li'], ['.cards', 'li'], ['.rows', 'li'], ['.tl', 'li'], ['.cv-cols', 'div'], ['.about-cols', '*'],
      ['.quick', '*'], ['.tools', 'div'], ['.contact-links', 'li']].forEach(([list, item]) =>
       sheet.querySelectorAll(list).forEach(l => pairs([...l.querySelectorAll(':scope > ' + item)].filter(visible), 'sheet ' + list)));
     sheet.querySelectorAll('.row').forEach(row => { if (visible(row)) pairs([...row.querySelectorAll('.row-thumb, .mark, .row-no, .row-title, .row-kind, .row-place, .row-year')].filter(visible), 'row'); });
