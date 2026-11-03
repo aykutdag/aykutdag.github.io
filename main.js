@@ -481,7 +481,6 @@
         v.preload = "none"; // nothing downloads until the visitor presses play
         v.poster = p.film.poster;
         v.src = p.film.src;
-        v.setAttribute("controlslist", "nodownload");
         v.setAttribute("aria-label", p.title + " (video)");
         box.append(v);
         media.append(box);
@@ -610,18 +609,6 @@
   chrome.forEach(c => { c.inert = true; });
   document.getElementById("gate-enter").focus({ preventScroll: true });
   gate.addEventListener("click", enter);
-
-  // ---------- Copy deterrents ----------
-  // No context menu (Save image, Copy), copying or dragging, except on links and contact
-  // details. This stops casual copying only: screenshots and the files themselves stay reachable.
-  const allowed = t => t instanceof Element && !!t.closest("a, .links");
-  addEventListener("contextmenu", e => { if (!allowed(e.target)) e.preventDefault(); });
-  addEventListener("dragstart", e => { if (!allowed(e.target)) e.preventDefault(); });
-  ["copy", "cut"].forEach(type => addEventListener(type, e => {
-    const sel = getSelection();
-    const node = sel && sel.anchorNode && (sel.anchorNode.nodeType === 1 ? sel.anchorNode : sel.anchorNode.parentElement);
-    if (!allowed(node)) e.preventDefault();
-  }));
 
   // ---------- Pointer and touch ----------
   // A finger disturbs the network only while it is down; a mouse while it is over the page.

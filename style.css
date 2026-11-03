@@ -23,12 +23,9 @@ html, body {
 button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; padding: 0; }
 a { color: inherit; }
 
-/* Deterrents against casual copying and image saving (with the handlers in main.js).
-   Contact details stay selectable. Images ignore the pointer, so a right-click or a long
-   press reaches their container instead of offering "Save image". */
-body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
-.links, .links * { -webkit-user-select: text; user-select: text; }
-img { -webkit-user-drag: none; pointer-events: none; }
+/* Text in windows stays selectable. The field and its controls do not select, so dragging
+   through the network never highlights the labels around it. */
+#field, .gate, .top, .colonies, .nodes, .foot { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 
 .sr-only {
   position: absolute; width: 1px; height: 1px; overflow: hidden;
