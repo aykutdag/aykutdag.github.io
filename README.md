@@ -1,4 +1,4 @@
-# aykutdagg.github.io
+# aykutdag.github.io
 
 Portfolio of Aykut Dağ, architectural and computational designer.
 
