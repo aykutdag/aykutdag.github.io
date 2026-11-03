@@ -10,7 +10,7 @@
 // links to it may be shared. featured: shown under Selected Work.
 window.GROUPS = [
   { id: "practice", label: "Practice", note: "Architecture offices", x: 0.30, y: 0.56 },
-  { id: "research", label: "Research", note: "Academic work", x: 0.70, y: 0.32 },
+  { id: "research", label: "Research & Lab", note: "Academic work", x: 0.70, y: 0.32 },
   { id: "media", label: "Installations and media", note: "Installations, exhibitions, video", x: 0.64, y: 0.74 }
 ];
 
@@ -411,13 +411,53 @@ window.PROJECTS = [
   }
 ];
 
+// The sheet's intro, about and contact sections (written into index.html by tools/build.py).
+// Facts follow Aykut_Dag_CV.pdf.
 window.ABOUT = {
   photo: "img/aykut.jpg",
-  text: [
-    "Architectural and computational designer with 4+ years of experience in international competitions and concept design for cultural, hospitality and office buildings.",
-    "I work with parametric design in Rhino and Grasshopper, interactive systems in TouchDesigner, generative AI and hands-on digital fabrication, with a particular interest in biophilic and bio-inspired design.",
-    "Currently an M.Sc. candidate in Architectural Design Computing at Istanbul Technical University, researching pneumatic systems and soft robotics."
-  ]
+  axis: "Space · Computation · Material · Interaction",
+  intro: "I am an architectural and computational designer working between space, computation, material and interaction — from international competitions and concept design to generative systems, responsive environments and soft robotic prototypes.",
+  now: "M.Sc. in Architectural Design Computing at Istanbul Technical University, researching pneumatic systems and soft robotics.",
+  areas: [
+    ["Architecture", "Concept design, international competitions, spatial organization, team leadership"],
+    ["Computational design", "Parametric modeling, generative systems, simulation"],
+    ["Interactive systems", "TouchDesigner, sensing, responsive environments"],
+    ["Material research", "Soft robotics, prototyping, digital fabrication"]
+  ],
+  axes: [
+    ["Architectural practice", "4+ years of concept and competition work for cultural, hospitality and office buildings at Melike Altınışık Architects, GG-loop, Aboutblank and Nous Architecture, from massing and space programming to drawings, visuals and jury presentations. Led the concept team of the II. Sejong Cultural Center entry, a shortlisted finalist."],
+    ["Computational exploration", "Rhino and Grasshopper definitions for facade panelization, form-finding and geometric rationalization; StyleGAN models and agent-based simulations that grow urban fabric from the behaviour of Physarum polycephalum."],
+    ["Experimental environments", "Sensor-driven installations, a responsive environment that turns EEG and heart-rate data into projection and spatial sound with KHORA Collective, and soft robotic actuators cast in silicone."]
+  ],
+  research: "Studies in computation, material and interaction from the M.Sc. in Architectural Design Computing at İTÜ and an Erasmus+ semester at the Bauhaus-Universität Weimar.",
+  // [years, place, role, location]
+  experience: [
+    ["2024–2025", "GG-loop", "Architectural Designer, facade design and computational visualization", "Amsterdam (remote)"],
+    ["2021–2024", "Melike Altınışık Architects (MAA)", "Concept Team Leader & Architect", "Istanbul"],
+    ["2020–2021", "Aboutblank", "Architectural Intern, competition team", "Istanbul"],
+    ["2020", "Nous Architecture", "Competition team member", "Istanbul"]
+  ],
+  // [years, school, programme]
+  education: [
+    ["2023–", "Istanbul Technical University", "M.Sc. Architectural Design Computing"],
+    ["2024–2025", "Bauhaus-Universität Weimar", "Erasmus+ exchange, M.Arch. programme"],
+    ["2016–2021", "Istanbul Technical University", "B.Arch.; Erasmus exchange at Opole University of Technology, 2018–2019"]
+  ],
+  // [year, competition, result]
+  honors: [
+    ["2023", "II. Sejong Cultural Center for Performing Arts", "Shortlisted finalist, international competition; concept team leader at MAA"],
+    ["2020", "Kadıköy Square Urban Design Competition", "1st Prize, with Aboutblank and Adapt Architects"],
+    ["2020", "Haliç Seashore Design Competition", "3rd Prize, with Nous Architecture"],
+    ["2020", "1927 Mimarlar Derneği", "3rd Prize, architectural drawing and photography"]
+  ],
+  // [year, title, where, project slug (optional)]
+  publications: [
+    ["2026", "Pulse Pavilion: A Human-Driven Psychophysiological Spatial Feedback System", "Digital Futures 2026 · abstract accepted · with KHORA Collective (Uçkan, Atukeren, Dağ et al.)"],
+    ["2026", "[KHORA]: Space of Becoming with Mind & Body", "Istanbul Digital Art Festival (IDAF), Atatürk Kültür Merkezi · spatial and generative designer, KHORA Collective", "khora"],
+    ["2020", "Glitch | Queer | Space", "Archithese, Zurich · issue “Queer”, pp. 68–69 · text and computational artwork"],
+    ["2019", "Sanata Bi Yer", "Doğuş Group exhibition, Istanbul · architectural photography"]
+  ],
+  location: "Based in Bursa, Turkey — open to relocation and remote work."
 };
 
 window.CONTACT = [

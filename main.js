@@ -27,6 +27,8 @@
   const hintEl = document.getElementById("hint");
   const win = document.getElementById("win");
   const winBody = document.getElementById("win-body");
+  const sheet = document.getElementById("sheet");
+  const sheetScroll = document.getElementById("sheet-scroll");
   const chrome = [topEl, document.querySelector("main"), document.querySelector(".foot")];
   const viewBtn = document.getElementById("toggle-view");
   const soundBtn = document.getElementById("sound");
@@ -56,9 +58,10 @@
   let signals = [];
   let abandoned = [];        // { x, y, t0 }: food sources the organism has just left
   const mouse = { x: -1, y: -1, px: -1, py: -1, speed: 0 };
+  let sheetOpen = false;     // the portfolio sheet is up (see "Second layer")
+  let sheetMoving = false;   // it is rising, falling or following a finger
   const now = () => performance.now() / 1000;
   const ease = t => 1 - Math.pow(1 - t, 3);
-  const isList = () => body.classList.contains("list");
 
   function el(tag, cls, text) {
     const e = document.createElement(tag);
@@ -143,12 +146,7 @@
       btn.addEventListener("focus", () => hoverOnProject(p.index));
       btn.addEventListener("mouseleave", () => hoverOnProject(-1));
       btn.addEventListener("blur", () => hoverOnProject(-1));
-      btn.addEventListener("click", () => {
-        const q = posOf(p);
-        Sound.chime(p.index, true, q.x * 2 - 1);
-        signal(q.x, q.y, 1.6, p.index);
-        openProject(p);
-      });
+      btn.addEventListener("click", () => chooseProject(p));
       li.append(btn);
       ol.append(li);
       nodeEls[p.index] = { li, btn };
@@ -198,7 +196,9 @@
     body.classList.toggle("short", short);
     document.documentElement.style.setProperty("--top-h", topEl.offsetHeight + "px");
     const top = Math.min(0.5, Math.max(0.3, (topEl.offsetHeight + 56) / innerHeight));
-    const bottom = short ? 0.82 : 0.88;
+    // nodes stay above the footer and its cue (two rows on phones)
+    const footTop = document.querySelector(".foot").getBoundingClientRect().top;
+    const bottom = Math.min(short ? 0.82 : 0.88, (footTop - 26) / innerHeight);
     groups.forEach((g, gi) => {
       if (tall || short) {
         const c = (tall ? TALL_COLONIES : SHORT_COLONIES)[gi];
@@ -240,7 +240,7 @@
   function placeLabels(g, tall, short) {
     const W = innerWidth, H = innerHeight;
     const hit = (a, b) => a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b;
-    const taken = [...document.querySelectorAll(".name, .role, .tags, .group-nav, .nav, #foot-agents, .hint")]
+    const taken = [...document.querySelectorAll(".name, .role, .tags, .group-nav, .nav, #foot-agents, .sheet-cue, .hint")]
       .map(e => e.getBoundingClientRect())
       .filter(r => r.width > 0 && r.height > 0)
       .map(r => ({ l: r.left - 4, r: r.right + 4, t: r.top - 4, b: r.bottom + 4 }));
@@ -311,10 +311,6 @@
   }
 
   function openGroup(gi, viaKeyboard) {
-    if (isList()) {
-      sections[gi].scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
-      return;
-    }
     if (gi === open) return;
     track("colony/" + groups[gi].id, groups[gi].label);
     hoverOnColony(-1);
@@ -334,10 +330,6 @@
   }
 
   function closeGroup() {
-    if (isList()) {
-      document.querySelector("main").scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
-      return;
-    }
     if (open < 0) return;
     const gi = open;
     const hadFocus = groupsEl.contains(document.activeElement);
@@ -373,23 +365,33 @@
   // ---------- Floating glass window ----------
   // On the animated field the glass itself is drawn by the simulation (see setGlass in
   // physarum.js), so the window grows out of the clicked node and the rest of the interface
-  // fades away. In the index view, on a still field or without WebGL, CSS frosted glass stands in.
+  // fades away. On a still field or without WebGL, CSS frosted glass stands in.
   function centerOf(elem) {
     const r = elem.getBoundingClientRect();
     return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
   }
 
-  // variant: extra classes for the window ("small" for Contact, "small about" for About)
-  function openWin(build, from, variant) {
+  // Only what is in front can be reached by keyboard and screen readers: the entry screen,
+  // else an open window, else the sheet, else the field and its header and footer.
+  function syncInert() {
+    const blocked = gateOpen || body.classList.contains("modal");
+    chrome.forEach(c => { c.inert = blocked || sheetOpen; });
+    sheet.inert = blocked || !sheetOpen;
+  }
+
+  // The simulation draws the glass while it animates; otherwise CSS frosted glass.
+  function glassMode() {
+    body.classList.toggle("gl-glass", !!sim && !still);
+  }
+
+  function openWin(build, from) {
     if (!win.hidden) closeWin(true);
     lastFocus = document.activeElement;
     winBody.replaceChildren();
     build(winBody);
-    win.classList.remove("small", "about");
-    if (variant) win.classList.add(...variant.split(" "));
-    body.classList.toggle("gl-glass", !!sim && !still && !isList());
+    glassMode();
     body.classList.add("modal");
-    chrome.forEach(c => { c.inert = true; });
+    syncInert();
     win.style.setProperty("--fx", from.x - innerWidth / 2 + "px");
     win.style.setProperty("--fy", from.y - innerHeight / 2 + "px");
     win.classList.remove("leave");
@@ -406,7 +408,7 @@
       Sound.duck(false);
       win.classList.remove("enter", "leave");
       body.classList.remove("modal");
-      chrome.forEach(c => { c.inert = false; });
+      syncInert();
       if (lastFocus && !instant) lastFocus.focus({ preventScroll: true });
     };
     if (instant || reduceMotion) {
@@ -439,8 +441,17 @@
 
   // The window grows out of the project's node, or out of the middle when it is not on screen.
   function originOf(p) {
-    const shown = isList() || nodeEls[p.index].li.classList.contains("shown");
+    const shown = nodeEls[p.index].li.classList.contains("shown");
     return shown ? centerOf(nodeEls[p.index].btn) : { x: innerWidth / 2, y: innerHeight / 2 };
+  }
+
+  // Choosing a project (its node, or its row or card on the sheet): the node chimes and
+  // sends a signal, as it always has, and the window opens from where it was chosen.
+  function chooseProject(p, from) {
+    const q = posOf(p);
+    Sound.chime(p.index, true, q.x * 2 - 1);
+    signal(q.x, q.y, 1.6, p.index);
+    openProject(p, from);
   }
 
   // A project window: credits, description and responsibilities on the left; video and
@@ -540,67 +551,272 @@
     return closeWin();
   }
 
+  // Back and forward: a project address opens that project; otherwise the window closes and
+  // the sheet shows or hides as it was at that point of the history.
   addEventListener("popstate", () => {
     const m = location.pathname.match(/^\/projects\/([^/]+)\/?$/);
     const p = m && bySlug[m[1]];
-    if (p && !gateOpen) openProject(p, null, true);
-    else if (!p) {
-      pushedProject = false;
-      document.title = HOME_TITLE;
-      closeWin();
+    if (p) {
+      if (!gateOpen) openProject(p, null, true);
+      return;
     }
+    pushedProject = false;
+    document.title = HOME_TITLE;
+    closeWin();
+    if (history.state && history.state.sheet) openSheet(null, true);
+    else closeSheet(true);
   });
-
-  document.querySelectorAll("[data-panel]").forEach(b => b.addEventListener("click", () => {
-    const which = b.dataset.panel;
-    track(which, which === "about" ? "About opened" : "Contact opened");
-    openWin(root => {
-      const h = el("h2", null, which === "about" ? "About" : "Contact"); h.id = "win-title";
-      if (which === "about") {
-        // portrait beside the text; stacked on narrow screens with the heading
-        // first, so the photo never sits under the close button
-        const grid = el("div", "about-grid");
-        const img = el("img", "portrait");
-        img.src = ABOUT.photo;
-        img.alt = "Portrait of Aykut Dağ";
-        img.decoding = "async";
-        const text = el("div", "about-text");
-        ABOUT.text.forEach(t => text.append(el("p", null, t)));
-        grid.append(h, img, text);
-        root.append(grid);
-      } else {
-        root.append(h);
-        const ul = el("ul", "links");
-        CONTACT.forEach(c => {
-          const a = el("a", null, c.label); a.href = c.href;
-          const mail = c.href.startsWith("mailto:");
-          if (!mail) { a.target = "_blank"; a.rel = "noopener"; }
-          a.addEventListener("click", () => track("contact/" + (mail ? "email" : c.label.toLowerCase()), "Contact: " + (mail ? "email" : c.label)));
-          const li = el("li"); li.append(a); ul.append(li);
-        });
-        root.append(ul);
-      }
-    }, centerOf(b), which === "about" ? "small about" : "small");
-  }));
 
   win.querySelector(".win-close").addEventListener("click", () => dismiss());
   addEventListener("keydown", e => {
     if (e.key !== "Escape") return;
-    if (!dismiss() && !isList()) closeGroup();
+    if (!dismiss() && !closeSheet()) closeGroup();
   });
 
-  // ---------- View + sound toggles ----------
-  function setList(on) {
-    body.classList.toggle("list", on);
-    viewBtn.setAttribute("aria-pressed", on);
-    viewBtn.textContent = on ? "Field" : "Index";
-    layout();
+  // ---------- Second layer: the portfolio sheet ----------
+  // Scrolling down on the field (the wheel, PageDown / ↓ / Space, or the cue at the bottom,
+  // tapped or dragged up) raises a glass sheet with the portfolio as a document: intro,
+  // selected work, every project, research and publications, about and contact. Its sections
+  // are plain HTML written by tools/build.py. The sheet stays put while its content scrolls,
+  // so the glass the simulation draws behind it never lags the text. It has its own history
+  // entry, so the back button lowers it again.
+  const cue = document.getElementById("sheet-cue");
+  const tabs = [...sheet.querySelectorAll(".sheet-tabs [data-to]")];
+  const PULL = 90;      // px of wheel or finger travel that raises or lowers the sheet
+  const PEEK_MAX = 150; // px the sheet's edge follows before it rises
+  let sheetFocus = null;
+
+  const sectionEl = name => sheetScroll.querySelector('[data-section="' + name + '"]');
+
+  function goToSection(name, instant) {
+    const s = sectionEl(name);
+    if (!s) return;
+    sheetScroll.scrollTo({ top: s.offsetTop - 4, behavior: instant || reduceMotion ? "auto" : "smooth" });
+    s.querySelector(".s-head").focus({ preventScroll: true });
   }
-  viewBtn.addEventListener("click", () => {
-    setList(!isList());
-    if (isList()) track("index", "Index view opened");
+
+  function moving() {
+    sheetMoving = true;
+    clearTimeout(moving.t);
+    moving.t = setTimeout(() => { sheetMoving = false; }, 700); // the rise or fall (0.6 s)
+  }
+
+  // The sheet's edge follows a wheel or a finger before it rises (px above its rest).
+  function peek(px) {
+    glassMode();
+    sheet.classList.toggle("dragging", px > 0);
+    if (px > 0) sheet.style.setProperty("--peek", Math.min(PEEK_MAX, px) + "px");
+    else sheet.style.removeProperty("--peek");
+    moving();
+  }
+
+  function openSheet(section, viaHistory) {
+    if (gateOpen || !win.hidden) return;
+    const was = sheetOpen;
+    if (!was) {
+      sheetOpen = true;
+      sheetFocus = document.activeElement;
+      hoverOnColony(-1);
+      hoverOnProject(-1);
+      sheet.classList.remove("dragging");
+      sheet.style.removeProperty("--peek");
+      sheet.style.removeProperty("--drag");
+      glassMode();
+      body.classList.add("sheet-open");
+      syncInert();
+      moving();
+      if (!viaHistory && !(history.state && history.state.sheet)) history.pushState({ sheet: true }, "", location.pathname);
+    }
+    if (section) goToSection(section, !was);
+    else if (!was) {
+      sheetScroll.scrollTop = 0; // scrolling down from the field starts at the beginning
+      sheet.querySelector(".sheet-close").focus({ preventScroll: true });
+    }
+  }
+
+  // Returns true when the sheet was up. The visitor's close goes back in the history when
+  // the sheet added an entry there (popstate then lowers it).
+  function closeSheet(viaHistory) {
+    if (!sheetOpen) return false;
+    if (!viaHistory && history.state && history.state.sheet) {
+      history.back();
+      return true;
+    }
+    sheetOpen = false;
+    sheet.style.removeProperty("--drag");
+    body.classList.remove("sheet-open");
+    syncInert();
+    moving();
+    hidePeekImg();
+    if (sheet.contains(document.activeElement)) (sheetFocus && document.contains(sheetFocus) ? sheetFocus : viewBtn).focus({ preventScroll: true });
+    return true;
+  }
+
+  sheet.querySelector(".sheet-close").addEventListener("click", () => closeSheet());
+  viewBtn.addEventListener("click", () => { openSheet("projects"); track("index", "Index view opened"); });
+  document.querySelectorAll("[data-panel]").forEach(b => b.addEventListener("click", () => {
+    const which = b.dataset.panel;
+    openSheet(which);
+    track(which, which === "about" ? "About opened" : "Contact opened");
+  }));
+
+  // The wheel on the field: the sheet's edge follows, then the sheet rises. On the sheet,
+  // pulling further up at the top of its content lowers it again. A pull counts only within
+  // one wheel gesture that started at the top, so scrolling up to the top does not close it.
+  let pull = 0, pullTimer = 0, lastWheel = 0, gestureFromTop = false;
+  addEventListener("wheel", e => {
+    if (gateOpen || !win.hidden) return;
+    const dy = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaMode === 2 ? e.deltaY * innerHeight : e.deltaY;
+    const t = now();
+    const fresh = t - lastWheel > 0.25;
+    lastWheel = t;
+    clearTimeout(pullTimer);
+    pullTimer = setTimeout(() => { pull = 0; if (!sheetOpen) peek(0); }, 220);
+    if (!sheetOpen) {
+      if (dy <= 0) return;
+      pull += dy;
+      if (pull >= PULL) { pull = 0; openSheet(null); track("sheet", "Portfolio sheet opened"); }
+      else peek(pull * PEEK_MAX / PULL);
+      return;
+    }
+    if (fresh) { pull = 0; gestureFromTop = sheetScroll.scrollTop <= 0; }
+    if (dy >= 0 || !gestureFromTop || sheetScroll.scrollTop > 0) { pull = 0; return; }
+    pull -= dy;
+    if (pull >= PULL) { pull = 0; closeSheet(); }
+  }, { passive: true });
+
+  addEventListener("keydown", e => {
+    if (gateOpen || sheetOpen || !win.hidden || e.altKey || e.ctrlKey || e.metaKey) return;
+    const onPage = !document.activeElement || document.activeElement === body;
+    if (e.key === "PageDown" || e.key === "ArrowDown" || (e.key === " " && onPage)) {
+      e.preventDefault();
+      openSheet(null);
+      track("sheet", "Portfolio sheet opened");
+    }
   });
 
+  // Dragging: the cue up raises the sheet, the sheet's top bar down lowers it. A short move
+  // springs back; a tap on the cue simply opens.
+  function dragger(handle, onMove, onEnd) {
+    let d = null;
+    handle.addEventListener("pointerdown", e => {
+      if (e.button) return;
+      d = { y0: e.clientY, dy: 0, id: e.pointerId };
+    });
+    handle.addEventListener("pointermove", e => {
+      if (!d || e.pointerId !== d.id) return;
+      d.dy = e.clientY - d.y0;
+      if (Math.abs(d.dy) > 6 && !handle.hasPointerCapture(d.id)) handle.setPointerCapture(d.id);
+      if (Math.abs(d.dy) > 6) onMove(d.dy);
+    });
+    const end = e => {
+      if (!d || e.pointerId !== d.id) return;
+      const dy = d.dy;
+      d = null;
+      if (Math.abs(dy) > 6) { handle.dataset.dragged = "1"; onEnd(dy); }
+    };
+    handle.addEventListener("pointerup", end);
+    handle.addEventListener("pointercancel", end);
+  }
+
+  dragger(cue, dy => peek(-dy), dy => {
+    if (-dy > PULL * 0.8) { openSheet(null); track("sheet", "Portfolio sheet opened"); }
+    else peek(0);
+  });
+  cue.addEventListener("click", () => {
+    if (cue.dataset.dragged) { delete cue.dataset.dragged; return; }
+    openSheet(null);
+    track("sheet", "Portfolio sheet opened");
+  });
+
+  const bar = sheet.querySelector(".sheet-bar");
+  dragger(bar, dy => {
+    sheet.classList.add("dragging");
+    sheet.style.setProperty("--drag", Math.max(0, dy) + "px");
+    moving();
+  }, dy => {
+    sheet.classList.remove("dragging");
+    sheet.style.removeProperty("--drag");
+    if (dy > PULL) closeSheet();
+    else moving();
+  });
+  bar.addEventListener("click", e => { if (bar.dataset.dragged) { delete bar.dataset.dragged; e.stopPropagation(); } }, true);
+
+  // Section tabs, and the tab of the section in view.
+  tabs.forEach(b => b.addEventListener("click", () => goToSection(b.dataset.to)));
+  let tabRaf = 0;
+  sheetScroll.addEventListener("scroll", () => {
+    if (tabRaf) return;
+    tabRaf = requestAnimationFrame(() => {
+      tabRaf = 0;
+      const y = sheetScroll.scrollTop + 120;
+      let cur = tabs[0];
+      tabs.forEach(b => { const s = sectionEl(b.dataset.to); if (s && s.offsetTop <= y) cur = b; });
+      if (sheetScroll.scrollTop + sheetScroll.clientHeight >= sheetScroll.scrollHeight - 4) cur = tabs[tabs.length - 1];
+      tabs.forEach(b => { if (b === cur) b.setAttribute("aria-current", "true"); else b.removeAttribute("aria-current"); });
+      const nav = cur.parentElement;
+      if (nav.scrollWidth > nav.clientWidth) nav.scrollTo({ left: cur.offsetLeft - nav.clientWidth / 2 + cur.offsetWidth / 2, behavior: "smooth" });
+    });
+  }, { passive: true });
+
+  // Projects: filter by colony, order by colony or by year (newest first).
+  const rowList = sheet.querySelector(".rows");
+  const filterBtns = [...sheet.querySelectorAll("[data-filter]")];
+  filterBtns.forEach(b => b.addEventListener("click", () => {
+    filterBtns.forEach(x => x.setAttribute("aria-pressed", x === b));
+    [...rowList.children].forEach(li => { li.hidden = b.dataset.filter !== "all" && li.dataset.group !== b.dataset.filter; });
+  }));
+  const sortBtns = [...sheet.querySelectorAll("[data-sort]")];
+  sortBtns.forEach(b => b.addEventListener("click", () => {
+    sortBtns.forEach(x => x.setAttribute("aria-pressed", x === b));
+    const byYear = b.dataset.sort === "year";
+    [...rowList.children]
+      .sort((x, y) => (byYear ? y.dataset.year - x.dataset.year : 0) || x.dataset.order - y.dataset.order)
+      .forEach(li => rowList.append(li));
+  }));
+
+  // Links to projects (rows, cards, publications) open the project window here; with a
+  // modifier key or the middle button they open the project's page in a new tab.
+  sheet.addEventListener("click", e => {
+    const a = e.target.closest("a[data-slug]");
+    if (a && !(e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || e.button)) {
+      e.preventDefault();
+      hidePeekImg();
+      chooseProject(bySlug[a.dataset.slug], centerOf(a));
+      return;
+    }
+    const to = e.target.closest(".s [data-to]");
+    if (to) goToSection(to.dataset.to);
+    const t = e.target.closest("[data-track]");
+    if (t) track(t.dataset.track, t.dataset.trackTitle || t.dataset.track);
+  });
+
+  // Pointing at a project on the sheet does what pointing at its node does; on desktops a row
+  // also shows its preview image beside the pointer.
+  const peekImg = el("img", "peek-img");
+  peekImg.alt = "";
+  peekImg.setAttribute("aria-hidden", "true");
+  sheet.append(peekImg);
+  const finePointer = matchMedia("(hover: hover) and (pointer: fine)").matches;
+  function hidePeekImg() { peekImg.classList.remove("on"); }
+  sheet.querySelectorAll("a[data-slug]").forEach(a => {
+    const p = bySlug[a.dataset.slug];
+    a.addEventListener("mouseenter", () => {
+      hoverOnProject(p.index);
+      if (finePointer && a.dataset.thumb) { peekImg.src = a.dataset.thumb; peekImg.classList.add("on"); }
+    });
+    a.addEventListener("mousemove", e => {
+      if (!peekImg.classList.contains("on")) return;
+      const w = 260, h = peekImg.naturalHeight ? w * peekImg.naturalHeight / peekImg.naturalWidth : 180;
+      peekImg.style.transform = "translate(" + Math.min(e.clientX + 28, innerWidth - w - 16) + "px," +
+        Math.max(16, Math.min(e.clientY - h / 2, innerHeight - h - 16)) + "px)";
+    });
+    a.addEventListener("mouseleave", () => { hoverOnProject(-1); hidePeekImg(); });
+    a.addEventListener("focus", () => hoverOnProject(p.index));
+    a.addEventListener("blur", () => hoverOnProject(-1));
+  });
+
+  // ---------- Sound toggle ----------
   // Sound is on; it starts with the entry click, since browsers block audio until a click,
   // tap or key press. The button turns it off and on for this visit only.
   function showSound(on) {
@@ -646,7 +862,7 @@
     clearInterval(welcomeTimer);
     Sound.set(true);
     body.classList.remove("gated");
-    chrome.forEach(c => { c.inert = false; });
+    syncInert();
     gate.classList.add("out");
     setTimeout(() => { gate.hidden = true; }, 900);
     track("enter", "Entered the site");
@@ -659,7 +875,7 @@
 
   gate.hidden = false;
   body.classList.add("gated");
-  chrome.forEach(c => { c.inert = true; });
+  syncInert();
   document.getElementById("gate-enter").focus({ preventScroll: true });
   gate.addEventListener("click", enter);
 
@@ -756,7 +972,7 @@
   function feed(breath) {
     const b = 0.85 + 0.3 * breath;
     sim.setFood(foodPoints().map(f => ({ x: f.x, y: f.y, s: f.s * b })).concat(repellents()));
-    const active = mouse.x >= 0 && !isList() && win.hidden;
+    const active = mouse.x >= 0 && !sheetOpen && win.hidden;
     sim.setMouse(
       Math.max(0, mouse.x) / innerWidth, Math.max(0, mouse.y) / innerHeight,
       active ? Math.min(1, 0.15 + mouse.speed * 0.06) : 0
@@ -766,21 +982,23 @@
     sim.setSignals(signals.map(g => ({ x: g.x, y: g.y, age: t - g.t0, s: g.s })));
   }
 
-  // The glass follows the window's on-screen box, so it tracks the CSS open/close animation.
-  // Its rim light turns toward the pointer.
+  // The glass follows the on-screen box of the window, or else of the sheet, so it tracks
+  // their CSS animations. Its rim light turns toward the pointer.
   const light = { x: -0.6, y: 0.8 };
   function updateGlass() {
-    if (win.hidden || !body.classList.contains("gl-glass")) { sim.setGlass(null); return; }
-    const r = win.getBoundingClientRect();
+    const pane = !win.hidden ? win : (sheetOpen || sheetMoving) ? sheet : null;
+    if (!pane || !body.classList.contains("gl-glass")) { sim.setGlass(null); return; }
+    const r = pane.getBoundingClientRect();
+    if (r.top >= innerHeight) { sim.setGlass(null); return; }
     const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
     if (mouse.x >= 0) {
       light.x += (mouse.x - cx - light.x) * 0.15;
       light.y += (cy - mouse.y - light.y) * 0.15;
     }
-    const cs = getComputedStyle(win);
+    const cs = getComputedStyle(pane);
     sim.setGlass({
       x: r.left, y: r.top, w: r.width, h: r.height,
-      r: (parseFloat(cs.borderTopLeftRadius) || 30) * r.width / win.offsetWidth,
+      r: (parseFloat(cs.borderTopLeftRadius) || 30) * r.width / pane.offsetWidth,
       a: parseFloat(cs.opacity),
       lx: light.x, ly: light.y
     });
@@ -876,10 +1094,12 @@
     const dt = lastTs ? ts - lastTs : 0;
     lastTs = ts;
     if (lost || !sim) return;
-    // In the index view the field is only a dim backdrop: half the frames are enough.
-    if (isList() && (tick++ & 1)) return;
+    // Behind the resting sheet the field is only a frosted backdrop: half the frames are
+    // enough. While the sheet moves, every frame, so its glass keeps up.
+    const backdrop = sheetOpen && !sheetMoving;
+    if (backdrop && (tick++ & 1)) return;
     try {
-      if (!isList()) gov.add(dt);
+      if (!backdrop) gov.add(dt);
       if (!running) return; // the governor switched to still
 
       const t = now() - t0;

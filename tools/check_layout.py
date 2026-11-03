@@ -1,5 +1,6 @@
-# Layout QA: at many screen sizes, open every colony and every project window and report
-# any two elements that overlap, anything outside the screen, and any horizontal overflow.
+# Layout QA: at many screen sizes, open every colony, every project window and the portfolio
+# sheet (and a project's own page), and report any two elements that overlap, anything
+# outside the screen, and any horizontal overflow.
 # Usage: python tools/check_layout.py [base_url] [chromium|webkit] [viewport filter, comma separated]
 # Needs Playwright (pip install playwright; playwright install). Run before publishing layout changes.
 from playwright.sync_api import sync_playwright
@@ -23,7 +24,7 @@ CHECK_JS = r"""(mode) => {
   const vw = innerWidth, vh = innerHeight;
   const outside = (e, label) => { const r = R(e); if (r.left < -1 || r.top < -1 || r.right > vw + 1 || r.bottom > vh + 1) out.push(label + ' outside screen: ' + name(e) + ' ' + [r.left, r.top, r.right, r.bottom].map(Math.round)); };
   const pairs = (list, label) => { for (let i = 0; i < list.length; i++) for (let j = i + 1; j < list.length; j++) if (hit(R(list[i]), R(list[j]))) out.push(label + ': ' + name(list[i]) + ' × ' + name(list[j])); };
-  const chrome = [...document.querySelectorAll('.name, .role, .tags, .group-nav button, .nav > *, #foot-agents, .hint')].filter(visible);
+  const chrome = [...document.querySelectorAll('.name, .role, .tags, .group-nav button, .nav > *, #foot-agents, .sheet-cue, .hint')].filter(visible);
 
   if (mode === 'field') {
     // every visible node / colony: its marker and its label, against each other and the page chrome
@@ -38,6 +39,22 @@ CHECK_JS = r"""(mode) => {
         if (parts[i].closest('li') !== parts[j].closest('li') && hit(R(parts[i]), R(parts[j]))) out.push('field: ' + name(parts[i]) + ' × ' + name(parts[j]));
       chrome.forEach(c => { if (hit(R(parts[i]), R(c))) out.push('field × header/footer: ' + name(parts[i]) + ' × ' + name(c)); });
     }
+  } else if (mode === 'sheet') {
+    // the portfolio sheet: on screen, no sideways scrolling, nothing overlapping inside a list,
+    // a row or a card, and no text running out of its box
+    const sheet = document.getElementById('sheet'), sc = document.getElementById('sheet-scroll');
+    const r = R(sheet);
+    if (r.left < -1 || r.right > vw + 1 || r.top < -1) out.push('sheet outside screen: ' + [r.left, r.top, r.right].map(Math.round));
+    if (sc.scrollWidth > sc.clientWidth + 1) out.push('sheet: horizontal overflow ' + sc.scrollWidth + ' > ' + sc.clientWidth);
+    if (hit(R(sheet.querySelector('.sheet-tabs')), R(sheet.querySelector('.sheet-close')))) out.push('sheet: tabs × close button');
+    [['.areas', 'li'], ['.cards', 'li'], ['.rows', 'li'], ['.pubs', 'li'], ['.tl', 'li'], ['.cv-cols', 'div'], ['.about-cols', '*'],
+     ['.quick', '*'], ['.tools', 'div'], ['.contact-links', 'li']].forEach(([list, item]) =>
+      sheet.querySelectorAll(list).forEach(l => pairs([...l.querySelectorAll(':scope > ' + item)].filter(visible), 'sheet ' + list)));
+    sheet.querySelectorAll('.row').forEach(row => { if (visible(row)) pairs([...row.querySelectorAll('.row-thumb, .mark, .row-no, .row-title, .row-kind, .row-place, .row-year')].filter(visible), 'row'); });
+    sheet.querySelectorAll('.card').forEach(c => pairs([...c.querySelectorAll('.card-img, .card-kicker, .card-title, .card-sub')].filter(visible), 'card'));
+    sheet.querySelectorAll('.s-head, .s-sub, .s p, .areas h3, .axes dt, .axes dd, .card-title, .card-sub, .row-title, .pub-title, .pub-where, .tl-body').forEach(e => {
+      if (visible(e) && e.scrollWidth > e.clientWidth + 1) out.push('sheet: text overflows ' + name(e));
+    });
   } else {
     const win = document.getElementById('win');
     outside(win, 'window');
@@ -91,10 +108,24 @@ with sync_playwright() as p:
                 title = pg.evaluate("document.getElementById('win-title').textContent").split("|")[0].strip()[:24]
                 run(pg, f"window {title}", "window", problems)
                 pg.evaluate("document.querySelector('.win-close').click()"); pg.wait_for_timeout(250)
-        for which in ["about", "contact"]:
-            pg.evaluate(f"document.querySelector('[data-panel={which}]').click()"); pg.wait_for_timeout(350)
-            run(pg, f"window {which}", "window", problems)
-            pg.evaluate("document.querySelector('.win-close').click()"); pg.wait_for_timeout(250)
+        # the portfolio sheet, both orders of the index, and a project opened from it
+        pg.evaluate("document.getElementById('sheet-cue').click()"); pg.wait_for_timeout(700)
+        run(pg, "sheet", "sheet", problems)
+        pg.evaluate("document.querySelector('[data-sort=year]').click()"); pg.wait_for_timeout(150)
+        run(pg, "sheet by year", "sheet", problems)
+        pg.evaluate("document.querySelector('.rows a.row').click()"); pg.wait_for_timeout(500)
+        pg.wait_for_function("[...document.querySelectorAll('#win img')].every(i => i.complete)", timeout=20000)
+        run(pg, "window from the sheet", "window", problems)
+        pg.evaluate("document.querySelector('.win-close').click()"); pg.wait_for_timeout(500)
+        if pg.evaluate("document.getElementById('win').hidden && document.body.classList.contains('sheet-open')") is not True:
+            problems.append("sheet: closing a project did not return to the sheet")
+        # a project's own page opens its project after Enter
+        pg.goto(BASE.rstrip("/") + "/projects/khora/"); pg.wait_for_timeout(1200)
+        pg.evaluate("document.getElementById('gate-enter').click()"); pg.wait_for_timeout(900)
+        pg.wait_for_function("[...document.querySelectorAll('#win img')].every(i => i.complete)", timeout=20000)
+        if "KHORA" not in (pg.evaluate("(document.getElementById('win-title') || {}).textContent") or ""):
+            problems.append("project page: /projects/khora/ did not open its project")
+        run(pg, "project page khora", "window", problems)
         print(f"== {vname}: {len(problems)} problems" + (f", errors {errs}" if errs else ""), flush=True)
         for pr in problems: print("   ", pr)
         total += problems
