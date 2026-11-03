@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- every relative address resolves from the site root, also on project pages (/projects/<slug>/) -->
+  <base href="/">
+  <title>SPARK | II. Sejong Cultural Center for Performing Arts — Aykut Dağ</title>
+  <meta name="description" content="The urban design approach for THE SPARK, the 2nd Sejong Center for Performing Arts, is focused on creating a cultural complex that becomes a landmark in…">
+  <link rel="canonical" href="https://aykutdag.github.io/projects/spark-sejong/">
+  <meta name="theme-color" content="#05070a">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <!-- Link previews (LinkedIn, WhatsApp, X...) -->
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Aykut Dağ">
+  <meta property="og:title" content="SPARK | II. Sejong Cultural Center for Performing Arts — Aykut Dağ">
+  <meta property="og:description" content="The urban design approach for THE SPARK, the 2nd Sejong Center for Performing Arts, is focused on creating a cultural complex that becomes a landmark in…">
+  <meta property="og:url" content="https://aykutdag.github.io/projects/spark-sejong/">
+  <meta property="og:image" content="https://aykutdag.github.io/img/sejong-1.jpg">
+  <meta property="og:image:width" content="1600">
+  <meta property="og:image:height" content="1594">
+  <meta property="og:image:alt" content="SPARK | II. Sejong Cultural Center for Performing Arts">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    "name": "SPARK | II. Sejong Cultural Center for Performing Arts",
+    "url": "https://aykutdag.github.io/projects/spark-sejong/",
+    "description": "The urban design approach for THE SPARK, the 2nd Sejong Center for Performing Arts, is focused on creating a cultural complex that becomes a landmark in…",
+    "genre": "Practice",
+    "image": [
+      "https://aykutdag.github.io/img/sejong-1.jpg",
+      "https://aykutdag.github.io/img/sejong-2.jpg",
+      "https://aykutdag.github.io/img/sejong-3.jpg",
+      "https://aykutdag.github.io/img/sejong-4.jpg"
+    ],
+    "creator": {
+      "@type": "Person",
+      "name": "Aykut Dağ",
+      "url": "https://aykutdag.github.io/"
+    },
+    "dateCreated": "2023"
+  }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=3667abef">
+</head>
+<body data-project="spark-sejong">
+  <canvas id="field" aria-hidden="true"></canvas>
+
+  <!-- Entry screen: browsers allow sound only after a click, so entering starts it.
+       Hidden until main.js shows it, so a script failure never locks the page. -->
+  <div id="gate" class="gate" role="dialog" aria-modal="true" aria-label="Welcome" hidden>
+    <div class="gate-inner">
+      <p class="gate-name" id="gate-name" lang="en" aria-hidden="true">Welcome</p>
+      <button type="button" class="gate-enter" id="gate-enter">Enter</button>
+    </div>
+  </div>
+
+  <header class="top">
+    <div class="ident">
+      <h1 class="name">Aykut Dağ</h1>
+      <p class="role">Architectural &amp; Computational Designer</p>
+      <p class="tags">Parametric design · Bio-inspired systems · Digital fabrication</p>
+      <nav class="group-nav" id="group-nav" aria-label="Project groups"></nav>
+    </div>
+    <nav class="nav" aria-label="Main">
+      <button type="button" id="toggle-view" aria-pressed="false">Index</button>
+      <button type="button" data-panel="about">About</button>
+      <a href="Aykut_Dag_CV.pdf" target="_blank" rel="noopener" id="cv-link">CV</a>
+      <button type="button" data-panel="contact">Contact</button>
+      <button type="button" id="sound" aria-pressed="false">Sound off</button>
+    </nav>
+  </header>
+
+  <main>
+    <h2 class="sr-only">Selected projects</h2>
+    <ol id="colonies" class="colonies"></ol>
+    <div id="groups"></div>
+  </main>
+
+  <footer class="foot">
+    <span id="foot-agents">Physarum polycephalum</span>
+    <span class="hint" id="hint"></span>
+  </footer>
+
+  <div id="win" class="win" role="dialog" aria-modal="true" aria-labelledby="win-title" hidden>
+    <button type="button" class="win-close" aria-label="Close">
+      <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2L10 10M10 2L2 10"/></svg>
+    </button>
+    <div id="win-body" class="win-body"><header class="win-head"><div class="p-no">01 · Practice</div><h2 id="win-title">SPARK | II. Sejong Cultural Center for Performing Arts</h2></header><div class="win-cols"><div class="win-info"><dl class="credits"><dt>Project</dt><dd>II. Sejong Cultural Center for Performing Arts</dd><dt>Location</dt><dd>Seoul, South Korea</dd><dt>Date</dt><dd>2023–2025</dd><dt>Client</dt><dd>Seoul Metropolitan Government</dd><dt>Status</dt><dd>International Competition, Shortlisted Finalist</dd><dt>Size</dt><dd>57,645 m²</dd><dt>Architect</dt><dd>Melike Altınışık Architects + BAUM Architects</dd><dt>Landscape architect</dt><dd>ALIVEUS Landscape</dd><dt>Project team leader (competition stage)</dt><dd>Aykut Dağ</dd><dt>Project team (competition stage)</dt><dd>Atakan Gündüz, Adham Mashaal</dd><dt>Architectural assistant team</dt><dd>Doğukan Cengiz, Anya Ghosh, Tolunay Demir, Samet Yılmaz</dd><dt>Creative media lead</dt><dd>Aykut Dağ</dd><dt>Media assistant team</dt><dd>Alper Fatih Tepe, Elif Yalçın, Samet Yılmaz, Yağmur Ayaydın</dd></dl><p>The urban design approach for THE SPARK, the 2nd Sejong Center for Performing Arts, is focused on creating a cultural complex that becomes a landmark in the heart of the city, blending nature and culture into a harmonious space for the community. Located at the corner of Yeouido Park, surrounded by the Han River on the north-east side and connecting waterside public activities towards the south-west, THE SPARK aims to preserve the existing ecosystem while providing an area for urban cultural events next to Seoul’s international financial center.</p><h3 class="sub">Responsibilities</h3><ul class="duties"><li>Team leading</li><li>Concept design development</li><li>Architectural layouts, space organizations</li><li>Managing area lists</li><li>2D drawings (plan, section, elevation)</li><li>Contributed to diagram production</li><li>Visualization</li><li>Architectural model photography &amp; videography</li></ul><p class="credit">2D drawings by Aykut Dağ · renders by MAA</p><ul class="ext"><li><a href="https://www.melikealtinisik.com/2-index/3549-iisejong-cultural-center-for-performing-arts/" target="_blank" rel="noopener">Project page at Melike Altınışık Architects</a></li></ul></div><div class="win-media"><img src="img/sejong-1.jpg" alt="SPARK | II. Sejong Cultural Center for Performing Arts, image 1 of 4" width="1600" height="1594" loading="lazy" decoding="async"><img src="img/sejong-2.jpg" alt="SPARK | II. Sejong Cultural Center for Performing Arts, image 2 of 4" width="1418" height="804" loading="lazy" decoding="async"><img src="img/sejong-3.jpg" alt="SPARK | II. Sejong Cultural Center for Performing Arts, image 3 of 4" width="1418" height="804" loading="lazy" decoding="async"><img src="img/sejong-4.jpg" alt="SPARK | II. Sejong Cultural Center for Performing Arts, image 4 of 4" width="1424" height="1404" loading="lazy" decoding="async"></div></div></div>
+  </div>
+
+  <script src="projects.js?v=ae3b0a72"></script>
+  <script src="glyphs.js?v=8c4af774"></script>
+  <script src="sound.js?v=5e7779a0"></script>
+  <script src="physarum.js?v=6a88886e"></script>
+  <script src="main.js?v=728897c6"></script>
+  <!-- Visitor statistics (cookieless): https://aykutdag.goatcounter.com -->
+  <script data-goatcounter="https://aykutdag.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</body>
+</html>

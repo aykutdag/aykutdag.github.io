@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- every relative address resolves from the site root, also on project pages (/projects/<slug>/) -->
+  <base href="/">
+  <title>The Orchestra of Illumination — Aykut Dağ</title>
+  <meta name="description" content="An interactive installation in which visitors’ steps make light. Its floor is a pressure-sensing system of piezo discs: each press generates a small…">
+  <link rel="canonical" href="https://aykutdag.github.io/projects/orchestra-of-illumination/">
+  <meta name="theme-color" content="#05070a">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <!-- Link previews (LinkedIn, WhatsApp, X...) -->
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Aykut Dağ">
+  <meta property="og:title" content="The Orchestra of Illumination — Aykut Dağ">
+  <meta property="og:description" content="An interactive installation in which visitors’ steps make light. Its floor is a pressure-sensing system of piezo discs: each press generates a small…">
+  <meta property="og:url" content="https://aykutdag.github.io/projects/orchestra-of-illumination/">
+  <meta property="og:image" content="https://aykutdag.github.io/img/orchestra-1.jpg">
+  <meta property="og:image:width" content="763">
+  <meta property="og:image:height" content="707">
+  <meta property="og:image:alt" content="The Orchestra of Illumination">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    "name": "The Orchestra of Illumination",
+    "url": "https://aykutdag.github.io/projects/orchestra-of-illumination/",
+    "description": "An interactive installation in which visitors’ steps make light. Its floor is a pressure-sensing system of piezo discs: each press generates a small…",
+    "genre": "Research",
+    "image": [
+      "https://aykutdag.github.io/img/orchestra-1.jpg",
+      "https://aykutdag.github.io/img/orchestra-2.jpg",
+      "https://aykutdag.github.io/img/orchestra-3.jpg",
+      "https://aykutdag.github.io/img/orchestra-4.jpg",
+      "https://aykutdag.github.io/img/orchestra-5.jpg",
+      "https://aykutdag.github.io/img/orchestra-6.jpg",
+      "https://aykutdag.github.io/img/orchestra-7.jpg",
+      "https://aykutdag.github.io/img/orchestra-8.jpg",
+      "https://aykutdag.github.io/img/orchestra-9.jpg",
+      "https://aykutdag.github.io/img/orchestra-10.jpg"
+    ],
+    "creator": {
+      "@type": "Person",
+      "name": "Aykut Dağ",
+      "url": "https://aykutdag.github.io/"
+    },
+    "dateCreated": "2024"
+  }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=3667abef">
+</head>
+<body data-project="orchestra-of-illumination">
+  <canvas id="field" aria-hidden="true"></canvas>
+
+  <!-- Entry screen: browsers allow sound only after a click, so entering starts it.
+       Hidden until main.js shows it, so a script failure never locks the page. -->
+  <div id="gate" class="gate" role="dialog" aria-modal="true" aria-label="Welcome" hidden>
+    <div class="gate-inner">
+      <p class="gate-name" id="gate-name" lang="en" aria-hidden="true">Welcome</p>
+      <button type="button" class="gate-enter" id="gate-enter">Enter</button>
+    </div>
+  </div>
+
+  <header class="top">
+    <div class="ident">
+      <h1 class="name">Aykut Dağ</h1>
+      <p class="role">Architectural &amp; Computational Designer</p>
+      <p class="tags">Parametric design · Bio-inspired systems · Digital fabrication</p>
+      <nav class="group-nav" id="group-nav" aria-label="Project groups"></nav>
+    </div>
+    <nav class="nav" aria-label="Main">
+      <button type="button" id="toggle-view" aria-pressed="false">Index</button>
+      <button type="button" data-panel="about">About</button>
+      <a href="Aykut_Dag_CV.pdf" target="_blank" rel="noopener" id="cv-link">CV</a>
+      <button type="button" data-panel="contact">Contact</button>
+      <button type="button" id="sound" aria-pressed="false">Sound off</button>
+    </nav>
+  </header>
+
+  <main>
+    <h2 class="sr-only">Selected projects</h2>
+    <ol id="colonies" class="colonies"></ol>
+    <div id="groups"></div>
+  </main>
+
+  <footer class="foot">
+    <span id="foot-agents">Physarum polycephalum</span>
+    <span class="hint" id="hint"></span>
+  </footer>
+
+  <div id="win" class="win" role="dialog" aria-modal="true" aria-labelledby="win-title" hidden>
+    <button type="button" class="win-close" aria-label="Close">
+      <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2L10 10M10 2L2 10"/></svg>
+    </button>
+    <div id="win-body" class="win-body"><header class="win-head"><div class="p-no">12 · Research</div><h2 id="win-title">The Orchestra of Illumination</h2></header><div class="win-cols"><div class="win-info"><dl class="credits"><dt>Project</dt><dd>Creating Interaction Spaces from the Human Behavior Data of Pressure on Piezo Buzzer: The Case of “The Orchestra of Illumination”</dd><dt>Course</dt><dd>MBL 557E Material-Based Computational Design in Architecture</dd><dt>Instructor</dt><dd>Assoc. Prof. Dr. Sevil Yazıcı</dd><dt>Programme</dt><dd>M.Sc. Architectural Design Computing, Istanbul Technical University</dd><dt>Date</dt><dd>Fall 2023–24 (January 2024)</dd><dt>Type</dt><dd>Course project, interactive installation prototype</dd><dt>Author</dt><dd>Aykut Dağ</dd><dt>Tools</dt><dd>Rhino, Grasshopper, Fritzing, piezo discs, LEDs</dd></dl><p>An interactive installation in which visitors’ steps make light. Its floor is a pressure-sensing system of piezo discs: each press generates a small current that lights LEDs, so the space turns human behaviour into light without batteries or an Arduino.</p><p>The form was found in Grasshopper with an attractor-point system: lights close to a pressure node shine brighter, distant ones dimmer. The circuit was simulated in Fritzing and tested on a breadboard prototype with different numbers of LEDs and piezo discs.</p><p>The best setup lit nine LEDs in a series circuit with parallel sections and a diode after every two LEDs; the LEDs’ own resistance made extra resistors and capacitors unnecessary. The study points to programmable building surfaces that harvest energy from people or wind.</p></div><div class="win-media"><img src="img/orchestra-1.jpg" alt="The Orchestra of Illumination, image 1 of 10" width="763" height="707" loading="lazy" decoding="async"><img src="img/orchestra-2.jpg" alt="The Orchestra of Illumination, image 2 of 10" width="1106" height="664" loading="lazy" decoding="async"><img src="img/orchestra-3.jpg" alt="The Orchestra of Illumination, image 3 of 10" width="863" height="580" loading="lazy" decoding="async"><img src="img/orchestra-4.jpg" alt="The Orchestra of Illumination, image 4 of 10" width="913" height="609" loading="lazy" decoding="async"><img src="img/orchestra-5.jpg" alt="The Orchestra of Illumination, image 5 of 10" width="1173" height="775" loading="lazy" decoding="async"><img src="img/orchestra-6.jpg" alt="The Orchestra of Illumination, image 6 of 10" width="1327" height="780" loading="lazy" decoding="async"><img src="img/orchestra-7.jpg" alt="The Orchestra of Illumination, image 7 of 10" width="586" height="995" loading="lazy" decoding="async"><img src="img/orchestra-8.jpg" alt="The Orchestra of Illumination, image 8 of 10" width="939" height="688" loading="lazy" decoding="async"><img src="img/orchestra-9.jpg" alt="The Orchestra of Illumination, image 9 of 10" width="1800" height="1273" loading="lazy" decoding="async"><img src="img/orchestra-10.jpg" alt="The Orchestra of Illumination, image 10 of 10" width="1800" height="1273" loading="lazy" decoding="async"></div></div></div>
+  </div>
+
+  <script src="projects.js?v=ae3b0a72"></script>
+  <script src="glyphs.js?v=8c4af774"></script>
+  <script src="sound.js?v=5e7779a0"></script>
+  <script src="physarum.js?v=6a88886e"></script>
+  <script src="main.js?v=728897c6"></script>
+  <!-- Visitor statistics (cookieless): https://aykutdag.goatcounter.com -->
+  <script data-goatcounter="https://aykutdag.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</body>
+</html>

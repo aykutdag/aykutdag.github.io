@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- every relative address resolves from the site root, also on project pages (/projects/<slug>/) -->
+  <base href="/">
+  <title>Concrete Flowers — Aykut Dağ</title>
+  <meta name="description" content="A deployable mold for micro-scale fabric formwork, developed from an origami crease pattern of four valley and four mountain lines with added supports, so…">
+  <link rel="canonical" href="https://aykutdag.github.io/projects/concrete-flowers/">
+  <meta name="theme-color" content="#05070a">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <!-- Link previews (LinkedIn, WhatsApp, X...) -->
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Aykut Dağ">
+  <meta property="og:title" content="Concrete Flowers — Aykut Dağ">
+  <meta property="og:description" content="A deployable mold for micro-scale fabric formwork, developed from an origami crease pattern of four valley and four mountain lines with added supports, so…">
+  <meta property="og:url" content="https://aykutdag.github.io/projects/concrete-flowers/">
+  <meta property="og:image" content="https://aykutdag.github.io/img/concrete-1.jpg">
+  <meta property="og:image:width" content="1600">
+  <meta property="og:image:height" content="1131">
+  <meta property="og:image:alt" content="Concrete Flowers">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    "name": "Concrete Flowers",
+    "url": "https://aykutdag.github.io/projects/concrete-flowers/",
+    "description": "A deployable mold for micro-scale fabric formwork, developed from an origami crease pattern of four valley and four mountain lines with added supports, so…",
+    "genre": "Research",
+    "image": [
+      "https://aykutdag.github.io/img/concrete-1.jpg",
+      "https://aykutdag.github.io/img/concrete-2.jpg",
+      "https://aykutdag.github.io/img/concrete-3.jpg",
+      "https://aykutdag.github.io/img/concrete-4.jpg",
+      "https://aykutdag.github.io/img/concrete-5.jpg",
+      "https://aykutdag.github.io/img/concrete-6.jpg",
+      "https://aykutdag.github.io/img/concrete-7.jpg",
+      "https://aykutdag.github.io/img/concrete-8.jpg",
+      "https://aykutdag.github.io/img/concrete-9.jpg",
+      "https://aykutdag.github.io/img/concrete-10.jpg",
+      "https://aykutdag.github.io/img/concrete-11.jpg",
+      "https://aykutdag.github.io/img/concrete-12.jpg"
+    ],
+    "creator": {
+      "@type": "Person",
+      "name": "Aykut Dağ",
+      "url": "https://aykutdag.github.io/"
+    },
+    "dateCreated": "2023"
+  }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=3667abef">
+</head>
+<body data-project="concrete-flowers">
+  <canvas id="field" aria-hidden="true"></canvas>
+
+  <!-- Entry screen: browsers allow sound only after a click, so entering starts it.
+       Hidden until main.js shows it, so a script failure never locks the page. -->
+  <div id="gate" class="gate" role="dialog" aria-modal="true" aria-label="Welcome" hidden>
+    <div class="gate-inner">
+      <p class="gate-name" id="gate-name" lang="en" aria-hidden="true">Welcome</p>
+      <button type="button" class="gate-enter" id="gate-enter">Enter</button>
+    </div>
+  </div>
+
+  <header class="top">
+    <div class="ident">
+      <h1 class="name">Aykut Dağ</h1>
+      <p class="role">Architectural &amp; Computational Designer</p>
+      <p class="tags">Parametric design · Bio-inspired systems · Digital fabrication</p>
+      <nav class="group-nav" id="group-nav" aria-label="Project groups"></nav>
+    </div>
+    <nav class="nav" aria-label="Main">
+      <button type="button" id="toggle-view" aria-pressed="false">Index</button>
+      <button type="button" data-panel="about">About</button>
+      <a href="Aykut_Dag_CV.pdf" target="_blank" rel="noopener" id="cv-link">CV</a>
+      <button type="button" data-panel="contact">Contact</button>
+      <button type="button" id="sound" aria-pressed="false">Sound off</button>
+    </nav>
+  </header>
+
+  <main>
+    <h2 class="sr-only">Selected projects</h2>
+    <ol id="colonies" class="colonies"></ol>
+    <div id="groups"></div>
+  </main>
+
+  <footer class="foot">
+    <span id="foot-agents">Physarum polycephalum</span>
+    <span class="hint" id="hint"></span>
+  </footer>
+
+  <div id="win" class="win" role="dialog" aria-modal="true" aria-labelledby="win-title" hidden>
+    <button type="button" class="win-close" aria-label="Close">
+      <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2L10 10M10 2L2 10"/></svg>
+    </button>
+    <div id="win-body" class="win-body"><header class="win-head"><div class="p-no">13 · Research</div><h2 id="win-title">Concrete Flowers</h2></header><div class="win-cols"><div class="win-info"><dl class="credits"><dt>Project</dt><dd>Extending Possibilities of Deployable Fabric Formwork in the Case of “Concrete Flowers”</dd><dt>Course</dt><dd>MBL 513E Digital Architectural Design and Modeling</dd><dt>Programme</dt><dd>M.Sc. Architectural Design Computing, Istanbul Technical University</dd><dt>Date</dt><dd>Fall 2023</dd><dt>Type</dt><dd>Course project, physical and digital</dd><dt>Author</dt><dd>Aykut Dağ</dd><dt>Tools</dt><dd>Rhino, Grasshopper, Crane, Kangaroo, Weaverbird, Agisoft Metashape, 3D printing (PLA)</dd></dl><p>A deployable mold for micro-scale fabric formwork, developed from an origami crease pattern of four valley and four mountain lines with added supports, so that the unit stands on its own and still folds into many variations.</p><p>The folding was studied in Grasshopper with Crane, then built through laser-cut and 3D-printed trials to a final PLA mold whose eight legs adjust in height step by step, joined at a central detail that lets each move independently. Viscose fabric laid over the strung frame takes the concrete: three parts white cement to one part water, cured for 12 hours.</p><p>Four casts with different leg heights produced eight-petalled “concrete flowers”. They were digitized with photogrammetry and compared with Kangaroo fabric simulations: the overall forms match while the bulges differ. As modules, the units suggest facade panels, screens and kinetic surfaces.</p></div><div class="win-media"><img src="img/concrete-1.jpg" alt="Concrete Flowers, image 1 of 12" width="1600" height="1131" loading="lazy" decoding="async"><img src="img/concrete-2.jpg" alt="Concrete Flowers, image 2 of 12" width="1600" height="1067" loading="lazy" decoding="async"><img src="img/concrete-3.jpg" alt="Concrete Flowers, image 3 of 12" width="1600" height="1131" loading="lazy" decoding="async"><img src="img/concrete-4.jpg" alt="Concrete Flowers, image 4 of 12" width="1600" height="1131" loading="lazy" decoding="async"><img src="img/concrete-5.jpg" alt="Concrete Flowers, image 5 of 12" width="1600" height="1131" loading="lazy" decoding="async"><img src="img/concrete-6.jpg" alt="Concrete Flowers, image 6 of 12" width="1600" height="1067" loading="lazy" decoding="async"><img src="img/concrete-7.jpg" alt="Concrete Flowers, image 7 of 12" width="1600" height="1131" loading="lazy" decoding="async"><img src="img/concrete-8.jpg" alt="Concrete Flowers, image 8 of 12" width="1600" height="477" loading="lazy" decoding="async"><img src="img/concrete-9.jpg" alt="Concrete Flowers, image 9 of 12" width="1600" height="1131" loading="lazy" decoding="async"><img src="img/concrete-10.jpg" alt="Concrete Flowers, image 10 of 12" width="1600" height="1200" loading="lazy" decoding="async"><img src="img/concrete-11.jpg" alt="Concrete Flowers, image 11 of 12" width="1600" height="1200" loading="lazy" decoding="async"><img src="img/concrete-12.jpg" alt="Concrete Flowers, image 12 of 12" width="1600" height="1067" loading="lazy" decoding="async"></div></div></div>
+  </div>
+
+  <script src="projects.js?v=ae3b0a72"></script>
+  <script src="glyphs.js?v=8c4af774"></script>
+  <script src="sound.js?v=5e7779a0"></script>
+  <script src="physarum.js?v=6a88886e"></script>
+  <script src="main.js?v=728897c6"></script>
+  <!-- Visitor statistics (cookieless): https://aykutdag.goatcounter.com -->
+  <script data-goatcounter="https://aykutdag.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</body>
+</html>

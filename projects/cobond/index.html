@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- every relative address resolves from the site root, also on project pages (/projects/<slug>/) -->
+  <base href="/">
+  <title>[Co]BOND — Aykut Dağ</title>
+  <meta name="description" content="[Co]BOND is a proposal for an interactive architectural installation exploring ecological empathy and human–nature synchronization. Inspired by Tønsberg’s…">
+  <link rel="canonical" href="https://aykutdag.github.io/projects/cobond/">
+  <meta name="theme-color" content="#05070a">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <!-- Link previews (LinkedIn, WhatsApp, X...) -->
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Aykut Dağ">
+  <meta property="og:title" content="[Co]BOND — Aykut Dağ">
+  <meta property="og:description" content="[Co]BOND is a proposal for an interactive architectural installation exploring ecological empathy and human–nature synchronization. Inspired by Tønsberg’s…">
+  <meta property="og:url" content="https://aykutdag.github.io/projects/cobond/">
+  <meta property="og:image" content="https://aykutdag.github.io/img/cobond-1.jpg">
+  <meta property="og:image:width" content="1600">
+  <meta property="og:image:height" content="1349">
+  <meta property="og:image:alt" content="[Co]BOND">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    "name": "[Co]BOND",
+    "url": "https://aykutdag.github.io/projects/cobond/",
+    "description": "[Co]BOND is a proposal for an interactive architectural installation exploring ecological empathy and human–nature synchronization. Inspired by Tønsberg’s…",
+    "genre": "Installations and media",
+    "image": [
+      "https://aykutdag.github.io/img/cobond-1.jpg",
+      "https://aykutdag.github.io/img/cobond-2.jpg",
+      "https://aykutdag.github.io/img/cobond-3.jpg"
+    ],
+    "creator": {
+      "@type": "Person",
+      "name": "Aykut Dağ",
+      "url": "https://aykutdag.github.io/"
+    },
+    "dateCreated": "2025"
+  }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=3667abef">
+</head>
+<body data-project="cobond">
+  <canvas id="field" aria-hidden="true"></canvas>
+
+  <!-- Entry screen: browsers allow sound only after a click, so entering starts it.
+       Hidden until main.js shows it, so a script failure never locks the page. -->
+  <div id="gate" class="gate" role="dialog" aria-modal="true" aria-label="Welcome" hidden>
+    <div class="gate-inner">
+      <p class="gate-name" id="gate-name" lang="en" aria-hidden="true">Welcome</p>
+      <button type="button" class="gate-enter" id="gate-enter">Enter</button>
+    </div>
+  </div>
+
+  <header class="top">
+    <div class="ident">
+      <h1 class="name">Aykut Dağ</h1>
+      <p class="role">Architectural &amp; Computational Designer</p>
+      <p class="tags">Parametric design · Bio-inspired systems · Digital fabrication</p>
+      <nav class="group-nav" id="group-nav" aria-label="Project groups"></nav>
+    </div>
+    <nav class="nav" aria-label="Main">
+      <button type="button" id="toggle-view" aria-pressed="false">Index</button>
+      <button type="button" data-panel="about">About</button>
+      <a href="Aykut_Dag_CV.pdf" target="_blank" rel="noopener" id="cv-link">CV</a>
+      <button type="button" data-panel="contact">Contact</button>
+      <button type="button" id="sound" aria-pressed="false">Sound off</button>
+    </nav>
+  </header>
+
+  <main>
+    <h2 class="sr-only">Selected projects</h2>
+    <ol id="colonies" class="colonies"></ol>
+    <div id="groups"></div>
+  </main>
+
+  <footer class="foot">
+    <span id="foot-agents">Physarum polycephalum</span>
+    <span class="hint" id="hint"></span>
+  </footer>
+
+  <div id="win" class="win" role="dialog" aria-modal="true" aria-labelledby="win-title" hidden>
+    <button type="button" class="win-close" aria-label="Close">
+      <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2L10 10M10 2L2 10"/></svg>
+    </button>
+    <div id="win-body" class="win-body"><header class="win-head"><div class="p-no">16 · Installations and media</div><h2 id="win-title">[Co]BOND</h2></header><div class="win-cols"><div class="win-info"><dl class="credits"><dt>Project</dt><dd>[Co]BOND</dd><dt>Type</dt><dd>Interactive architectural installation proposal</dd><dt>Date</dt><dd>2025</dd><dt>Location</dt><dd>Norway</dd><dt>Team</dt><dd>Bengü Özmutlu, Aykut Dağ, Ayşegül Akçay Kavakoğlu</dd></dl><p>[Co]BOND is a proposal for an interactive architectural installation exploring ecological empathy and human–nature synchronization. Inspired by Tønsberg’s whaling history, the project reimagines a destructive past as a regenerative future of coexistence.</p><p>Through an agent-based choreographic system, participants become spatial agents whose movements activate eco-digital baleen whale agents within a computational feedback loop. Using the Whale Optimization Algorithm (WOA) and camera sensors, the system synchronizes human and digital whale movements, projecting dynamic paths onto transparent tulle surfaces to create an immersive threshold space between technology and ecology.</p></div><div class="win-media"><img src="img/cobond-1.jpg" alt="[Co]BOND, image 1 of 3" width="1600" height="1349" loading="lazy" decoding="async"><img src="img/cobond-2.jpg" alt="[Co]BOND, image 2 of 3" width="1111" height="665" loading="lazy" decoding="async"><img src="img/cobond-3.jpg" alt="[Co]BOND, image 3 of 3" width="947" height="572" loading="lazy" decoding="async"></div></div></div>
+  </div>
+
+  <script src="projects.js?v=ae3b0a72"></script>
+  <script src="glyphs.js?v=8c4af774"></script>
+  <script src="sound.js?v=5e7779a0"></script>
+  <script src="physarum.js?v=6a88886e"></script>
+  <script src="main.js?v=728897c6"></script>
+  <!-- Visitor statistics (cookieless): https://aykutdag.goatcounter.com -->
+  <script data-goatcounter="https://aykutdag.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</body>
+</html>

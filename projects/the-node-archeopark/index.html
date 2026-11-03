@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- every relative address resolves from the site root, also on project pages (/projects/<slug>/) -->
+  <base href="/">
+  <title>THE NODE | Archeopark — Aykut Dağ</title>
+  <meta name="description" content="Our spatial response to the design for Incheon Geomdan Museum Library Cultural Complex (IGMLCC) aims to create a cultural complex for the visitors and…">
+  <link rel="canonical" href="https://aykutdag.github.io/projects/the-node-archeopark/">
+  <meta name="theme-color" content="#05070a">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <!-- Link previews (LinkedIn, WhatsApp, X...) -->
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Aykut Dağ">
+  <meta property="og:title" content="THE NODE | Archeopark — Aykut Dağ">
+  <meta property="og:description" content="Our spatial response to the design for Incheon Geomdan Museum Library Cultural Complex (IGMLCC) aims to create a cultural complex for the visitors and…">
+  <meta property="og:url" content="https://aykutdag.github.io/projects/the-node-archeopark/">
+  <meta property="og:image" content="https://aykutdag.github.io/img/node-1.jpg">
+  <meta property="og:image:width" content="1600">
+  <meta property="og:image:height" content="1596">
+  <meta property="og:image:alt" content="THE NODE | Archeopark">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    "name": "THE NODE | Archeopark",
+    "url": "https://aykutdag.github.io/projects/the-node-archeopark/",
+    "description": "Our spatial response to the design for Incheon Geomdan Museum Library Cultural Complex (IGMLCC) aims to create a cultural complex for the visitors and…",
+    "genre": "Practice",
+    "image": [
+      "https://aykutdag.github.io/img/node-1.jpg",
+      "https://aykutdag.github.io/img/node-2.jpg",
+      "https://aykutdag.github.io/img/node-3.jpg",
+      "https://aykutdag.github.io/img/node-4.jpg"
+    ],
+    "creator": {
+      "@type": "Person",
+      "name": "Aykut Dağ",
+      "url": "https://aykutdag.github.io/"
+    },
+    "dateCreated": "2023"
+  }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=3667abef">
+</head>
+<body data-project="the-node-archeopark">
+  <canvas id="field" aria-hidden="true"></canvas>
+
+  <!-- Entry screen: browsers allow sound only after a click, so entering starts it.
+       Hidden until main.js shows it, so a script failure never locks the page. -->
+  <div id="gate" class="gate" role="dialog" aria-modal="true" aria-label="Welcome" hidden>
+    <div class="gate-inner">
+      <p class="gate-name" id="gate-name" lang="en" aria-hidden="true">Welcome</p>
+      <button type="button" class="gate-enter" id="gate-enter">Enter</button>
+    </div>
+  </div>
+
+  <header class="top">
+    <div class="ident">
+      <h1 class="name">Aykut Dağ</h1>
+      <p class="role">Architectural &amp; Computational Designer</p>
+      <p class="tags">Parametric design · Bio-inspired systems · Digital fabrication</p>
+      <nav class="group-nav" id="group-nav" aria-label="Project groups"></nav>
+    </div>
+    <nav class="nav" aria-label="Main">
+      <button type="button" id="toggle-view" aria-pressed="false">Index</button>
+      <button type="button" data-panel="about">About</button>
+      <a href="Aykut_Dag_CV.pdf" target="_blank" rel="noopener" id="cv-link">CV</a>
+      <button type="button" data-panel="contact">Contact</button>
+      <button type="button" id="sound" aria-pressed="false">Sound off</button>
+    </nav>
+  </header>
+
+  <main>
+    <h2 class="sr-only">Selected projects</h2>
+    <ol id="colonies" class="colonies"></ol>
+    <div id="groups"></div>
+  </main>
+
+  <footer class="foot">
+    <span id="foot-agents">Physarum polycephalum</span>
+    <span class="hint" id="hint"></span>
+  </footer>
+
+  <div id="win" class="win" role="dialog" aria-modal="true" aria-labelledby="win-title" hidden>
+    <button type="button" class="win-close" aria-label="Close">
+      <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2L10 10M10 2L2 10"/></svg>
+    </button>
+    <div id="win-body" class="win-body"><header class="win-head"><div class="p-no">04 · Practice</div><h2 id="win-title">THE NODE | Archeopark</h2></header><div class="win-cols"><div class="win-info"><dl class="credits"><dt>Project</dt><dd>THE NODE Archeopark</dd><dt>Location</dt><dd>Incheon, South Korea</dd><dt>Date</dt><dd>2023</dd><dt>Client</dt><dd>Incheon Metropolitan Government</dd><dt>Status</dt><dd>International Competition, Entry</dd><dt>Size</dt><dd>23,000 m²</dd><dt>Architect</dt><dd>Melike Altınışık Architects (MAA) + WITHWORKS (WW) + MUSU Architects</dd><dt>Design architect</dt><dd>Melike Altınışık Architects</dd><dt>Project team (competition stage)</dt><dd>Aykut Dağ, Atakan Gündüz, Adham Mashaal, Elifcan Merdan</dd><dt>Architectural assistant team</dt><dd>Muskaan Chowdhary, Anya Ghosh, Faizan Sharief</dd></dl><p>Our spatial response to the design for Incheon Geomdan Museum Library Cultural Complex (IGMLCC) aims to create a cultural complex for the visitors and public where history and nature are the main subjects of THE NODE Archeopark.</p><p>THE NODE Archeopark will play a catalytic role as a base for the community in Geomdan New Town in Incheon. It will preserve social and cultural background with sustainable architectural vision while becoming an Archeopark as an active learning center where it won’t only become a place for symbol but also it will let the citizens to become owners of public spaces.</p><p>This unique cultural complex located at the corner of the Park No.14 is surrounded with a central lake on a wide area with green axis from north to south and developed as an open space to accommodate urban cultural events. It is an area that requires harmony with the natural environment and a plan to preserve the existing ecosystem in which the nature and architecture meet.</p><p>It has a harmonized design approach in between landscape, waterscape, culturalscape, archeoscape and cityscape. The Eco-Bridges connecting the Park No.13 and Park No.15 with Park No.14 also became a design tool for a sustainable environmental role of the Cultural Complex.</p><h3 class="sub">Responsibilities</h3><ul class="duties"><li>Leading interns</li><li>Concept design development</li><li>Contributed to diagram production</li><li>Visualization</li></ul></div><div class="win-media"><img src="img/node-1.jpg" alt="THE NODE | Archeopark, image 1 of 4" width="1600" height="1596" loading="lazy" decoding="async"><img src="img/node-2.jpg" alt="THE NODE | Archeopark, image 2 of 4" width="1424" height="804" loading="lazy" decoding="async"><img src="img/node-3.jpg" alt="THE NODE | Archeopark, image 3 of 4" width="1600" height="900" loading="lazy" decoding="async"><img src="img/node-4.jpg" alt="THE NODE | Archeopark, image 4 of 4" width="1600" height="1367" loading="lazy" decoding="async"></div></div></div>
+  </div>
+
+  <script src="projects.js?v=ae3b0a72"></script>
+  <script src="glyphs.js?v=8c4af774"></script>
+  <script src="sound.js?v=5e7779a0"></script>
+  <script src="physarum.js?v=6a88886e"></script>
+  <script src="main.js?v=728897c6"></script>
+  <!-- Visitor statistics (cookieless): https://aykutdag.goatcounter.com -->
+  <script data-goatcounter="https://aykutdag.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</body>
+</html>

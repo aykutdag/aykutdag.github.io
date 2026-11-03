@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- every relative address resolves from the site root, also on project pages (/projects/<slug>/) -->
+  <base href="/">
+  <title>Basilica of Saint Neophytos — Aykut Dağ</title>
+  <meta name="description" content="This project focuses on the submerged basilica on the shores of Lake İznik, one of the significant monuments of early Christianity. By integrating…">
+  <link rel="canonical" href="https://aykutdag.github.io/projects/basilica-saint-neophytos/">
+  <meta name="theme-color" content="#05070a">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <!-- Link previews (LinkedIn, WhatsApp, X...) -->
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Aykut Dağ">
+  <meta property="og:title" content="Basilica of Saint Neophytos — Aykut Dağ">
+  <meta property="og:description" content="This project focuses on the submerged basilica on the shores of Lake İznik, one of the significant monuments of early Christianity. By integrating…">
+  <meta property="og:url" content="https://aykutdag.github.io/projects/basilica-saint-neophytos/">
+  <meta property="og:image" content="https://aykutdag.github.io/img/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Basilica of Saint Neophytos">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    "name": "Basilica of Saint Neophytos",
+    "url": "https://aykutdag.github.io/projects/basilica-saint-neophytos/",
+    "description": "This project focuses on the submerged basilica on the shores of Lake İznik, one of the significant monuments of early Christianity. By integrating…",
+    "genre": "Installations and media",
+    "image": [
+      "https://aykutdag.github.io/img/og.jpg"
+    ],
+    "creator": {
+      "@type": "Person",
+      "name": "Aykut Dağ",
+      "url": "https://aykutdag.github.io/"
+    }
+  }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=3667abef">
+</head>
+<body data-project="basilica-saint-neophytos">
+  <canvas id="field" aria-hidden="true"></canvas>
+
+  <!-- Entry screen: browsers allow sound only after a click, so entering starts it.
+       Hidden until main.js shows it, so a script failure never locks the page. -->
+  <div id="gate" class="gate" role="dialog" aria-modal="true" aria-label="Welcome" hidden>
+    <div class="gate-inner">
+      <p class="gate-name" id="gate-name" lang="en" aria-hidden="true">Welcome</p>
+      <button type="button" class="gate-enter" id="gate-enter">Enter</button>
+    </div>
+  </div>
+
+  <header class="top">
+    <div class="ident">
+      <h1 class="name">Aykut Dağ</h1>
+      <p class="role">Architectural &amp; Computational Designer</p>
+      <p class="tags">Parametric design · Bio-inspired systems · Digital fabrication</p>
+      <nav class="group-nav" id="group-nav" aria-label="Project groups"></nav>
+    </div>
+    <nav class="nav" aria-label="Main">
+      <button type="button" id="toggle-view" aria-pressed="false">Index</button>
+      <button type="button" data-panel="about">About</button>
+      <a href="Aykut_Dag_CV.pdf" target="_blank" rel="noopener" id="cv-link">CV</a>
+      <button type="button" data-panel="contact">Contact</button>
+      <button type="button" id="sound" aria-pressed="false">Sound off</button>
+    </nav>
+  </header>
+
+  <main>
+    <h2 class="sr-only">Selected projects</h2>
+    <ol id="colonies" class="colonies"></ol>
+    <div id="groups"></div>
+  </main>
+
+  <footer class="foot">
+    <span id="foot-agents">Physarum polycephalum</span>
+    <span class="hint" id="hint"></span>
+  </footer>
+
+  <div id="win" class="win" role="dialog" aria-modal="true" aria-labelledby="win-title" hidden>
+    <button type="button" class="win-close" aria-label="Close">
+      <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2L10 10M10 2L2 10"/></svg>
+    </button>
+    <div id="win-body" class="win-body"><header class="win-head"><div class="p-no">15 · Installations and media</div><h2 id="win-title">Basilica of Saint Neophytos</h2></header><div class="win-cols"><div class="win-info"><dl class="credits"><dt>Project</dt><dd>Basilica of Saint Neophytos</dd><dt>Type</dt><dd>Independent research &amp; digital installation</dd><dt>Location</dt><dd>İznik, Turkey</dd><dt>Team</dt><dd>Aykut Dağ</dd></dl><p>This project focuses on the submerged basilica on the shores of Lake İznik, one of the significant monuments of early Christianity. By integrating archaeological preservation with computational design, the work reinterprets the structure’s historical phases through data-driven modeling and algorithmic visualization.</p><p>The project analyzes the basilica’s architectural geometry and temporal transformation, translating structural and environmental data into a layered digital narrative. Conceived as an immersive exhibition proposal, it bridges scientific research and artistic representation, offering a contemporary approach to the preservation and communication of İznik’s cultural heritage.</p><ul class="ext"><li><a href="https://www.youtube.com/watch?v=Cqy3eO7X4Eo" target="_blank" rel="noopener">Watch on YouTube</a></li></ul></div><div class="win-media"></div></div></div>
+  </div>
+
+  <script src="projects.js?v=ae3b0a72"></script>
+  <script src="glyphs.js?v=8c4af774"></script>
+  <script src="sound.js?v=5e7779a0"></script>
+  <script src="physarum.js?v=6a88886e"></script>
+  <script src="main.js?v=728897c6"></script>
+  <!-- Visitor statistics (cookieless): https://aykutdag.goatcounter.com -->
+  <script data-goatcounter="https://aykutdag.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</body>
+</html>

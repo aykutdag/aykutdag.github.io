@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- every relative address resolves from the site root, also on project pages (/projects/<slug>/) -->
+  <base href="/">
+  <title>Physarum Urban Generation II: Weimar — Aykut Dağ</title>
+  <meta name="description" content="Physarum polycephalum is a single-celled organism that forms efficient networks, inspiring simulations for urban design and infrastructure planning. This…">
+  <link rel="canonical" href="https://aykutdag.github.io/projects/physarum-urban-generation-weimar/">
+  <meta name="theme-color" content="#05070a">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <!-- Link previews (LinkedIn, WhatsApp, X...) -->
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Aykut Dağ">
+  <meta property="og:title" content="Physarum Urban Generation II: Weimar — Aykut Dağ">
+  <meta property="og:description" content="Physarum polycephalum is a single-celled organism that forms efficient networks, inspiring simulations for urban design and infrastructure planning. This…">
+  <meta property="og:url" content="https://aykutdag.github.io/projects/physarum-urban-generation-weimar/">
+  <meta property="og:image" content="https://aykutdag.github.io/img/weimar-1.jpg">
+  <meta property="og:image:width" content="720">
+  <meta property="og:image:height" content="1280">
+  <meta property="og:image:alt" content="Physarum Urban Generation II: Weimar">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    "name": "Physarum Urban Generation II: Weimar",
+    "url": "https://aykutdag.github.io/projects/physarum-urban-generation-weimar/",
+    "description": "Physarum polycephalum is a single-celled organism that forms efficient networks, inspiring simulations for urban design and infrastructure planning. This…",
+    "genre": "Research",
+    "image": [
+      "https://aykutdag.github.io/img/weimar-1.jpg",
+      "https://aykutdag.github.io/img/weimar-2.jpg"
+    ],
+    "creator": {
+      "@type": "Person",
+      "name": "Aykut Dağ",
+      "url": "https://aykutdag.github.io/"
+    },
+    "dateCreated": "2025"
+  }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=3667abef">
+</head>
+<body data-project="physarum-urban-generation-weimar">
+  <canvas id="field" aria-hidden="true"></canvas>
+
+  <!-- Entry screen: browsers allow sound only after a click, so entering starts it.
+       Hidden until main.js shows it, so a script failure never locks the page. -->
+  <div id="gate" class="gate" role="dialog" aria-modal="true" aria-label="Welcome" hidden>
+    <div class="gate-inner">
+      <p class="gate-name" id="gate-name" lang="en" aria-hidden="true">Welcome</p>
+      <button type="button" class="gate-enter" id="gate-enter">Enter</button>
+    </div>
+  </div>
+
+  <header class="top">
+    <div class="ident">
+      <h1 class="name">Aykut Dağ</h1>
+      <p class="role">Architectural &amp; Computational Designer</p>
+      <p class="tags">Parametric design · Bio-inspired systems · Digital fabrication</p>
+      <nav class="group-nav" id="group-nav" aria-label="Project groups"></nav>
+    </div>
+    <nav class="nav" aria-label="Main">
+      <button type="button" id="toggle-view" aria-pressed="false">Index</button>
+      <button type="button" data-panel="about">About</button>
+      <a href="Aykut_Dag_CV.pdf" target="_blank" rel="noopener" id="cv-link">CV</a>
+      <button type="button" data-panel="contact">Contact</button>
+      <button type="button" id="sound" aria-pressed="false">Sound off</button>
+    </nav>
+  </header>
+
+  <main>
+    <h2 class="sr-only">Selected projects</h2>
+    <ol id="colonies" class="colonies"></ol>
+    <div id="groups"></div>
+  </main>
+
+  <footer class="foot">
+    <span id="foot-agents">Physarum polycephalum</span>
+    <span class="hint" id="hint"></span>
+  </footer>
+
+  <div id="win" class="win" role="dialog" aria-modal="true" aria-labelledby="win-title" hidden>
+    <button type="button" class="win-close" aria-label="Close">
+      <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2L10 10M10 2L2 10"/></svg>
+    </button>
+    <div id="win-body" class="win-body"><header class="win-head"><div class="p-no">10 · Research</div><h2 id="win-title">Physarum Urban Generation II: Weimar</h2></header><div class="win-cols"><div class="win-info"><dl class="credits"><dt>Project</dt><dd>Urban Porosity in Weimar: Physarum-Inspired Agent-Based Urban Fabric Generation</dd><dt>Course</dt><dd>Parametric Urban Design &amp; Analysis</dd><dt>Institution</dt><dd>Bauhaus-Universität Weimar (Erasmus+ exchange)</dd><dt>Date</dt><dd>Summer semester 2025</dd><dt>Location</dt><dd>Weimar, Germany</dd><dt>Type</dt><dd>Course project, agent-based simulation and video</dd><dt>Author</dt><dd>Aykut Dağ</dd><dt>Tools</dt><dd>Rhino, Grasshopper, TouchDesigner, StyleGAN, After Effects</dd></dl><p>Physarum polycephalum is a single-celled organism that forms efficient networks, inspiring simulations for urban design and infrastructure planning. This project uses a Physarum-inspired, agent-based model to simulate an adaptive and porous urban fabric in Weimar.</p><p>Instead of a rigid top-down plan, the network emerges organically from attractor points, generating efficient and flexible connections. The goal is an urban system that self-organizes, negotiates complexity, and integrates green, open, and resilient spaces.</p><p>The project imagines the city plan as a kind of machine dream, where urban structure emerges through the adaptive logic of Physarum. The visual transitions come from part I, where StyleGAN merged the patterns of slime mold with the geometries of urban grids; here the process was simulated and refined within a parametric design environment, translating this vision onto the fabric of Weimar.</p><ul class="ext"><li><a href="https://www.instagram.com/p/DQRRft4CGt-/" target="_blank" rel="noopener">Instagram post</a></li></ul></div><div class="win-media"><img src="img/weimar-1.jpg" alt="Physarum Urban Generation II: Weimar, image 1 of 2" width="720" height="1280" loading="lazy" decoding="async"><img src="img/weimar-2.jpg" alt="Physarum Urban Generation II: Weimar, image 2 of 2" width="720" height="1280" loading="lazy" decoding="async"></div></div></div>
+  </div>
+
+  <script src="projects.js?v=ae3b0a72"></script>
+  <script src="glyphs.js?v=8c4af774"></script>
+  <script src="sound.js?v=5e7779a0"></script>
+  <script src="physarum.js?v=6a88886e"></script>
+  <script src="main.js?v=728897c6"></script>
+  <!-- Visitor statistics (cookieless): https://aykutdag.goatcounter.com -->
+  <script data-goatcounter="https://aykutdag.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</body>
+</html>

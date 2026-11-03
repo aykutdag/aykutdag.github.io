@@ -6,6 +6,8 @@
 // credits: [label, value] rows of the project's credit block. short: the node label on phones.
 // text: paragraphs. duties: responsibilities. video: YouTube id.
 // film: a video hosted with the site { src, poster, portrait }. links: [{ label, href, icon }].
+// slug: the project's address (aykutdag.github.io/projects/<slug>/); keep it once published,
+// links to it may be shared. featured: shown under Selected Work.
 window.GROUPS = [
   { id: "practice", label: "Practice", note: "Architecture offices", x: 0.30, y: 0.56 },
   { id: "research", label: "Research", note: "Academic work", x: 0.70, y: 0.32 },
@@ -15,7 +17,7 @@ window.GROUPS = [
 window.PROJECTS = [
   // ---------- Practice ----------
   {
-    group: "practice", glyph: "sejong",
+    group: "practice", glyph: "sejong", slug: "spark-sejong", featured: true,
     title: "SPARK | II. Sejong Cultural Center for Performing Arts",
     short: "SPARK",
     meta: "Seoul · 2023–2025 · Shortlisted finalist",
@@ -44,7 +46,7 @@ window.PROJECTS = [
     x: 0.56, y: 0.26
   },
   {
-    group: "practice", glyph: "libreville",
+    group: "practice", glyph: "libreville", slug: "libreville-arena",
     title: "Libreville Arena & Convention Centre",
     short: "Libreville Arena",
     meta: "Libreville · 2024 · Commission",
@@ -72,7 +74,7 @@ window.PROJECTS = [
     x: 0.86, y: 0.38
   },
   {
-    group: "practice", glyph: "banpo",
+    group: "practice", glyph: "banpo", slug: "the-flux-banpo",
     title: "THE FLUX | Banpo Cultural Connection Park",
     short: "THE FLUX",
     meta: "Seoul · 2024 · Competition entry",
@@ -100,7 +102,7 @@ window.PROJECTS = [
     x: 0.22, y: 0.42
   },
   {
-    group: "practice", glyph: "node",
+    group: "practice", glyph: "node", slug: "the-node-archeopark",
     title: "THE NODE | Archeopark",
     short: "THE NODE",
     meta: "Incheon · 2023 · Competition entry",
@@ -127,7 +129,7 @@ window.PROJECTS = [
     x: 0.45, y: 0.50
   },
   {
-    group: "practice", glyph: "nefbaku",
+    group: "practice", glyph: "nefbaku", slug: "nef-baku",
     title: "NEF BAKU Residence",
     short: "NEF Baku",
     meta: "Baku · 2022 · Commission",
@@ -154,7 +156,7 @@ window.PROJECTS = [
     x: 0.70, y: 0.58
   },
   {
-    group: "practice", glyph: "viridia",
+    group: "practice", glyph: "viridia", slug: "viridia-hotel",
     title: "Viridia Hotel Building",
     short: "Viridia Hotel",
     meta: "Kavaja · 2025 · Commission",
@@ -178,7 +180,7 @@ window.PROJECTS = [
     x: 0.84, y: 0.80
   },
   {
-    group: "practice", glyph: "birdscape",
+    group: "practice", glyph: "birdscape", slug: "coa-hills-birdscape",
     title: "COA Hills Birdscape",
     short: "COA Birdscape",
     meta: "Sakarya · 2024 · Research project",
@@ -205,7 +207,7 @@ window.PROJECTS = [
     x: 0.16, y: 0.74
   },
   {
-    group: "practice", glyph: "kadikoy",
+    group: "practice", glyph: "kadikoy", slug: "in-situ-kadikoy",
     title: "IN SITU | Kadıköy Square Urban Design Competition",
     short: "IN SITU Kadıköy",
     meta: "Istanbul · 2020 · 1st Prize",
@@ -230,7 +232,7 @@ window.PROJECTS = [
 
   // ---------- Research (İTÜ Architectural Design Computing; Bauhaus-Universität Weimar) ----------
   {
-    group: "research", glyph: "stylegan",
+    group: "research", glyph: "stylegan", slug: "physarum-urban-generation-istanbul",
     title: "Physarum Urban Generation I: Istanbul",
     short: "Physarum Urban I",
     meta: "İTÜ · 2024 · Machine learning (part I)",
@@ -252,7 +254,7 @@ window.PROJECTS = [
     x: 0.28, y: 0.44
   },
   {
-    group: "research", glyph: "weimar",
+    group: "research", glyph: "weimar", slug: "physarum-urban-generation-weimar", featured: true,
     title: "Physarum Urban Generation II: Weimar",
     short: "Physarum Urban II",
     meta: "Bauhaus-Universität Weimar · 2025 · Urban simulation (part II)",
@@ -277,7 +279,7 @@ window.PROJECTS = [
     x: 0.58, y: 0.30
   },
   {
-    group: "research", glyph: "acoustic",
+    group: "research", glyph: "acoustic", slug: "adaptive-acoustic-panels",
     title: "Adaptive Acoustic Panels in Open Office Layouts",
     short: "Adaptive Acoustics",
     meta: "İTÜ · 2024 · Generative systems",
@@ -299,7 +301,7 @@ window.PROJECTS = [
     x: 0.80, y: 0.52
   },
   {
-    group: "research", glyph: "orchestra",
+    group: "research", glyph: "orchestra", slug: "orchestra-of-illumination",
     title: "The Orchestra of Illumination",
     short: "Orchestra",
     meta: "İTÜ · 2024 · Smart materials",
@@ -323,7 +325,7 @@ window.PROJECTS = [
     x: 0.22, y: 0.78
   },
   {
-    group: "research", glyph: "concrete",
+    group: "research", glyph: "concrete", slug: "concrete-flowers",
     title: "Concrete Flowers",
     short: "Concrete Flowers",
     meta: "İTÜ · 2023 · Fabric formwork",
@@ -347,7 +349,7 @@ window.PROJECTS = [
 
   // ---------- Installations and media ----------
   {
-    group: "media", glyph: "khora",
+    group: "media", glyph: "khora", slug: "khora", featured: true,
     title: "[KHORA]: Space of Becoming with Mind & Body",
     short: "KHORA",
     meta: "IDAF Istanbul · 2026 · Spatial installation",
@@ -371,7 +373,7 @@ window.PROJECTS = [
     x: 0.28, y: 0.50
   },
   {
-    group: "media", glyph: "basilica",
+    group: "media", glyph: "basilica", slug: "basilica-saint-neophytos",
     title: "Basilica of Saint Neophytos",
     short: "Saint Neophytos",
     meta: "İznik · Research & digital installation",
@@ -389,7 +391,7 @@ window.PROJECTS = [
     x: 0.78, y: 0.42
   },
   {
-    group: "media", glyph: "cobond",
+    group: "media", glyph: "cobond", slug: "cobond",
     title: "[Co]BOND",
     short: "[Co]BOND",
     meta: "Norway · 2025 · Installation proposal",

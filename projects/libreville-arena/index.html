@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- every relative address resolves from the site root, also on project pages (/projects/<slug>/) -->
+  <base href="/">
+  <title>Libreville Arena &amp; Convention Centre — Aykut Dağ</title>
+  <meta name="description" content="The Libreville Arena &amp; Convention Centre, located within the Champ Triomphal Masterplan in Libreville, Gabon, aims to establish a mixed-use center that…">
+  <link rel="canonical" href="https://aykutdag.github.io/projects/libreville-arena/">
+  <meta name="theme-color" content="#05070a">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <!-- Link previews (LinkedIn, WhatsApp, X...) -->
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Aykut Dağ">
+  <meta property="og:title" content="Libreville Arena &amp; Convention Centre — Aykut Dağ">
+  <meta property="og:description" content="The Libreville Arena &amp; Convention Centre, located within the Champ Triomphal Masterplan in Libreville, Gabon, aims to establish a mixed-use center that…">
+  <meta property="og:url" content="https://aykutdag.github.io/projects/libreville-arena/">
+  <meta property="og:image" content="https://aykutdag.github.io/img/libreville-1.jpg">
+  <meta property="og:image:width" content="1064">
+  <meta property="og:image:height" content="600">
+  <meta property="og:image:alt" content="Libreville Arena &amp; Convention Centre">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    "name": "Libreville Arena & Convention Centre",
+    "url": "https://aykutdag.github.io/projects/libreville-arena/",
+    "description": "The Libreville Arena & Convention Centre, located within the Champ Triomphal Masterplan in Libreville, Gabon, aims to establish a mixed-use center that…",
+    "genre": "Practice",
+    "image": [
+      "https://aykutdag.github.io/img/libreville-1.jpg",
+      "https://aykutdag.github.io/img/libreville-2.jpg",
+      "https://aykutdag.github.io/img/libreville-3.jpg"
+    ],
+    "creator": {
+      "@type": "Person",
+      "name": "Aykut Dağ",
+      "url": "https://aykutdag.github.io/"
+    },
+    "dateCreated": "2024"
+  }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=3667abef">
+</head>
+<body data-project="libreville-arena">
+  <canvas id="field" aria-hidden="true"></canvas>
+
+  <!-- Entry screen: browsers allow sound only after a click, so entering starts it.
+       Hidden until main.js shows it, so a script failure never locks the page. -->
+  <div id="gate" class="gate" role="dialog" aria-modal="true" aria-label="Welcome" hidden>
+    <div class="gate-inner">
+      <p class="gate-name" id="gate-name" lang="en" aria-hidden="true">Welcome</p>
+      <button type="button" class="gate-enter" id="gate-enter">Enter</button>
+    </div>
+  </div>
+
+  <header class="top">
+    <div class="ident">
+      <h1 class="name">Aykut Dağ</h1>
+      <p class="role">Architectural &amp; Computational Designer</p>
+      <p class="tags">Parametric design · Bio-inspired systems · Digital fabrication</p>
+      <nav class="group-nav" id="group-nav" aria-label="Project groups"></nav>
+    </div>
+    <nav class="nav" aria-label="Main">
+      <button type="button" id="toggle-view" aria-pressed="false">Index</button>
+      <button type="button" data-panel="about">About</button>
+      <a href="Aykut_Dag_CV.pdf" target="_blank" rel="noopener" id="cv-link">CV</a>
+      <button type="button" data-panel="contact">Contact</button>
+      <button type="button" id="sound" aria-pressed="false">Sound off</button>
+    </nav>
+  </header>
+
+  <main>
+    <h2 class="sr-only">Selected projects</h2>
+    <ol id="colonies" class="colonies"></ol>
+    <div id="groups"></div>
+  </main>
+
+  <footer class="foot">
+    <span id="foot-agents">Physarum polycephalum</span>
+    <span class="hint" id="hint"></span>
+  </footer>
+
+  <div id="win" class="win" role="dialog" aria-modal="true" aria-labelledby="win-title" hidden>
+    <button type="button" class="win-close" aria-label="Close">
+      <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2L10 10M10 2L2 10"/></svg>
+    </button>
+    <div id="win-body" class="win-body"><header class="win-head"><div class="p-no">02 · Practice</div><h2 id="win-title">Libreville Arena &amp; Convention Centre</h2></header><div class="win-cols"><div class="win-info"><dl class="credits"><dt>Project</dt><dd>Libreville Arena &amp; Convention Centre</dd><dt>Location</dt><dd>Libreville, Gabon</dd><dt>Date</dt><dd>2024</dd><dt>Client</dt><dd>FB Group</dd><dt>Status</dt><dd>Commission</dd><dt>Size</dt><dd>65,000 m²</dd><dt>Architect</dt><dd>Melike Altınışık Architects + BAUM Architects</dd><dt>Design architect</dt><dd>Melike Altınışık Architects</dd><dt>Landscape architect</dt><dd>ALIVEUS Landscape</dd><dt>Project team leader (competition stage)</dt><dd>Aykut Dağ</dd><dt>Project team (competition stage)</dt><dd>Adham Mashaal, Mamdouh Barakat, Atakan Gündüz</dd><dt>Architectural assistant team</dt><dd>Onkar Pal, Rabia Maral</dd></dl><p>The Libreville Arena &amp; Convention Centre, located within the Champ Triomphal Masterplan in Libreville, Gabon, aims to establish a mixed-use center that serves as a catalyst for advancing and promoting Gabon as a major attraction in Central Africa.</p><p>The architectural design concept focuses on creating high-quality architectural and urban environments with an eco-responsible approach. The center is designed to blend the local and visitor communities of all generations in harmony across two distinct zones: the Convention Zone and the Accommodation Zone.</p><h3 class="sub">Responsibilities</h3><ul class="duties"><li>Team leading</li><li>Concept design development</li><li>Contributed to diagram production</li><li>Visualization</li></ul><ul class="ext"><li><a href="https://www.melikealtinisik.com/2-index/3645-libreville-arena-convention-center/" target="_blank" rel="noopener">Project page at Melike Altınışık Architects</a></li></ul></div><div class="win-media"><img src="img/libreville-1.jpg" alt="Libreville Arena &amp; Convention Centre, image 1 of 3" width="1064" height="600" loading="lazy" decoding="async"><img src="img/libreville-2.jpg" alt="Libreville Arena &amp; Convention Centre, image 2 of 3" width="1091" height="615" loading="lazy" decoding="async"><img src="img/libreville-3.jpg" alt="Libreville Arena &amp; Convention Centre, image 3 of 3" width="1093" height="615" loading="lazy" decoding="async"></div></div></div>
+  </div>
+
+  <script src="projects.js?v=ae3b0a72"></script>
+  <script src="glyphs.js?v=8c4af774"></script>
+  <script src="sound.js?v=5e7779a0"></script>
+  <script src="physarum.js?v=6a88886e"></script>
+  <script src="main.js?v=728897c6"></script>
+  <!-- Visitor statistics (cookieless): https://aykutdag.goatcounter.com -->
+  <script data-goatcounter="https://aykutdag.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</body>
+</html>

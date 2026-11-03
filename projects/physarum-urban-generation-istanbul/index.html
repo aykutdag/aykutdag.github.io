@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- every relative address resolves from the site root, also on project pages (/projects/<slug>/) -->
+  <base href="/">
+  <title>Physarum Urban Generation I: Istanbul — Aykut Dağ</title>
+  <meta name="description" content="Physarum polycephalum connects food sources through remarkably efficient networks; in a maze it finds the shortest path between two food sources (Nakagaki…">
+  <link rel="canonical" href="https://aykutdag.github.io/projects/physarum-urban-generation-istanbul/">
+  <meta name="theme-color" content="#05070a">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <!-- Link previews (LinkedIn, WhatsApp, X...) -->
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Aykut Dağ">
+  <meta property="og:title" content="Physarum Urban Generation I: Istanbul — Aykut Dağ">
+  <meta property="og:description" content="Physarum polycephalum connects food sources through remarkably efficient networks; in a maze it finds the shortest path between two food sources (Nakagaki…">
+  <meta property="og:url" content="https://aykutdag.github.io/projects/physarum-urban-generation-istanbul/">
+  <meta property="og:image" content="https://aykutdag.github.io/img/stylegan-1.jpg">
+  <meta property="og:image:width" content="1600">
+  <meta property="og:image:height" content="1600">
+  <meta property="og:image:alt" content="Physarum Urban Generation I: Istanbul">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    "name": "Physarum Urban Generation I: Istanbul",
+    "url": "https://aykutdag.github.io/projects/physarum-urban-generation-istanbul/",
+    "description": "Physarum polycephalum connects food sources through remarkably efficient networks; in a maze it finds the shortest path between two food sources (Nakagaki…",
+    "genre": "Research",
+    "image": [
+      "https://aykutdag.github.io/img/stylegan-1.jpg",
+      "https://aykutdag.github.io/img/stylegan-2.jpg",
+      "https://aykutdag.github.io/img/stylegan-3.jpg",
+      "https://aykutdag.github.io/img/stylegan-4.jpg",
+      "https://aykutdag.github.io/img/stylegan-5.jpg",
+      "https://aykutdag.github.io/img/stylegan-6.jpg",
+      "https://aykutdag.github.io/img/stylegan-7.jpg"
+    ],
+    "creator": {
+      "@type": "Person",
+      "name": "Aykut Dağ",
+      "url": "https://aykutdag.github.io/"
+    },
+    "dateCreated": "2024"
+  }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=3667abef">
+</head>
+<body data-project="physarum-urban-generation-istanbul">
+  <canvas id="field" aria-hidden="true"></canvas>
+
+  <!-- Entry screen: browsers allow sound only after a click, so entering starts it.
+       Hidden until main.js shows it, so a script failure never locks the page. -->
+  <div id="gate" class="gate" role="dialog" aria-modal="true" aria-label="Welcome" hidden>
+    <div class="gate-inner">
+      <p class="gate-name" id="gate-name" lang="en" aria-hidden="true">Welcome</p>
+      <button type="button" class="gate-enter" id="gate-enter">Enter</button>
+    </div>
+  </div>
+
+  <header class="top">
+    <div class="ident">
+      <h1 class="name">Aykut Dağ</h1>
+      <p class="role">Architectural &amp; Computational Designer</p>
+      <p class="tags">Parametric design · Bio-inspired systems · Digital fabrication</p>
+      <nav class="group-nav" id="group-nav" aria-label="Project groups"></nav>
+    </div>
+    <nav class="nav" aria-label="Main">
+      <button type="button" id="toggle-view" aria-pressed="false">Index</button>
+      <button type="button" data-panel="about">About</button>
+      <a href="Aykut_Dag_CV.pdf" target="_blank" rel="noopener" id="cv-link">CV</a>
+      <button type="button" data-panel="contact">Contact</button>
+      <button type="button" id="sound" aria-pressed="false">Sound off</button>
+    </nav>
+  </header>
+
+  <main>
+    <h2 class="sr-only">Selected projects</h2>
+    <ol id="colonies" class="colonies"></ol>
+    <div id="groups"></div>
+  </main>
+
+  <footer class="foot">
+    <span id="foot-agents">Physarum polycephalum</span>
+    <span class="hint" id="hint"></span>
+  </footer>
+
+  <div id="win" class="win" role="dialog" aria-modal="true" aria-labelledby="win-title" hidden>
+    <button type="button" class="win-close" aria-label="Close">
+      <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2L10 10M10 2L2 10"/></svg>
+    </button>
+    <div id="win-body" class="win-body"><header class="win-head"><div class="p-no">09 · Research</div><h2 id="win-title">Physarum Urban Generation I: Istanbul</h2></header><div class="win-cols"><div class="win-info"><dl class="credits"><dt>Project</dt><dd>Machine Learning for Biomimicry in Architecture: Synthesizing Urban and Fungal Patterns Using StyleGAN, the Case of Istanbul</dd><dt>Course</dt><dd>MBL 559E, Spring 2023–24</dd><dt>Programme</dt><dd>M.Sc. Architectural Design Computing, Istanbul Technical University</dd><dt>Date</dt><dd>June 2024</dd><dt>Type</dt><dd>Course research paper</dd><dt>Author</dt><dd>Aykut Dağ</dd><dt>Tools</dt><dd>StyleGAN3, Python, Google Colab</dd></dl><p>Physarum polycephalum connects food sources through remarkably efficient networks; in a maze it finds the shortest path between two food sources (Nakagaki et al., 2000). This paper asks whether that natural optimization can inform urban form, using Istanbul as the case.</p><p>A StyleGAN3 model was trained in Google Colab on two datasets: urban plans of Istanbul’s suburban and historical fabric at different scales, and images of Physarum growth patterns. The generated images blend the two into hybrid urban patterns, morphological variations from dense cores to sprawling networks, and new configurations.</p><p>The results were mixed: some outputs captured both the city and the organism, while others overfitted, lost spatial coherence or varied in quality. More diverse training data, better model settings and stronger evaluation metrics are named as the next steps. The study continued as part II at Bauhaus-Universität Weimar.</p></div><div class="win-media"><img src="img/stylegan-1.jpg" alt="Physarum Urban Generation I: Istanbul, image 1 of 7" width="1600" height="1600" loading="lazy" decoding="async"><img src="img/stylegan-2.jpg" alt="Physarum Urban Generation I: Istanbul, image 2 of 7" width="1600" height="898" loading="lazy" decoding="async"><img src="img/stylegan-3.jpg" alt="Physarum Urban Generation I: Istanbul, image 3 of 7" width="1600" height="898" loading="lazy" decoding="async"><img src="img/stylegan-4.jpg" alt="Physarum Urban Generation I: Istanbul, image 4 of 7" width="1280" height="720" loading="lazy" decoding="async"><img src="img/stylegan-5.jpg" alt="Physarum Urban Generation I: Istanbul, image 5 of 7" width="1280" height="720" loading="lazy" decoding="async"><img src="img/stylegan-6.jpg" alt="Physarum Urban Generation I: Istanbul, image 6 of 7" width="1280" height="720" loading="lazy" decoding="async"><img src="img/stylegan-7.jpg" alt="Physarum Urban Generation I: Istanbul, image 7 of 7" width="1600" height="903" loading="lazy" decoding="async"></div></div></div>
+  </div>
+
+  <script src="projects.js?v=ae3b0a72"></script>
+  <script src="glyphs.js?v=8c4af774"></script>
+  <script src="sound.js?v=5e7779a0"></script>
+  <script src="physarum.js?v=6a88886e"></script>
+  <script src="main.js?v=728897c6"></script>
+  <!-- Visitor statistics (cookieless): https://aykutdag.goatcounter.com -->
+  <script data-goatcounter="https://aykutdag.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</body>
+</html>

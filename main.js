@@ -35,10 +35,12 @@
     (navigator.maxTouchPoints > 0 && Math.min(screen.width, screen.height) < 900);
 
   const groups = GROUPS.map(g => Object.assign({ items: [] }, g));
+  const bySlug = {};
   PROJECTS.forEach((p, i) => {
     p.index = i;
     p.no = String(i + 1).padStart(2, "0");
     groups.find(g => g.id === p.group).items.push(p);
+    bySlug[p.slug] = p;
   });
 
   let sim = null;            // the live simulation; null shows the poster image instead
@@ -427,9 +429,24 @@
     external: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 4.5H19.5V10.5M19.5 4.5L11 13M17 14V19.5H4.5V7H10"/></svg>'
   };
 
+  // ---------- Project addresses ----------
+  // Each project also has its own page (projects/<slug>/, written by tools/build.py). Opening
+  // a project moves the address bar there, so it can be shared, bookmarked and left with the
+  // back button; closing it returns to the home address.
+  const HOME_TITLE = "Aykut Dağ — Architectural & Computational Designer";
+  const projectUrl = p => "/projects/" + p.slug + "/";
+  let pushedProject = false; // the open project's address was added to the history here
+
+  // The window grows out of the project's node, or out of the middle when it is not on screen.
+  function originOf(p) {
+    const shown = isList() || nodeEls[p.index].li.classList.contains("shown");
+    return shown ? centerOf(nodeEls[p.index].btn) : { x: innerWidth / 2, y: innerHeight / 2 };
+  }
+
   // A project window: credits, description and responsibilities on the left; video and
   // images on the right. While a video is open the site's own sound steps aside.
-  function openProject(p) {
+  // viaHistory: opened by the address (back / forward, a project page), so nothing is pushed.
+  function openProject(p, from, viaHistory) {
     track("project/" + p.glyph, p.title);
     openWin(root => {
       const head = el("header", "win-head");
@@ -497,9 +514,42 @@
       const cols = el("div", "win-cols");
       cols.append(info, media);
       root.append(head, cols);
-    }, centerOf(nodeEls[p.index].btn));
+    }, from || originOf(p));
     if (p.video || p.film) Sound.duck(true);
+    document.title = p.title + " — Aykut Dağ";
+    if (viaHistory) {
+      pushedProject = !!(history.state && history.state.pushed);
+    } else if (location.pathname !== projectUrl(p)) {
+      history.pushState({ project: p.slug, pushed: true }, "", projectUrl(p));
+      pushedProject = true;
+    }
   }
+
+  // The visitor closes the window: a project's address goes back to the home address.
+  function dismiss() {
+    if (win.hidden) return false;
+    if (location.pathname.startsWith("/projects/")) {
+      document.title = HOME_TITLE;
+      if (pushedProject) {
+        pushedProject = false;
+        history.back(); // popstate closes the window
+        return true;
+      }
+      history.replaceState(null, "", "/");
+    }
+    return closeWin();
+  }
+
+  addEventListener("popstate", () => {
+    const m = location.pathname.match(/^\/projects\/([^/]+)\/?$/);
+    const p = m && bySlug[m[1]];
+    if (p && !gateOpen) openProject(p, null, true);
+    else if (!p) {
+      pushedProject = false;
+      document.title = HOME_TITLE;
+      closeWin();
+    }
+  });
 
   document.querySelectorAll("[data-panel]").forEach(b => b.addEventListener("click", () => {
     const which = b.dataset.panel;
@@ -533,10 +583,10 @@
     }, centerOf(b), which === "about" ? "small about" : "small");
   }));
 
-  win.querySelector(".win-close").addEventListener("click", () => closeWin());
+  win.querySelector(".win-close").addEventListener("click", () => dismiss());
   addEventListener("keydown", e => {
     if (e.key !== "Escape") return;
-    if (!closeWin() && !isList()) closeGroup();
+    if (!dismiss() && !isList()) closeGroup();
   });
 
   // ---------- View + sound toggles ----------
@@ -602,6 +652,9 @@
     track("enter", "Entered the site");
     Sound.chime(5, true, 0);
     signal(0.5, 0.5, 1.6, 5);
+    // a project's own page (projects/<slug>/) opens that project once the visitor is in
+    const linked = bySlug[body.dataset.project];
+    if (linked) openProject(linked, null, true);
   }
 
   gate.hidden = false;

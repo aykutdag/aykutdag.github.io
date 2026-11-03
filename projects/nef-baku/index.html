@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- every relative address resolves from the site root, also on project pages (/projects/<slug>/) -->
+  <base href="/">
+  <title>NEF BAKU Residence — Aykut Dağ</title>
+  <meta name="description" content="The proposed 18-storey NEF BAKU Residence, located in the rapidly evolving Baku Absheron district, is designed to reflect the distinctive character of its…">
+  <link rel="canonical" href="https://aykutdag.github.io/projects/nef-baku/">
+  <meta name="theme-color" content="#05070a">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <!-- Link previews (LinkedIn, WhatsApp, X...) -->
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Aykut Dağ">
+  <meta property="og:title" content="NEF BAKU Residence — Aykut Dağ">
+  <meta property="og:description" content="The proposed 18-storey NEF BAKU Residence, located in the rapidly evolving Baku Absheron district, is designed to reflect the distinctive character of its…">
+  <meta property="og:url" content="https://aykutdag.github.io/projects/nef-baku/">
+  <meta property="og:image" content="https://aykutdag.github.io/img/nefbaku-1.jpg">
+  <meta property="og:image:width" content="1600">
+  <meta property="og:image:height" content="1598">
+  <meta property="og:image:alt" content="NEF BAKU Residence">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    "name": "NEF BAKU Residence",
+    "url": "https://aykutdag.github.io/projects/nef-baku/",
+    "description": "The proposed 18-storey NEF BAKU Residence, located in the rapidly evolving Baku Absheron district, is designed to reflect the distinctive character of its…",
+    "genre": "Practice",
+    "image": [
+      "https://aykutdag.github.io/img/nefbaku-1.jpg",
+      "https://aykutdag.github.io/img/nefbaku-2.jpg",
+      "https://aykutdag.github.io/img/nefbaku-3.jpg"
+    ],
+    "creator": {
+      "@type": "Person",
+      "name": "Aykut Dağ",
+      "url": "https://aykutdag.github.io/"
+    },
+    "dateCreated": "2022"
+  }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=3667abef">
+</head>
+<body data-project="nef-baku">
+  <canvas id="field" aria-hidden="true"></canvas>
+
+  <!-- Entry screen: browsers allow sound only after a click, so entering starts it.
+       Hidden until main.js shows it, so a script failure never locks the page. -->
+  <div id="gate" class="gate" role="dialog" aria-modal="true" aria-label="Welcome" hidden>
+    <div class="gate-inner">
+      <p class="gate-name" id="gate-name" lang="en" aria-hidden="true">Welcome</p>
+      <button type="button" class="gate-enter" id="gate-enter">Enter</button>
+    </div>
+  </div>
+
+  <header class="top">
+    <div class="ident">
+      <h1 class="name">Aykut Dağ</h1>
+      <p class="role">Architectural &amp; Computational Designer</p>
+      <p class="tags">Parametric design · Bio-inspired systems · Digital fabrication</p>
+      <nav class="group-nav" id="group-nav" aria-label="Project groups"></nav>
+    </div>
+    <nav class="nav" aria-label="Main">
+      <button type="button" id="toggle-view" aria-pressed="false">Index</button>
+      <button type="button" data-panel="about">About</button>
+      <a href="Aykut_Dag_CV.pdf" target="_blank" rel="noopener" id="cv-link">CV</a>
+      <button type="button" data-panel="contact">Contact</button>
+      <button type="button" id="sound" aria-pressed="false">Sound off</button>
+    </nav>
+  </header>
+
+  <main>
+    <h2 class="sr-only">Selected projects</h2>
+    <ol id="colonies" class="colonies"></ol>
+    <div id="groups"></div>
+  </main>
+
+  <footer class="foot">
+    <span id="foot-agents">Physarum polycephalum</span>
+    <span class="hint" id="hint"></span>
+  </footer>
+
+  <div id="win" class="win" role="dialog" aria-modal="true" aria-labelledby="win-title" hidden>
+    <button type="button" class="win-close" aria-label="Close">
+      <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2L10 10M10 2L2 10"/></svg>
+    </button>
+    <div id="win-body" class="win-body"><header class="win-head"><div class="p-no">05 · Practice</div><h2 id="win-title">NEF BAKU Residence</h2></header><div class="win-cols"><div class="win-info"><dl class="credits"><dt>Project</dt><dd>NEF BAKU Residence</dd><dt>Location</dt><dd>Baku, Azerbaijan</dd><dt>Date</dt><dd>2022</dd><dt>Client</dt><dd>NEF Global</dd><dt>Status</dt><dd>Commission</dd><dt>Size</dt><dd>23,000 m² / 75 m</dd><dt>Architect</dt><dd>Melike Altınışık Architects</dd><dt>Project team (competition stage)</dt><dd>Aykut Dağ, Elifcan Merdan, Adham Mashaal</dd><dt>Architectural assistant team</dt><dd>Kutay Koçtekin, Abdullah Aydemir, Abdullah Mallah</dd></dl><p>The proposed 18-storey NEF BAKU Residence, located in the rapidly evolving Baku Absheron district, is designed to reflect the distinctive character of its neighborhood while establishing harmony with its architectural presence across the entire district. This 75-meter-high residence tower aims to provide a vibrant addition to the district.</p><p>The architectural concept focuses on creating high-quality architectural and urban environments with an eco-responsible approach, distinguishing itself from nearby towers in Baku’s skyline. With multiple balconies facing the sea, most residences enjoy unique natural scenery. The building’s massing allows for a generous public podium and includes a community center offering space for temporary events, welcoming both residents and visitors.</p><p>The 60-unit residential tower in the heart of Baku sets a precedent by offering a wide range of flat types to accommodate different contemporary family configurations. Amenities at NEF BAKU Residence include a wellness level with a spa, pool, sunken courtyard, and entertainment suite with a cinema.</p><h3 class="sub">Responsibilities</h3><ul class="duties"><li>Intern team leading</li><li>Concept design development</li><li>Architectural layouts, space organizations</li><li>Managing area lists</li><li>2D drawings (plan, section, elevation)</li><li>Contributed to diagram production</li><li>Visualization</li></ul><p class="credit">Renders by MAA</p><ul class="ext"><li><a href="https://www.melikealtinisik.com/2-index/3681-nef-baku-residence/" target="_blank" rel="noopener">Project page at Melike Altınışık Architects</a></li></ul></div><div class="win-media"><img src="img/nefbaku-1.jpg" alt="NEF BAKU Residence, image 1 of 3" width="1600" height="1598" loading="lazy" decoding="async"><img src="img/nefbaku-2.jpg" alt="NEF BAKU Residence, image 2 of 3" width="1473" height="1472" loading="lazy" decoding="async"><img src="img/nefbaku-3.jpg" alt="NEF BAKU Residence, image 3 of 3" width="704" height="1600" loading="lazy" decoding="async"></div></div></div>
+  </div>
+
+  <script src="projects.js?v=ae3b0a72"></script>
+  <script src="glyphs.js?v=8c4af774"></script>
+  <script src="sound.js?v=5e7779a0"></script>
+  <script src="physarum.js?v=6a88886e"></script>
+  <script src="main.js?v=728897c6"></script>
+  <!-- Visitor statistics (cookieless): https://aykutdag.goatcounter.com -->
+  <script data-goatcounter="https://aykutdag.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</body>
+</html>
