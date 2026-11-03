@@ -190,6 +190,8 @@
   const SHORT_COLONIES = [[0.2, 0.15], [0.5, 0.6], [0.8, 0.15]];
 
   function layout() {
+    // where the organism feeds now, to compare once the places are recomputed
+    const fedBefore = sim && groups[0].fx !== undefined ? foodPoints() : null;
     const tall = innerHeight > innerWidth * 1.15;
     const short = !tall && innerHeight < 560;
     body.classList.toggle("tall", tall);
@@ -232,7 +234,19 @@
     document.documentElement.style.setProperty("--col-w", Math.round(innerWidth * 0.22 - 56) + "px");
     groups.forEach(g => placeLabels(g, tall, short));
     placeNodes();
+    // When the places move (a browser toolbar showing or hiding, the phone turning, late
+    // fonts), the food at the new places is richer for a few seconds, so the network
+    // gathers under the rings again instead of lingering beside them. (Repelling the old
+    // places would also clear the new ones: they are closer than the repellent's reach.)
+    if (fedBefore) {
+      const fedNow = foodPoints();
+      if (fedBefore.some((f, i) => fedNow[i] && Math.hypot((f.x - fedNow[i].x) * innerWidth, (f.y - fedNow[i].y) * innerHeight) > 6)) {
+        regather = now();
+      }
+    }
   }
+  let regather = -1e9; // when the food last moved
+  const REGATHER_TIME = 6; // seconds the moved food stays richer
 
   // Labels must never cover each other, a node or the header and footer. For each node (at
   // its final position) try the preferred side first, then the other side, then the same
@@ -1042,7 +1056,8 @@
   }
 
   function feed(breath) {
-    const b = 0.85 + 0.3 * breath;
+    // breathing, and up to three times richer just after the food has moved (see layout)
+    const b = (0.85 + 0.3 * breath) * (1 + 2 * Math.max(0, 1 - (now() - regather) / REGATHER_TIME));
     sim.setFood(foodPoints().map(f => ({ x: f.x, y: f.y, s: f.s * b })).concat(repellents()));
     const active = mouse.x >= 0 && !sheetOpen && win.hidden;
     sim.setMouse(
@@ -1255,5 +1270,15 @@
   }
 
   tier = startTier();
-  startSim();
+  // The first network grows where the colonies finally sit. Their places depend on the
+  // header's height, which settles once the web fonts arrive, so wait for those (at most
+  // 1.2 s, while the entry screen is up). Otherwise it would grow beside the rings.
+  const fontsIn = document.fonts
+    ? Promise.all(['400 13px "Instrument Sans"', '500 30px "Instrument Sans"', '11px "JetBrains Mono"']
+        .map(f => document.fonts.load(f))).catch(() => {})
+    : Promise.resolve();
+  Promise.race([fontsIn, new Promise(r => setTimeout(r, 1200))]).then(() => {
+    layout();
+    startSim();
+  });
 })();
