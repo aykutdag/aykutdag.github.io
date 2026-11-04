@@ -411,23 +411,23 @@ window.PROJECTS = [
   }
 ];
 
-// The sheet's intro, about and contact sections (written into index.html by tools/build.py).
+// The sheet's about, CV and contact sections (written into index.html by tools/build.py).
 // Facts follow Aykut_Dag_CV.pdf.
 window.ABOUT = {
   photo: "img/aykut.jpg",
   axis: "Space · Computation · Material · Interaction",
   intro: "I am an architectural and computational designer working between space, computation, material and interaction — from international competitions and concept design to generative systems, responsive environments and soft robotic prototypes.",
   now: "M.Sc. in Architectural Design Computing at Istanbul Technical University, researching pneumatic systems and soft robotics.",
+  // [area, what it covers, what that has meant in practice]
   areas: [
-    ["Architecture", "Concept design, international competitions, spatial organization, team leadership"],
-    ["Computational design", "Parametric modeling, generative systems, simulation"],
-    ["Interactive systems", "TouchDesigner, sensing, responsive environments"],
-    ["Material research", "Soft robotics, prototyping, digital fabrication"]
-  ],
-  axes: [
-    ["Architectural practice", "4+ years of concept and competition work for cultural, hospitality and office buildings at Melike Altınışık Architects, GG-loop, Aboutblank and Nous Architecture, from massing and space programming to drawings, visuals and jury presentations. Led the concept team of the II. Sejong Cultural Center entry, a shortlisted finalist."],
-    ["Computational exploration", "Rhino and Grasshopper definitions for facade panelization, form-finding and geometric rationalization; StyleGAN models and agent-based simulations that grow urban fabric from the behaviour of Physarum polycephalum."],
-    ["Experimental environments", "Sensor-driven installations, a responsive environment that turns EEG and heart-rate data into projection and spatial sound with KHORA Collective, and soft robotic actuators cast in silicone."]
+    ["Architecture", "Concept design, international competitions, spatial organization, team leadership",
+      "4+ years of concept and competition work for cultural, hospitality and office buildings at Melike Altınışık Architects, GG-loop, Aboutblank and Nous Architecture, from massing and space programming to drawings, visuals and jury presentations. Led the concept team of the II. Sejong Cultural Center entry, a shortlisted finalist."],
+    ["Computational design", "Parametric modeling, generative systems, simulation",
+      "Rhino and Grasshopper definitions for facade panelization, form-finding and geometric rationalization; StyleGAN models and agent-based simulations that grow urban fabric from the behaviour of Physarum polycephalum."],
+    ["Interactive systems", "TouchDesigner, sensing, responsive environments",
+      "Sensor-driven installations and a responsive environment that turns EEG and heart-rate data into projection and spatial sound with KHORA Collective."],
+    ["Material research", "Soft robotics, prototyping, digital fabrication",
+      "Soft robotic actuators cast in silicone, 3D-printed prototypes and deployable fabric formwork."]
   ],
   // [years, place, role, location]
   experience: [

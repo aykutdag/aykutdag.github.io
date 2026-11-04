@@ -5,7 +5,7 @@
   // What the ?debug readout reports: why the simulation is not running (if so), how many
   // frames it has drawn, a hash of the drawn pixels (it changes while the field moves),
   // lost WebGL contexts and any errors.
-  const status = { why: "", frames: 0, lost: 0, hash: "", errors: [] };
+  const status = { why: "", frames: 0, steps: 0, lost: 0, hash: "", errors: [] };
   if (params.has("debug")) {
     addEventListener("error", e => status.errors.push((e.message || "error") + " @" + String(e.filename || "").split("/").pop() + ":" + e.lineno));
     addEventListener("unhandledrejection", e => status.errors.push("promise: " + e.reason));
@@ -78,7 +78,6 @@
       if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path, title: title || path, event: true });
     } catch (e) { /* statistics are optional */ }
   }
-  document.getElementById("cv-link").addEventListener("click", () => track("cv", "CV opened"));
 
   // ---------- Signals (electric pulses leaving a food source) ----------
   function signal(x, y, strength, tone) {
@@ -406,6 +405,7 @@
     glassMode();
     body.classList.add("modal");
     syncInert();
+    winMovingUntil = now() + 0.85; // its grow animation (0.62 s) and the content fading in
     win.style.setProperty("--fx", from.x - innerWidth / 2 + "px");
     win.style.setProperty("--fy", from.y - innerHeight / 2 + "px");
     win.classList.remove("leave");
@@ -433,6 +433,7 @@
     }
     win.classList.remove("enter");
     win.classList.add("leave");
+    winMovingUntil = now() + 0.4; // its shrink animation (0.26 s)
     win.addEventListener("animationend", function end(e) {
       if (e.target !== win) return;
       win.removeEventListener("animationend", end);
@@ -718,6 +719,7 @@
       sheetScroll.scrollTop = 0; // scrolling down from the field starts at the beginning
       sheet.querySelector(".sheet-close").focus({ preventScroll: true });
     }
+    markTab(); // also when nothing scrolls (already at the place)
   }
 
   // Returns true when the sheet was up. The visitor's close goes back in the history when
@@ -745,6 +747,14 @@
     openSheet(which);
     track(which, which === "about" ? "About opened" : "Contact opened");
   }));
+  // The header's CV opens the sheet's CV section (it offers the PDF); with a modifier key,
+  // or without scripts, the link opens the PDF itself.
+  document.getElementById("cv-link").addEventListener("click", e => {
+    if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || e.button) { track("cv", "CV opened"); return; }
+    e.preventDefault();
+    openSheet("cv");
+    track("cv/section", "CV section opened");
+  });
 
   // The wheel on the field: the sheet's edge follows, then the sheet rises. On the sheet,
   // pulling further up at the top of its content lowers it again. A pull counts only within
@@ -831,19 +841,17 @@
   // Section tabs, and the tab of the section in view.
   tabs.forEach(b => b.addEventListener("click", () => goToSection(b.dataset.to)));
   let tabRaf = 0;
-  sheetScroll.addEventListener("scroll", () => {
-    if (tabRaf) return;
-    tabRaf = requestAnimationFrame(() => {
-      tabRaf = 0;
-      const y = sheetScroll.scrollTop + 120;
-      let cur = tabs[0];
-      tabs.forEach(b => { const s = sectionEl(b.dataset.to); if (s && s.offsetTop <= y) cur = b; });
-      if (sheetScroll.scrollTop + sheetScroll.clientHeight >= sheetScroll.scrollHeight - 4) cur = tabs[tabs.length - 1];
-      tabs.forEach(b => { if (b === cur) b.setAttribute("aria-current", "true"); else b.removeAttribute("aria-current"); });
-      const nav = cur.parentElement;
-      if (nav.scrollWidth > nav.clientWidth) nav.scrollTo({ left: cur.offsetLeft - nav.clientWidth / 2 + cur.offsetWidth / 2, behavior: "smooth" });
-    });
-  }, { passive: true });
+  function markTab() {
+    tabRaf = 0;
+    const y = sheetScroll.scrollTop + 120;
+    let cur = tabs[0];
+    tabs.forEach(b => { const s = sectionEl(b.dataset.to); if (s && s.offsetTop <= y) cur = b; });
+    if (sheetScroll.scrollTop > 0 && sheetScroll.scrollTop + sheetScroll.clientHeight >= sheetScroll.scrollHeight - 4) cur = tabs[tabs.length - 1];
+    tabs.forEach(b => { if (b === cur) b.setAttribute("aria-current", "true"); else b.removeAttribute("aria-current"); });
+    const nav = cur.parentElement;
+    if (nav.scrollWidth > nav.clientWidth) nav.scrollTo({ left: cur.offsetLeft - nav.clientWidth / 2 + cur.offsetWidth / 2, behavior: "smooth" });
+  }
+  sheetScroll.addEventListener("scroll", () => { if (!tabRaf) tabRaf = requestAnimationFrame(markTab); }, { passive: true });
 
   // Projects: filter by colony, order by colony or by year (newest first).
   const rowList = sheet.querySelector(".rows");
@@ -1175,30 +1183,47 @@
   let tick = 0;
   const t0 = now();
 
+  // The organism takes STEP_RATE steps a second on every screen, as on a 60 Hz phone. (It
+  // used to take two steps per frame, so a 144 Hz monitor ran it nearly five times faster
+  // and the network scattered.) It is drawn after its steps, so its hair-thin trails look
+  // the same at any refresh rate; while the glass of a window or the sheet moves, every
+  // frame, so the glass keeps up with the box. Behind the resting sheet the field is only a
+  // frosted backdrop and goes at half the rate.
+  const STEP_RATE = 60;
+  let stepDebt = 0;          // steps owed for the time that has passed
+  let drawnAt = 0;           // when the field was last drawn (the governor's frame time)
+  let winMovingUntil = 0;    // the window is growing or shrinking until then (s)
+
   function frame(ts) {
     if (!running) return;
     requestAnimationFrame(frame);
     const dt = lastTs ? ts - lastTs : 0;
     lastTs = ts;
     if (lost || !sim) return;
-    // Behind the resting sheet the field is only a frosted backdrop: half the frames are
-    // enough. While the sheet moves, every frame, so its glass keeps up.
     const backdrop = sheetOpen && !sheetMoving;
-    if (backdrop && (tick++ & 1)) return;
     try {
-      if (!backdrop) gov.add(dt);
+      // the pointer is sampled as it always was (every frame, every other behind the sheet)
+      if (!(backdrop && (tick++ & 1))) {
+        if (mouse.px >= 0 && mouse.x >= 0) {
+          const d = Math.hypot(mouse.x - mouse.px, mouse.y - mouse.py);
+          mouse.speed += (d - mouse.speed) * 0.2;
+        } else mouse.speed *= 0.9;
+        mouse.px = mouse.x; mouse.py = mouse.y;
+        Sound.activity(mouse.speed, Math.max(0, mouse.x) / innerWidth);
+      }
+      stepTween(); // the nodes' spread follows the display
+
+      // at most 3 steps at once, so a stall does not make the network lurch
+      stepDebt = Math.min(stepDebt + dt * (backdrop ? STEP_RATE / 2 : STEP_RATE) / 1000, 3);
+      const steps = Math.floor(stepDebt);
+      if (!steps && !sheetMoving && now() >= winMovingUntil) return; // nothing new to draw
+      stepDebt -= steps;
+      if (!backdrop) gov.add(drawnAt ? ts - drawnAt : 0);
+      drawnAt = ts;
       if (!running) return; // the governor switched to still
 
       const t = now() - t0;
       const breath = 0.5 + 0.5 * Math.sin((t / BREATH_PERIOD) * Math.PI * 2);
-      if (mouse.px >= 0 && mouse.x >= 0) {
-        const d = Math.hypot(mouse.x - mouse.px, mouse.y - mouse.py);
-        mouse.speed += (d - mouse.speed) * 0.2;
-      } else mouse.speed *= 0.9;
-      mouse.px = mouse.x; mouse.py = mouse.y;
-      Sound.activity(mouse.speed, Math.max(0, mouse.x) / innerWidth);
-
-      stepTween();
 
       if (!reduceMotion && now() > nextSignal) {
         const pts = foodPoints();
@@ -1208,8 +1233,8 @@
       }
 
       feed(breath);
-      sim.step();
-      if (!reduceMotion) sim.step();
+      for (let i = 0; i < steps; i++) sim.step();
+      status.steps += steps;
       updateGlass();
       sim.render(breath);
       status.frames++;
@@ -1241,15 +1266,16 @@
   if (params.has("debug")) {
     const box = el("div", "debug");
     body.append(box);
-    let raf = 0, last = performance.now(), simLast = 0;
+    let raf = 0, last = performance.now(), simLast = 0, stepsLast = 0;
     (function count() { raf++; requestAnimationFrame(count); })();
     setInterval(() => {
       try {
         const t = performance.now(), sec = (t - last) / 1000;
         const fps = Math.round(raf / sec), simFps = Math.round((status.frames - simLast) / sec);
-        raf = 0; simLast = status.frames; last = t;
+        const stepsPerSec = Math.round((status.steps - stepsLast) / sec);
+        raf = 0; simLast = status.frames; stepsLast = status.steps; last = t;
         box.textContent = [
-          fps + " fps (sim " + simFps + ")",
+          fps + " fps (sim " + simFps + ", " + stepsPerSec + " steps/s)",
           "frames " + status.frames + (status.hash ? " #" + status.hash : ""),
           sim ? "tier " + tier + " " + sim.size.join("×") : "poster",
           sim ? sim.agentCount.toLocaleString("en") + " agents" : "",

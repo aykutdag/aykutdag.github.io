@@ -1,6 +1,6 @@
 """Build step before publishing: python tools/build.py
 
-1. Writes the sheet's sections (intro, selected work, projects, about, contact) into
+1. Writes the sheet's sections (about, selected work, projects, CV, contact) into
    index.html as plain HTML, between <!-- build:sheet --> and <!-- /build:sheet -->, then stamps
    asset URLs (runs stamp.py).
 2. Writes one page per project at projects/<slug>/index.html: the same site, with the
@@ -188,14 +188,18 @@ def sheet_html(data):
                        f'<span>{esc(what)}</span>{where}</span></li>')
         return '<ul class="tl">' + "".join(out) + "</ul>"
 
-    cv = '<a class="pill" href="Aykut_Dag_CV.pdf" target="_blank" rel="noopener" data-track="cv" data-track-title="CV opened">'
     s = []
-    s.append(f'<section class="s s-intro" data-section="intro" aria-labelledby="h-intro">{head("01", "Intro", "intro")}'
+    # 01 About: portrait beside the introduction, then the four areas of practice
+    pw, ph = image_size(about["photo"])
+    s.append(f'<section class="s s-about" data-section="about" aria-labelledby="h-about">{head("01", "About", "about")}'
+             f'<div class="about-top"><img class="portrait" src="{about["photo"]}" alt="Portrait of Aykut Dağ" width="{pw}" height="{ph}" loading="lazy" decoding="async">'
              f'<p class="lede">{esc(about["intro"])}</p>'
-             f'<p class="now"><span class="now-k">Currently</span>{esc(about["now"])}</p>'
-             '<ul class="areas">' + "".join(f"<li><h3>{esc(t)}</h3><p>{esc(d)}</p></li>" for t, d in about["areas"]) + "</ul>"
+             f'<div class="about-now"><p class="now"><span class="now-k">Currently</span>{esc(about["now"])}</p>'
              '<p class="quick"><button type="button" class="pill" data-to="work">Selected work</button>'
-             f'{cv}CV (PDF)</a><button type="button" class="pill" data-to="contact">Contact</button></p></section>')
+             '<button type="button" class="pill" data-to="cv">CV</button>'
+             '<button type="button" class="pill" data-to="contact">Contact</button></p></div></div>'
+             '<ul class="areas">' + "".join(f'<li><h3>{esc(t)}</h3><p class="area-tags">{esc(tags)}</p><p>{esc(d)}</p></li>'
+                                            for t, tags, d in about["areas"]) + "</ul></section>")
     s.append(f'<section class="s" data-section="work" aria-labelledby="h-work">{head("02", "Selected work", "work")}'
              '<ul class="cards">' + "".join(card(p) for p in projects if p.get("featured")) + "</ul></section>")
 
@@ -210,15 +214,14 @@ def sheet_html(data):
              '<button type="button" data-sort="year" aria-pressed="false">Year</button></div></div>'
              '<ol class="rows">' + "".join(row(i, p) for i, p in enumerate(projects)) + "</ol></section>")
 
-    pw, ph = image_size(about["photo"])
-    s.append(f'<section class="s s-about" data-section="about" aria-labelledby="h-about">{head("04", "About", "about")}'
-             f'<div class="about-cols"><img class="portrait" src="{about["photo"]}" alt="Portrait of Aykut Dağ" width="{pw}" height="{ph}" loading="lazy" decoding="async">'
-             '<dl class="axes">' + "".join(f"<dt>{esc(t)}</dt><dd>{esc(d)}</dd>" for t, d in about["axes"]) + "</dl></div>"
+    # 04 CV: experience, education and honors, and the full PDF
+    s.append(f'<section class="s s-cv" data-section="cv" aria-labelledby="h-cv">{head("04", "CV", "cv")}'
              '<div class="cv-cols">'
              f'<div><h3 class="s-sub">Experience</h3>{timeline(about["experience"])}</div>'
              f'<div><h3 class="s-sub">Education</h3>{timeline(about["education"])}</div>'
              f'<div><h3 class="s-sub">Honors</h3>{timeline(about["honors"])}</div></div>'
-             f'<p class="quick">{cv}Full CV (PDF)</a></p></section>')
+             '<p class="quick"><a class="pill" href="Aykut_Dag_CV.pdf" target="_blank" rel="noopener" data-track="cv" '
+             'data-track-title="CV opened">Download CV (PDF)</a></p></section>')
 
     links = []
     for c in contact:

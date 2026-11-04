@@ -47,12 +47,12 @@ CHECK_JS = r"""(mode) => {
     if (r.left < -1 || r.right > vw + 1 || r.top < -1) out.push('sheet outside screen: ' + [r.left, r.top, r.right].map(Math.round));
     if (sc.scrollWidth > sc.clientWidth + 1) out.push('sheet: horizontal overflow ' + sc.scrollWidth + ' > ' + sc.clientWidth);
     if (hit(R(sheet.querySelector('.sheet-tabs')), R(sheet.querySelector('.sheet-close')))) out.push('sheet: tabs × close button');
-    [['.areas', 'li'], ['.cards', 'li'], ['.rows', 'li'], ['.tl', 'li'], ['.cv-cols', 'div'], ['.about-cols', '*'],
+    [['.areas', 'li'], ['.cards', 'li'], ['.rows', 'li'], ['.tl', 'li'], ['.cv-cols', 'div'], ['.about-top', '*'],
      ['.quick', '*'], ['.tools', 'div'], ['.contact-links', 'li']].forEach(([list, item]) =>
       sheet.querySelectorAll(list).forEach(l => pairs([...l.querySelectorAll(':scope > ' + item)].filter(visible), 'sheet ' + list)));
     sheet.querySelectorAll('.row').forEach(row => { if (visible(row)) pairs([...row.querySelectorAll('.row-thumb, .mark, .row-no, .row-title, .row-kind, .row-place, .row-year')].filter(visible), 'row'); });
     sheet.querySelectorAll('.card').forEach(c => pairs([...c.querySelectorAll('.card-img, .card-kicker, .card-title, .card-sub')].filter(visible), 'card'));
-    sheet.querySelectorAll('.s-head, .s-sub, .s p, .areas h3, .axes dt, .axes dd, .card-title, .card-sub, .row-title, .pub-title, .pub-where, .tl-body').forEach(e => {
+    sheet.querySelectorAll('.s-head, .s-sub, .s p, .areas h3, .card-title, .card-sub, .row-title, .tl-body').forEach(e => {
       if (visible(e) && e.scrollWidth > e.clientWidth + 1) out.push('sheet: text overflows ' + name(e));
     });
   } else {
