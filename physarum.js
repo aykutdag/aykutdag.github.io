@@ -221,17 +221,19 @@ void main() {
   o = vec4(pow(max(c, 0.0), vec3(0.95)), 1.0);
 }`;
 
-  // A floating window of "liquid glass" over the rendered field: the backdrop is frosted
-  // (blurred mip taps) and tinted, the rounded slab's bevel bends it inward like a lens with
-  // a little dispersion, and a hairline of light runs along the rim, brightest where the edge
-  // faces the light (the pointer). Everything outside dims slightly under a soft shadow.
+  // Panes of "liquid glass" over the rendered field (two: a window or the sheet, and the
+  // header's name block): the backdrop is frosted (blurred mip taps) and tinted, the rounded
+  // slab's bevel bends it inward like a lens with a little dispersion, and a hairline of
+  // light runs along the rim, brightest where the edge faces the light (the pointer). Each
+  // pane casts a soft shadow; a window also dims the whole field a little (pane.z).
   const FS_GLASS = `#version 300 es
 precision highp float;
 in vec2 uv;
 uniform sampler2D scene;
 uniform vec2 res;
-uniform vec4 rect;   // glass center (xy) and half size (zw), scene pixels, y up
-uniform float radius, alpha, k;
+uniform vec4 rect[2];  // per pane: center (xy) and half size (zw), scene pixels, y up
+uniform vec3 pane[2];  // per pane: corner radius, opacity, dimming of the field around it
+uniform float k;
 uniform vec2 light;
 out vec4 o;
 float box(vec2 p, vec2 b, float r) {
@@ -249,15 +251,26 @@ vec3 frost(vec2 p) {
 void main() {
   vec2 p = uv * res;
   vec3 base = texture(scene, uv).rgb;
-  vec2 q = p - rect.xy;
-  float d = box(q, rect.zw, radius);
-  float sh = box(q + vec2(0.0, 18.0 * k), rect.zw, radius);
-  base *= 1.0 - alpha * (0.22 + 0.45 * (1.0 - smoothstep(0.0, 70.0 * k, sh)));
-  if (d > 1.5) { o = vec4(base, 1.0); return; }
+  // shadows and dimming from every pane; the glass itself from the pane this pixel is in,
+  // the front one (slot 0) where they overlap
+  float d = 1e9;
+  int at = -1;
+  for (int i = 0; i < 2; i++) {
+    if (pane[i].y < 0.001) continue;
+    vec2 qi = p - rect[i].xy;
+    float sh = box(qi + vec2(0.0, 18.0 * k), rect[i].zw, pane[i].x);
+    base *= 1.0 - pane[i].y * (pane[i].z + 0.45 * (1.0 - smoothstep(0.0, 70.0 * k, sh)));
+    float di = box(qi, rect[i].zw, pane[i].x);
+    if (at < 0 && di <= 1.5) { d = di; at = i; }
+  }
+  if (at < 0) { o = vec4(base, 1.0); return; }
+  vec4 R = rect[at];
+  float radius = pane[at].x, alpha = pane[at].y;
+  vec2 q = p - R.xy;
 
   vec2 e = vec2(1.0, 0.0);
-  vec2 n = normalize(vec2(box(q + e.xy, rect.zw, radius) - box(q - e.xy, rect.zw, radius),
-                          box(q + e.yx, rect.zw, radius) - box(q - e.yx, rect.zw, radius)) + 1e-5);
+  vec2 n = normalize(vec2(box(q + e.xy, R.zw, radius) - box(q - e.xy, R.zw, radius),
+                          box(q + e.yx, R.zw, radius) - box(q - e.yx, R.zw, radius)) + 1e-5);
   float x = clamp(-d / (26.0 * k), 0.0, 1.0);   // 0 at the rim, 1 where the slab turns flat
   float slope = pow(1.0 - x, 2.5);
   vec2 off = -n * slope * 38.0 * k;
@@ -273,7 +286,7 @@ void main() {
   float rim = exp(-pow((d + 1.2 * k) / (0.9 * k), 2.0));
   float sheen = pow(1.0 - x, 4.0);
   c += vec3(0.92, 0.97, 1.0) * (rim * (0.25 + 0.75 * facing * facing) * 0.9 + sheen * (0.05 + 0.12 * facing));
-  c += vec3(0.6, 0.7, 0.8) * 0.035 * smoothstep(-rect.w, rect.w, q.y);
+  c += vec3(0.6, 0.7, 0.8) * 0.035 * smoothstep(-R.w, R.w, q.y);
 
   o = vec4(mix(base, c, smoothstep(0.75, -0.75, d) * alpha), 1.0);
 }`;
@@ -383,7 +396,8 @@ void main() { o = vec4(1.0, 0.0, 0.0, 1.0); }`;
     }
 
     let tw, th, k, aw, ah, agents, trail, dust, scene, glow;
-    const glass = { rect: new Float32Array(4), radius: 0, alpha: 0, light: new Float32Array([-0.6, 0.8]) };
+    // two glass panes: rect = center and half size, pane = corner radius, opacity, dimming
+    const glass = { rect: new Float32Array(8), pane: new Float32Array(6), light: new Float32Array([-0.6, 0.8]) };
     const food = new Float32Array(MAX_FOOD * 3);
     const sig = new Float32Array(MAX_SIGNALS * 4);
     const mouse = new Float32Array(3);
@@ -462,15 +476,19 @@ void main() { o = vec4(1.0, 0.0, 0.0, 1.0); }`;
       mouse[0] = x * tw; mouse[1] = (1 - y) * th; mouse[2] = strength;
     }
 
-    // g: {x, y, w, h, r (corner radius), a (opacity), lx, ly (light direction, y up)} in CSS
-    // pixels, y down; or null when no window is open.
-    function setGlass(g) {
-      glass.alpha = g ? g.a : 0;
+    // g: {x, y, w, h, r (corner radius), a (opacity), dim (how much it darkens the field around
+    // it, 0.22 if left out), lx, ly (light direction, y up)} in CSS pixels, y down; or null for
+    // no pane. slot 0: a window or the sheet; slot 1: the header's name block.
+    function setGlass(g, slot = 0) {
+      const at = slot * 3;
+      glass.pane[at + 1] = g ? g.a : 0;
       if (!g) return;
-      glass.rect[0] = (g.x + g.w / 2) * k; glass.rect[1] = th - (g.y + g.h / 2) * k;
-      glass.rect[2] = g.w / 2 * k; glass.rect[3] = g.h / 2 * k;
-      glass.radius = g.r * k;
-      glass.light[0] = g.lx; glass.light[1] = g.ly;
+      const r = slot * 4;
+      glass.rect[r] = (g.x + g.w / 2) * k; glass.rect[r + 1] = th - (g.y + g.h / 2) * k;
+      glass.rect[r + 2] = g.w / 2 * k; glass.rect[r + 3] = g.h / 2 * k;
+      glass.pane[at] = g.r * k;
+      glass.pane[at + 2] = g.dim === undefined ? 0.22 : g.dim;
+      if (g.lx !== undefined) { glass.light[0] = g.lx; glass.light[1] = g.ly; }
     }
 
     // list: [{x, y, age (s), s (strength)}]
@@ -562,8 +580,8 @@ void main() { o = vec4(1.0, 0.0, 0.0, 1.0); }`;
       gl.uniform1f(prog.glow.u.exposure, P.exposure);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
-      // With a glass window open the field renders into `scene` first, then through the glass.
-      const glassOn = glass.alpha > 0.001;
+      // With a glass pane showing the field renders into `scene` first, then through the glass.
+      const glassOn = glass.pane[1] > 0.001 || glass.pane[4] > 0.001;
       gl.bindFramebuffer(gl.FRAMEBUFFER, glassOn ? scene.fb : null);
       gl.viewport(0, 0, tw, th);
       gl.useProgram(prog.render.p);
@@ -592,8 +610,7 @@ void main() { o = vec4(1.0, 0.0, 0.0, 1.0); }`;
       gl.uniform1i(ug.scene, 0);
       gl.uniform2f(ug.res, tw, th);
       gl.uniform4fv(ug.rect, glass.rect);
-      gl.uniform1f(ug.radius, glass.radius);
-      gl.uniform1f(ug.alpha, glass.alpha);
+      gl.uniform3fv(ug.pane, glass.pane);
       gl.uniform1f(ug.k, k);
       gl.uniform2fv(ug.light, glass.light);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);

@@ -152,6 +152,19 @@ body.poster.tall::before { background-image: url("img/poster-tall.jpg"); }
 }
 .role { margin: 10px 0 0; font-size: 15px; font-weight: 500; }
 .tags { margin: 4px 0 0; font-size: 13px; color: var(--muted); }
+/* The name block on a pane of liquid glass (drawn by the simulation, see updateGlass; frosted
+   CSS glass on a still field). Its three lines are fitted to one width by fitIdent(). */
+.ident-card {
+  display: inline-block; position: relative;
+  margin: -18px 0 0 -22px; padding: 18px 22px 16px;
+  border-radius: 22px;
+}
+.name, .role, .tags { white-space: nowrap; }
+body:not(.gl-glass) .ident-card {
+  background: rgba(16, 21, 26, 0.55);
+  -webkit-backdrop-filter: blur(22px) saturate(1.5); backdrop-filter: blur(22px) saturate(1.5);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), inset 0 0 0 1px rgba(255, 255, 255, 0.12), 0 18px 50px rgba(0, 0, 0, 0.45);
+}
 .nav { display: flex; gap: 22px; font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; }
 .nav a, .nav button { text-decoration: none; padding: 4px 0; border-bottom: 1px solid transparent; }
 .nav button[aria-pressed="true"] { border-bottom-color: var(--accent); }
@@ -701,6 +714,7 @@ body.tall .node .short, body.short .node .short {
 /* Phones turned sideways: a compact header */
 @media (max-height: 560px) and (orientation: landscape) {
   .top { padding: 14px 22px 0; }
+  .ident-card { margin: -10px 0 0 -14px; padding: 10px 14px 9px; border-radius: 16px; }
   .name { font-size: 26px; }
   .role { font-size: 12px; margin-top: 4px; }
   .tags { display: none; }
@@ -718,7 +732,8 @@ body.tall .node .short, body.short .node .short {
 
 /* Small screens */
 @media (max-width: 720px) {
-  .top { padding: 18px 18px 0; flex-direction: column; gap: 12px; }
+  .top { padding: 20px 20px 0; flex-direction: column; gap: 12px; }
+  .ident-card { margin: -12px 0 0 -12px; padding: 12px 14px 11px 12px; border-radius: 18px; }
   .top::before { width: 100%; height: 240px; }
   .name { font-size: 30px; }
   .role { font-size: 13px; margin-top: 6px; }

@@ -188,7 +188,35 @@
   const TALL_COLONIES = [[0.30, 0.12], [0.70, 0.48], [0.34, 0.84]]; // x, and y within the free area
   const SHORT_COLONIES = [[0.2, 0.15], [0.5, 0.6], [0.8, 0.15]];
 
+  // The name, the role and the tagline end on one vertical line, as they start on one. The
+  // name sets the width (on narrow screens the role does, kept at a readable size, and the
+  // name grows to match); the role is sized to it and the tagline tracked out to it, and
+  // what font sizes cannot reach exactly goes into the word spaces.
+  const LINE_MIN = 11; // px: the smallest the role and the tagline may get
+  function fitIdent() {
+    const name = topEl.querySelector(".name"), role = topEl.querySelector(".role"), tags = topEl.querySelector(".tags");
+    [name, role, tags].forEach(e => { e.style.fontSize = e.style.letterSpacing = e.style.wordSpacing = ""; });
+    const width = e => { const r = document.createRange(); r.selectNodeContents(e); return r.getBoundingClientRect().width; };
+    const size = e => parseFloat(getComputedStyle(e).fontSize);
+    const spaces = e => (e.textContent.match(/ /g) || []).length;
+    const shown = getComputedStyle(tags).display !== "none";
+    const W = Math.min(innerWidth - 48, Math.max(width(name), width(role) * LINE_MIN / size(role),
+      shown ? width(tags) * LINE_MIN / (size(tags) * 0.96) : 0)); // (0.96: room left for its tracking)
+    if (width(name) < W) name.style.fontSize = size(name) * W / width(name) + "px";
+    role.style.fontSize = size(role) * W / width(role) + "px";
+    [name, role].forEach(e => {
+      const gap = W - width(e);
+      if (Math.abs(gap) > 0.3 && spaces(e)) e.style.wordSpacing = gap / spaces(e) + "px";
+    });
+    if (shown) {
+      if (width(tags) > W) tags.style.fontSize = size(tags) * W * 0.96 / width(tags) + "px";
+      // tracking after every character but the last, so the last one ends at the line
+      tags.style.letterSpacing = (W - width(tags)) / (tags.textContent.length - 1) + "px";
+    }
+  }
+
   function layout() {
+    fitIdent(); // first: it sets the header's height
     // where the organism feeds now, to compare once the places are recomputed
     const fedBefore = sim && groups[0].fx !== undefined ? foodPoints() : null;
     const tall = innerHeight > innerWidth * 1.15;
@@ -394,7 +422,7 @@
 
   // The simulation draws the glass while it animates; otherwise CSS frosted glass.
   function glassMode() {
-    body.classList.toggle("gl-glass", !!sim && !still);
+    body.classList.toggle("gl-glass", !!sim && !still && !lost && !body.classList.contains("poster"));
   }
 
   function openWin(build, from) {
@@ -1078,33 +1106,43 @@
   }
 
   // The glass follows the on-screen box of the window, or else of the sheet, so it tracks
-  // their CSS animations. Its rim light turns toward the pointer.
+  // their CSS animations; a second pane sits under the header's name block and fades with the
+  // header. The rim light turns toward the pointer.
   const light = { x: -0.6, y: 0.8 };
-  function updateGlass() {
-    const pane = !win.hidden ? win : (sheetOpen || sheetMoving) ? sheet : null;
-    if (!pane || !body.classList.contains("gl-glass")) { sim.setGlass(null); return; }
-    const r = pane.getBoundingClientRect();
-    if (r.top >= innerHeight) { sim.setGlass(null); return; }
-    const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
-    if (mouse.x >= 0) {
-      light.x += (mouse.x - cx - light.x) * 0.15;
-      light.y += (cy - mouse.y - light.y) * 0.15;
-    }
-    const cs = getComputedStyle(pane);
-    sim.setGlass({
+  const identCard = topEl.querySelector(".ident-card");
+  function paneGlass(el, alpha, dim) {
+    const r = el.getBoundingClientRect();
+    if (alpha < 0.01 || r.width < 1 || r.top >= innerHeight) return null;
+    const cs = getComputedStyle(el);
+    return {
       x: r.left, y: r.top, w: r.width, h: r.height,
-      r: (parseFloat(cs.borderTopLeftRadius) || 30) * r.width / pane.offsetWidth,
-      a: parseFloat(cs.opacity),
-      lx: light.x, ly: light.y
-    });
+      r: (parseFloat(cs.borderTopLeftRadius) || 30) * r.width / el.offsetWidth,
+      a: alpha * parseFloat(cs.opacity), dim
+    };
+  }
+  function updateGlass() {
+    const glassy = body.classList.contains("gl-glass");
+    const pane = !win.hidden ? win : (sheetOpen || sheetMoving) ? sheet : null;
+    const main = glassy && pane ? paneGlass(pane, 1, 0.22) : null;
+    const ident = glassy ? paneGlass(identCard, parseFloat(getComputedStyle(topEl).opacity), 0) : null;
+    const lit = main || ident; // the light turns around the pane in front
+    if (lit && mouse.x >= 0) {
+      light.x += (mouse.x - (lit.x + lit.w / 2) - light.x) * 0.15;
+      light.y += ((lit.y + lit.h / 2) - mouse.y - light.y) * 0.15;
+    }
+    if (main) { main.lx = light.x; main.ly = light.y; }
+    if (ident) { ident.lx = light.x; ident.ly = light.y; }
+    sim.setGlass(main, 0);
+    sim.setGlass(ident, 1);
   }
 
-  // Still mode: grow a network for the current food and draw it once.
+  // Still mode: grow a network for the current food and draw it once (CSS glass then).
   function settle() {
     if (!sim || lost) return;
     feed(0.5);
     for (let i = 0; i < 400; i++) sim.step();
-    sim.setGlass(null);
+    sim.setGlass(null, 0);
+    sim.setGlass(null, 1);
     sim.render(0.5);
   }
 
@@ -1113,11 +1151,13 @@
     running = false;
     stepTween(true);
     abandoned = [];
+    glassMode();
     settle();
   }
 
   function showPoster(on) {
     body.classList.toggle("poster", on);
+    glassMode();
   }
 
   function startSim() {
