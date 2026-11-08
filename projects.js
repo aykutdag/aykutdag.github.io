@@ -232,6 +232,29 @@ window.PROJECTS = [
 
   // ---------- Research (İTÜ Architectural Design Computing; Bauhaus-Universität Weimar) ----------
   {
+    group: "research", glyph: "thesis", slug: "immaterial-architectural-space",
+    title: "Immaterial Architectural Space: A Pneumatic Modular System",
+    short: "Immaterial Space",
+    meta: "İTÜ · 2025–ongoing · M.Sc. thesis",
+    text: [
+      "This thesis asks whether the designed movement of a flexible material can be used to control perceived absence in an interior space. It proposes a pneumatic modular system modelled on the morphology of the lung: a branching air network, sized according to Murray’s Law, feeds a field of Voronoi cells that act like alveoli. The module is cast in soft silicone and restrained by a 3D-printed constraint network, so that air pressure supplied by a pump becomes a controlled change in the surface.",
+      "The research follows a Research through Design approach combined with material-based integrated computational design, in two phases. In the digital phase the module is generated in Grasshopper, inflated with particle-spring physics in Kangaroo 2 and optimised with multi-objective evolutionary search in Wallacei X. In the physical phase, FDM-printed negative moulds and TPU constraint networks are used to cast silicone modules, which are inflated and measured against the digital prediction.",
+      "When the module is inflated, its silicone membrane stretches and thins. More light passes through, and the surface seems to dissolve. The thesis asks whether this designed change can be used to control how present a wall or ceiling feels in an interior.",
+      "Three principles are taken from the lung: a branching air network sized by Murray’s Law, a cellular packing of soft chambers based on the alveoli, and a membrane whose thickness responds to pressure. Surfactant, gas exchange and self-repair are not transferred."
+    ],
+    credits: [
+      ["Project", "Immaterial Architectural Space: A Proposal for a Pneumatic Modular System"],
+      ["Programme", "M.Sc. Architectural Design Computing, Istanbul Technical University"],
+      ["Advisor", "Assoc. Prof. Dr. Sevil Yazıcı"],
+      ["Date", "2025–ongoing (final defence January 2027)"],
+      ["Type", "M.Sc. thesis"],
+      ["Tools", "Rhino, Grasshopper, Python, Kangaroo 2, Wallacei X, FDM printing (PLA, TPU), silicone casting"]
+    ],
+    duties: ["Research design and methodology", "Computational form-finding and optimisation", "Mould design and 3D printing", "Silicone casting, inflation tests and measurement"],
+    images: ["img/thesis-1.jpg", "img/thesis-2.jpg", "img/thesis-3.jpg", "img/thesis-4.jpg", "img/thesis-5.jpg", "img/thesis-6.jpg", "img/thesis-7.jpg", "img/thesis-8.jpg", "img/thesis-9.jpg", "img/thesis-10.jpg", "img/thesis-11.jpg", "img/thesis-12.jpg", "img/thesis-13.jpg", "img/thesis-14.jpg", "img/thesis-15.jpg"],
+    x: 0.80, y: 0.80
+  },
+  {
     group: "research", glyph: "stylegan", slug: "physarum-urban-generation-istanbul",
     title: "Physarum Urban Generation I: Istanbul",
     short: "Physarum Urban I",
