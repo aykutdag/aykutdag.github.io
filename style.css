@@ -448,6 +448,8 @@ body:not(.gl-glass) .win, body:not(.gl-glass) .sheet {
 .win .video video { object-fit: contain; background: #000; }
 /* a vertical (9:16) film: narrower, centred, so it does not fill the whole column */
 .win .video.portrait { width: min(100%, 340px); margin-left: auto; margin-right: auto; padding-bottom: min(177.78%, 604px); }
+/* a 3:4 film */
+.win .video.tall { width: min(100%, 400px); margin-left: auto; margin-right: auto; padding-bottom: min(133.33%, 533px); }
 .win dt { font-family: var(--mono); font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; padding-top: 2px; }
 .win dd { margin: 0; }
 .win p { font-size: 16px; line-height: 1.6; color: #d8e0e4; margin: 0 0 14px; max-width: 68ch; }

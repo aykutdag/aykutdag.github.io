@@ -52,8 +52,14 @@ def image_size(src):
         return im.size
 
 
+def poster(p):
+    film = p.get("film")
+    film = film[0] if isinstance(film, list) and film else film
+    return (film or {}).get("poster")
+
+
 def share_image(p):
-    src = (p.get("images") or [None])[0] or (p.get("film") or {}).get("poster") or "img/og.jpg"
+    src = (p.get("images") or [None])[0] or poster(p) or "img/og.jpg"
     return src, image_size(src)
 
 
@@ -131,7 +137,7 @@ def project_page(shell, p, group_label):
 
 def preview(p):
     """The project's preview image in img/thumb/ (made by thumbs()), or None."""
-    src = (p.get("images") or [None])[0] or (p.get("film") or {}).get("poster")
+    src = (p.get("images") or [None])[0] or poster(p)
     return "img/thumb/" + pathlib.Path(src).name if src else None
 
 
@@ -250,7 +256,7 @@ def thumbs(projects):
     out_dir.mkdir(exist_ok=True)
     made = 0
     for p in projects:
-        src = (p.get("images") or [None])[0] or (p.get("film") or {}).get("poster")
+        src = (p.get("images") or [None])[0] or poster(p)
         if not src:
             continue
         dst = out_dir / pathlib.Path(src).name

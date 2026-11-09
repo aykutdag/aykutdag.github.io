@@ -1,6 +1,8 @@
 // One-line diagrams for each project, drawn on a 48 × 48 grid (stroke only, no fill).
 // Each glyph abstracts the project's key diagram; replace freely with your own.
 window.GLYPHS = {
+  // Twin candle holder: two joined cups with soft rims and their flames
+  burca: '<path d="M8 41V21Q12 18 16 21T24 21V41Z"/><path d="M24 41V28Q28 25 32 28T40 28V41Z"/><path d="M16 15Q14 12 16 8Q18 12 16 15Z"/><path d="M32 22Q30 19 32 15Q34 19 32 22Z"/>',
   // Auditorium seating fan and stage
   sejong: '<path d="M8 32A16 16 0 0 1 40 32"/><path d="M13 32A11 11 0 0 1 35 32"/><path d="M18 32A6 6 0 0 1 30 32"/><path d="M16 38H32"/>',
   // Arena bowl with access axis

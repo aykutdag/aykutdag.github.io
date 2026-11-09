@@ -547,18 +547,19 @@
         box.append(f);
         media.append(box);
       }
-      if (p.film) {
-        const box = el("div", "video" + (p.film.portrait ? " portrait" : ""));
+      const films = [].concat(p.film || []);
+      films.forEach((fm, k) => {
+        const box = el("div", "video" + (fm.portrait ? " portrait" : "") + (fm.tall ? " tall" : ""));
         const v = document.createElement("video");
         v.controls = true;
         v.playsInline = true;
         v.preload = "none"; // nothing downloads until the visitor presses play
-        v.poster = p.film.poster;
-        v.src = p.film.src;
-        v.setAttribute("aria-label", p.title + " (video)");
+        v.poster = fm.poster;
+        v.src = fm.src;
+        v.setAttribute("aria-label", p.title + " (video" + (films.length > 1 ? " " + (k + 1) + " of " + films.length : "") + ")");
         box.append(v);
         media.append(box);
-      }
+      });
       // each image enlarges into the viewer
       const shots = p.images || [];
       shots.forEach((src, k) => {

@@ -103,6 +103,7 @@ with sync_playwright() as p:
             for k in range(n):
                 pg.evaluate(f"document.querySelectorAll('.node-item.shown .node')[{k}].click()")
                 pg.wait_for_timeout(400)
+                pg.evaluate("document.querySelectorAll('#win img').forEach(i => i.loading = 'eager')")  # lazy images far below the videos
                 pg.wait_for_function("[...document.querySelectorAll('#win img')].every(i => i.complete)", timeout=20000)
                 pg.wait_for_timeout(150)
                 title = pg.evaluate("document.getElementById('win-title').textContent").split("|")[0].strip()[:24]
@@ -114,6 +115,7 @@ with sync_playwright() as p:
         pg.evaluate("document.querySelector('[data-sort=year]').click()"); pg.wait_for_timeout(150)
         run(pg, "sheet by year", "sheet", problems)
         pg.evaluate("document.querySelector('.rows a.row').click()"); pg.wait_for_timeout(500)
+        pg.evaluate("document.querySelectorAll('#win img').forEach(i => i.loading = 'eager')")  # lazy images far below the videos
         pg.wait_for_function("[...document.querySelectorAll('#win img')].every(i => i.complete)", timeout=20000)
         run(pg, "window from the sheet", "window", problems)
         pg.evaluate("document.querySelector('.win-close').click()"); pg.wait_for_timeout(500)
@@ -122,6 +124,7 @@ with sync_playwright() as p:
         # a project's own page opens its project after Enter
         pg.goto(BASE.rstrip("/") + "/projects/khora/"); pg.wait_for_timeout(1200)
         pg.evaluate("document.getElementById('gate-enter').click()"); pg.wait_for_timeout(900)
+        pg.evaluate("document.querySelectorAll('#win img').forEach(i => i.loading = 'eager')")  # lazy images far below the videos
         pg.wait_for_function("[...document.querySelectorAll('#win img')].every(i => i.complete)", timeout=20000)
         if "KHORA" not in (pg.evaluate("(document.getElementById('win-title') || {}).textContent") or ""):
             problems.append("project page: /projects/khora/ did not open its project")

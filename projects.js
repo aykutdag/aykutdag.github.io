@@ -369,6 +369,39 @@ window.PROJECTS = [
     images: ["img/concrete-1.jpg", "img/concrete-2.jpg", "img/concrete-3.jpg", "img/concrete-4.jpg", "img/concrete-5.jpg", "img/concrete-6.jpg", "img/concrete-7.jpg", "img/concrete-8.jpg", "img/concrete-9.jpg", "img/concrete-10.jpg", "img/concrete-11.jpg", "img/concrete-12.jpg"],
     x: 0.52, y: 0.70
   },
+  {
+    group: "research", glyph: "burca", slug: "burca-design",
+    title: "BURÇA | Design Objects Brand",
+    short: "BURÇA",
+    meta: "Self-initiated · 2024 · Design objects brand",
+    text: [
+      "Burça is a small brand of design objects that we set up in 2024 to bring digital fabrication into everyday interiors. Its motto, “timeless designs shaped by 3D printers and stone”, names its two production lines: objects printed directly in PLA, and objects cast in stone powder from silicone moulds made on 3D-printed masters. Beyond the products, the work covered building the brand itself: its name and story, logo, colour palette, logo animation, product visuals and the Instagram page.",
+      "The meaning. In Turkic and Altaic mythology, Burça Han is the god of wealth and prosperity. He symbolises peace and well-being, and he is the son of the god Ülgen.",
+      "The story. Burça Han is the god who brings peace, abundance and prosperity to the earth. The root of the word, “Bur/Pur”, means wealth and abundance. Known in Turkic mythology as the son of Ülgen, he keeps nature and life in balance.",
+      "Why we chose it. Burça stands for the calm and elegance at the heart of our designs. Modern, refined objects shaped by inspiration from nature carry the power of mythology into your living spaces.",
+      "Candle holder, cast in stone powder. The soft, joined form of the two cups is modelled digitally and 3D-printed as a master. Silicone is poured around the master; once it cures, the master is removed, leaving a flexible mould that can be used again and again. A stone-powder mix is cast into the mould, and each piece keeps the fine pores and matte surface of stone.",
+      "Planter, FDM-printed PLA. The soft, folded form is modelled digitally and printed in PLA on an FDM printer, with the fine layer lines kept as the surface texture. Drainage holes in the base and a matching drip tray make it ready for indoor plants."
+    ],
+    credits: [
+      ["Brand", "Burça Design"],
+      ["Date", "2024"],
+      ["Type", "Self-initiated design objects brand"],
+      ["Products", "Twin candle holder (stone powder, cast in a silicone mould); planter (FDM-printed PLA)"],
+      ["Production", "3D modelling, FDM 3D printing, silicone mould making, casting"]
+    ],
+    duties: ["Brand concept, naming and identity (logo, colour palette)", "Product design and 3D modelling", "3D printing, silicone mould making and casting", "Logo animation, product visuals and social media content"],
+    film: [
+      { src: "media/burca-logo.mp4", poster: "img/burca-logo-poster.jpg", portrait: true },
+      { src: "media/burca-candle.mp4", poster: "img/burca-candle-poster.jpg", tall: true },
+      { src: "media/burca-planter.mp4", poster: "img/burca-planter-poster.jpg", tall: true },
+      { src: "media/burca-pair.mp4", poster: "img/burca-pair-poster.jpg", portrait: true },
+      { src: "media/burca-reel-candle.mp4", poster: "img/burca-reel-candle-poster.jpg", portrait: true },
+      { src: "media/burca-reel-planter.mp4", poster: "img/burca-reel-planter-poster.jpg", portrait: true }
+    ],
+    links: [{ label: "Instagram page", href: "https://www.instagram.com/burca.design/", icon: "instagram" }],
+    images: ["img/burca-1.jpg", "img/burca-2.jpg"],
+    x: 0.86, y: 0.24
+  },
 
   // ---------- Installations and media ----------
   {
